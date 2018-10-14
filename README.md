@@ -1,4 +1,4 @@
-# Clikr
+# clikr
 COS333 Project 
 ToDo:
 - Scaffholding
