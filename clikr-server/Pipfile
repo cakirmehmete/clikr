@@ -12,6 +12,7 @@ flask-script = "*"
 marshmallow = "*"
 flask-bcrypt = "*"
 pyjwt = "*"
+gunicorn = "*"
 
 [dev-packages]
 

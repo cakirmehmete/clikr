@@ -8,6 +8,7 @@ pipenv shell
 # Env
 export FLASK_ENV=development
 export DATABASE_URL=postgres://USER:PASS@HOST:PORT/DB_NAME
+export PORT=
 
 # Database
 1. Install Docker
