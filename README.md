@@ -7,7 +7,7 @@ pipenv shell
 
 # Env
 export FLASK_ENV=development
-export DATABASE_URL=postgres://name:password@localhost:32769/clikr_api_db
+export DATABASE_URL=postgres://USER:PASS@HOST:PORT/DB_NAME
 
 # Database
 1. Install Docker
@@ -16,3 +16,8 @@ export DATABASE_URL=postgres://name:password@localhost:32769/clikr_api_db
 4. Make sure to set POSTGRES_PASSWORD and POSTGRES_USER
 5. Copy down the 'Access URL' port
 6. Create a database: ```createdb -h localhost -p PORT -U USER DB_NAME```
+
+# Setup Database
+1. python manage.py db init
+2. python manage.py db migrate
+3. python manage.py db upgrade
