@@ -3,7 +3,7 @@
 ```
 pipenv --three
 pipenv shell
-```
+``` 
 
 # Env
 export FLASK_ENV=development
@@ -22,3 +22,8 @@ export PORT=
 1. python manage.py db init
 2. python manage.py db migrate
 3. python manage.py db upgrade
+
+# Deployment
+```
+git subtree split --branch heroku --prefix clikr-server/
+```
