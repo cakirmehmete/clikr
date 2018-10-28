@@ -1,5 +1,5 @@
 # clikr-server
-
+Getting started. Let's first get into a pipenv shell so we use the same python env.
 ```
 pipenv --three
 pipenv shell
