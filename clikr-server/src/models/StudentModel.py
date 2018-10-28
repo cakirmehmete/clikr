@@ -13,7 +13,7 @@ class StudentModel(db.Model):
 
   id = db.Column(db.Integer, primary_key=True)
   netId = db.Column(db.String(128), nullable=False)
-  firstName = db.Column(db.String(128), unique=True, nullable=False)
+  firstName = db.Column(db.String(128), nullable=False)
   lastName = db.Column(db.String(128), nullable=False)
   created_at = db.Column(db.DateTime)
   modified_at = db.Column(db.DateTime)
