@@ -27,3 +27,10 @@ export PORT=
 ```
 git subtree split --branch heroku --prefix clikr-server/
 ```
+
+# Python style guide
+* function names: ```get_all_students()```
+* variable names: ```first_name```
+* constants: ```MAX_ANSWER_OPTIONS```
+* class names: ```StudentModel```
+* indent using 4 spaces
