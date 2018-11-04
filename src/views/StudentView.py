@@ -58,7 +58,7 @@ def login():
     # check if student exists in DB
     student = StudentModel.get_student_by_netId(netId)
     if not student:
-        return custom_response({'error': 'invalid user'}, 400)
+        return custom_response({'error': 'invalid user'}, 400) # FIXME: returns null token if user doesn't exist
 
     token = Auth.generate_token(netId, 'student')
     return custom_response({'api-token': token}, 200)
