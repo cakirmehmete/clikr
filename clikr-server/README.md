@@ -32,8 +32,8 @@ git subtree split --branch heroku --prefix clikr-server/
 # How to test the API
 1. make sure docker and the postgres image are running
 2. ```cd``` to ```clikr-server``` and make sure you're in the virtual environment: ```pipenv shell```
-3. make sure your DB is up to date: ```python manage.py db upgrade```
-4. export all the required environment variables (see above)
+3. export all the required environment variables (see above)
+4. make sure your DB is up to date: ```python manage.py db upgrade```
 5. run the server: ```python run.py```
 6. start Postman
 7. create students/profs using the /admin prefix
