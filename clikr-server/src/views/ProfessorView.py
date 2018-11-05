@@ -191,7 +191,7 @@ def login():
         return custom_response({'error': 'invalid user'}, 400)
 
     token = Auth.generate_token(netId, 'professor')
-    return custom_response({'api-token': token}, 200)
+    return custom_response({'x-access-token': token}, 200)
 
 def custom_response(res, status_code):
     """
