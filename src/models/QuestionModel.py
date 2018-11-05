@@ -22,6 +22,7 @@ class QuestionModel(db.Model):
     question_text = db.Column(db.String(1024), nullable=True)
     correct_answer = db.Column(db.String(1024), nullable=True)
     creator_id = db.Column(db.String(36), db.ForeignKey('professors.id'))  # TODO: on update, on delete behavior
+    is_open = db.Column(db.Boolean, nullable=False, default=False)
     opened_at = db.Column(db.DateTime, nullable=True)
     closed_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime)
@@ -44,6 +45,7 @@ class QuestionModel(db.Model):
         self.question_title = data.get('question_title')
         self.question_text = data.get('question_text')
         self.creator_id = data.get('creator_id')
+        self.is_open = False
         self.opened_at = None
         self.closed_at = None
         timestamp = datetime.datetime.utcnow()
@@ -121,6 +123,7 @@ class QuestionSchema(Schema):
     question_title = fields.Str()
     question_text = fields.Str()
     creator_id = fields.Str()
+    is_open = fields.Bool(dump_only=True)
     opened_at = fields.DateTime(dump_only=True)
     closed_at = fields.DateTime(dump_only=True)
     created_at = fields.DateTime(dump_only=True)

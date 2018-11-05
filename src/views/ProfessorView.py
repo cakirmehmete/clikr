@@ -2,6 +2,7 @@
 
 from flask import request, json, Response, Blueprint
 import uuid
+import datetime
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
@@ -108,9 +109,9 @@ def create_lecture(current_user, course_id):
     lecture_data = lecture_schema.dump(lecture).data
     return custom_response({'message': 'lecture created', 'id': lecture_data['id'], 'course_id': lecture_data['course_id']}, 200)
 
-@professor_api.route('/courses/<course_id>/lectures/<lecture_id>/questions', methods=['GET']) # TODO: the part '/courses/<course_id>/ is not necessary
+@professor_api.route('/lectures/<lecture_id>/questions', methods=['GET'])
 @Auth.professor_token_required
-def get_questions(current_user, course_id, lecture_id):
+def get_questions(current_user, lecture_id):
     """
     Returns all questions for a lecture
     """
@@ -129,9 +130,9 @@ def get_questions(current_user, course_id, lecture_id):
     question_data = question_schema.dump(questions, many=True).data
     return custom_response(question_data, 200)
 
-@professor_api.route('/courses/<course_id>/lectures/<lecture_id>/questions', methods=['POST'])  # TODO: the part '/courses/<course_id>/ is not necessary
+@professor_api.route('/lectures/<lecture_id>/questions', methods=['POST']) 
 @Auth.professor_token_required
-def create_question(current_user, course_id, lecture_id):
+def create_question(current_user, lecture_id):
     """
     Create a new question in a lecture
     """
@@ -174,6 +175,60 @@ def create_question(current_user, course_id, lecture_id):
     # prepare response
     question_data = question_schema.dump(question).data
     return custom_response({'message': 'question created', 'id': question_data['id'], 'lecture_id': question_data['lecture_id'], 'question_type': question_data['question_type']}, 201)
+
+@professor_api.route('/questions/<question_id>', methods=['POST'])
+@Auth.professor_token_required
+def handle_question_action(current_user, question_id):
+    # retrieve question and check if valid
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # get data from request body
+    req_data = request.get_json()
+
+    # call the appropriate handler
+    action = req_data['action']
+    if action == 'open':
+        return _open_question(current_user, question, course)
+    elif action == 'close':
+        return _close_question(current_user, question, course)
+    else:
+        return custom_response({'error': 'invalid action'}, 400)
+
+def _open_question(current_user, question, course):
+    # check if question is opened already
+    if question.is_open:
+        return custom_response({'error': 'question is open already'}, 400)
+    
+    # open the question (note that that questions can be opened and closed multiple times)
+    updated_data = {
+        'is_open': True,
+        'opened_at': datetime.datetime.utcnow(),
+        'closed_at': None
+    }
+    question.update(updated_data)
+
+    return custom_response({'message': 'question opened'}, 200)
+
+def _close_question(current_user, question, course):
+    # check if question is open
+    if not question.is_open:
+        return custom_response({'error': 'question is not open'}, 400)
+
+    # close the question
+    updated_data = {
+        'is_open': False,
+        'closed_at': datetime.datetime.utcnow()
+    }
+    question.update(updated_data)
+
+    return custom_response({'message': 'question closed'}, 200)
 
 @professor_api.route('/login', methods=['POST'])
 def login():
