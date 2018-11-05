@@ -20,9 +20,9 @@ def create_app(env_name):
   app.config.from_object(app_config[env_name])
   db.init_app(app)
 
-  app.register_blueprint(student_blueprint, url_prefix='/api/v1/students')
-  app.register_blueprint(professor_blueprint, url_prefix='/api/v1/professors')
-  app.register_blueprint(admin_blueprint, url_prefix='/api/v1/admins')
+  app.register_blueprint(student_blueprint, url_prefix='/api/v1/student')
+  app.register_blueprint(professor_blueprint, url_prefix='/api/v1/professor')
+  app.register_blueprint(admin_blueprint, url_prefix='/api/v1/admin')
 
   @app.route('/', methods=['GET'])
   def index():

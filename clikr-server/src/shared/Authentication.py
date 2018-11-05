@@ -37,7 +37,7 @@ class Auth():
             token = None
 
             if 'x-access-token' in request.headers:
-                token = request.headers['x-acess-token']
+                token = request.headers['x-access-token']
 
             if not token:
                 return jsonify({'message' : 'Token is missing!'}), 401
