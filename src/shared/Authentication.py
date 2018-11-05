@@ -36,8 +36,8 @@ class Auth():
         def decorated(*args, **kwargs):
             token = None
 
-            if 'api-token' in request.headers:
-                token = request.headers['api-token']
+            if 'x-access-token' in request.headers:
+                token = request.headers['x-acess-token']
 
             if not token:
                 return jsonify({'message' : 'Token is missing!'}), 401
@@ -63,8 +63,8 @@ class Auth():
         def decorated(*args, **kwargs):
             token = None
 
-            if 'api-token' in request.headers:
-                token = request.headers['api-token']
+            if 'x-access-token' in request.headers:
+                token = request.headers['x-access-token']
 
             if not token:
                 return jsonify({'message' : 'Token is missing!'}), 401

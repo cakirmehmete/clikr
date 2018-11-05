@@ -61,7 +61,7 @@ def login():
         return custom_response({'error': 'invalid user'}, 400) # FIXME: returns null token if user doesn't exist
 
     token = Auth.generate_token(netId, 'student')
-    return custom_response({'api-token': token}, 200)
+    return custom_response({'x-acess-token': token}, 200)
 
 def custom_response(res, status_code):
     """
