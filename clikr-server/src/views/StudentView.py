@@ -4,12 +4,14 @@ from flask import request, json, Response, Blueprint
 import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
+from ..models.QuestionModel import QuestionModel, QuestionSchema
 from ..models import db
 from ..shared.Authentication import Auth
 
 student_api = Blueprint('students', __name__)
 student_schema = StudentSchema()
 course_schema = CourseSchema()
+question_schema = QuestionSchema()
 
 @student_api.route('/courses', methods=['GET'])
 @Auth.student_token_required
@@ -45,6 +47,26 @@ def enroll_in_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
 
+@student_api.route('/courses/<course_id>/questions', methods=['GET'])
+@Auth.student_token_required
+def get_open_questions(current_user, course_id):
+    """
+    returns all open questions for this course
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check permissions (enrollment)
+    if not current_user in course.students:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # query database and return result
+    open_questions = QuestionModel.query.filter_by(is_open=True)
+    question_data = question_schema.dump(open_questions, many=True).data
+    return custom_response(question_data, 200)
+
 @student_api.route('/login', methods=['POST'])
 def login():
     """
@@ -61,7 +83,7 @@ def login():
         return custom_response({'error': 'invalid user'}, 400) # FIXME: returns null token if user doesn't exist
 
     token = Auth.generate_token(netId, 'student')
-    return custom_response({'api-token': token}, 200)
+    return custom_response({'x-acess-token': token}, 200)
 
 def custom_response(res, status_code):
     """

@@ -38,7 +38,7 @@ git subtree split --branch heroku --prefix clikr-server/
 6. start Postman
 7. create students/profs using the /admin prefix
 8. log in as a prof/student using professors/login or students/login
-9. add the returned token to the header ```api-token``` in every subsequent request
+9. add the returned token to the header ```x-access-token``` in every subsequent request
 
 # Python style guide
 * function names: ```get_all_students()```
