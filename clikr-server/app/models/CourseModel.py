@@ -1,30 +1,32 @@
-# src/models/LectureModel.py
+# src/models/CourseModel.py
 
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
-class LectureModel(db.Model):
+class CourseModel(db.Model):
     """
-    Lecture Model
+    Course Model
     """
 
     # table name
-    __tablename__ = 'lectures'
+    __tablename__ = 'courses'
 
     # columns
     id = db.Column(db.String(36), primary_key=True) # uuid
-    course_id = db.Column(db.String(36), db.ForeignKey('courses.id')) # TODO: on update, on delete behavior
-    date = db.Column(db.Date, nullable=True)
-    title = db.Column(db.String(256), nullable=True)
+    dept = db.Column(db.String(128), nullable=False)    # TODO: courses can be listed in multiple deptartments
+    coursenum = db.Column(db.Integer, nullable=False)   # TODO: same
+    title = db.Column(db.String(256), nullable=False)
     description = db.Column(db.String(1024), nullable=True)
+    year = db.Column(db.Integer, nullable=True)
+    term = db.Column(db.String(32), nullable=True)
     creator_id = db.Column(db.String(36), db.ForeignKey('professors.id'))  # TODO: on update, on delete behavior
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
 
     # relationships
-    questions = db.relationship('QuestionModel', backref='lecture', lazy=True)
+    lectures = db.relationship('LectureModel', backref='course', lazy=True)
 
     # class constructor
     def __init__(self, data):
@@ -32,10 +34,12 @@ class LectureModel(db.Model):
         Class constructor
         """
         self.id = str(uuid.uuid4())
-        self.course_id = data.get('course_id')
-        self.date = data.get('date')
+        self.dept = data.get('dept')
+        self.coursenum = data.get('coursenum')
         self.title = data.get('title')
         self.description = data.get('description')
+        self.year = data.get('year')
+        self.term = data.get('term')
         self.creator_id = data.get('creator_id')
         timestamp = datetime.datetime.utcnow()
         self.created_at = timestamp
@@ -56,25 +60,27 @@ class LectureModel(db.Model):
         db.session.commit()
 
     @staticmethod
-    def get_all_lectures():
-        return LectureModel.query.all()
+    def get_all_courses():
+        return CourseModel.query.all()
 
     @staticmethod
-    def get_lecture_by_uuid(value):
-        return LectureModel.query.filter_by(id=value).first()
+    def get_course_by_uuid(value):
+        return CourseModel.query.filter_by(id=value).first()
 
     def __repr__(self):
-        return '<Lecture(id {})>'.format(self.id)
+        return '<Course(title {})>'.format(self.title)
 
-class LectureSchema(Schema):
+class CourseSchema(Schema):
     """
-    Lecture Schema
+    Course Schema
     """
     id = fields.Str(dump_only=True)
-    course_id = fields.Str(required=True)
-    date = fields.Date()
-    title = fields.Str()
+    dept = fields.Str(required=True)
+    coursenum = fields.Str(required=True)
+    title = fields.Str(required=True)
     description = fields.Str()
+    year = fields.Integer()
+    term = fields.Str()
     creator_id = fields.Str()
     created_at = fields.DateTime(dump_only=True)
     modified_at = fields.DateTime(dump_only=True)

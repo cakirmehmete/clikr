@@ -5,7 +5,7 @@ import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
-from ..models import db
+from .. import db
 from ..shared.Authentication import Auth
 
 student_api = Blueprint('students', __name__)
