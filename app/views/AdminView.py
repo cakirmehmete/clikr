@@ -8,7 +8,7 @@ from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
-from ..models import db
+from .. import db
 from ..shared.Authentication import Auth
 
 admin_api = Blueprint('admins', __name__)

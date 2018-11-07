@@ -1,23 +1,22 @@
-# src/models/ProfessorModel.py
-
+# src/models/StudentModel.py
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
-# helper table for the many-to-many relationship courses_profs
-courses_profs = db.Table('courses_profs',
+# helper table for the many-to-many relationship courses-students
+courses_students = db.Table('courses_students',
     db.Column('course_id', db.String(36), db.ForeignKey('courses.id'), primary_key=True),
-    db.Column('professor_id', db.String(36), db.ForeignKey('professors.id'), primary_key=True)
+    db.Column('student_id', db.String(36), db.ForeignKey('students.id'), primary_key=True)
 )
 
-class ProfessorModel(db.Model):
+class StudentModel(db.Model):
     """
-    Professor Model
+    Student Model
     """
 
     # table name
-    __tablename__ = 'professors'
+    __tablename__ = 'students'
 
     # columns
     id = db.Column(db.String(36), primary_key=True) # uuid
@@ -28,8 +27,7 @@ class ProfessorModel(db.Model):
     modified_at = db.Column(db.DateTime)
 
     # relationships
-    created_courses = db.relationship('CourseModel', backref='creator', lazy=True) # TODO: is lazy really the best option here?
-    courses = db.relationship('CourseModel', secondary=courses_profs, lazy=True, backref='professors')
+    courses = db.relationship('CourseModel', secondary=courses_students, lazy=True, backref='students')
 
     # class constructor
     def __init__(self, data):
@@ -59,23 +57,23 @@ class ProfessorModel(db.Model):
         db.session.commit()
 
     @staticmethod
-    def get_all_professors():
-        return ProfessorModel.query.all()
+    def get_all_students():
+        return StudentModel.query.all()
 
     @staticmethod
-    def get_professor_by_netId(value):
-        return ProfessorModel.query.filter_by(netId=value).first()
+    def get_student_by_netId(value):
+        return StudentModel.query.filter_by(netId=value).first()
 
     @staticmethod
-    def get_professor_by_uuid(value):
-        return ProfessorModel.query.filter_by(id=value).first()
+    def get_student_by_uuid(value):
+        return StudentModel.query.filter_by(id=value).first()
 
     def __repr__(self):
-        return '<Professor(netId {})>'.format(self.netId)
+        return '<Student(netId {})>'.format(self.netId)
 
-class ProfessorSchema(Schema):
+class StudentSchema(Schema):
     """
-    Professor Schema
+    Student Schema
     """
     id = fields.Str(dump_only=True)
     netId = fields.Str(required=True)
