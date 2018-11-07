@@ -3,7 +3,7 @@
 
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
 class QuestionModel(db.Model):
