@@ -122,6 +122,7 @@ class QuestionSchema(Schema):
     question_type = fields.Str(required=True)
     question_title = fields.Str()
     question_text = fields.Str()
+    correct_answer = fields.Str()
     creator_id = fields.Str()
     is_open = fields.Bool(dump_only=True)
     opened_at = fields.DateTime(dump_only=True)

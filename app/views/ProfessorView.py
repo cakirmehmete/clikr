@@ -10,6 +10,8 @@ from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoice
 from .. import db
 from ..shared.Authentication import Auth
 
+from .. import socketio
+
 professor_api = Blueprint('professors', __name__)
 professor_schema = ProfessorSchema()
 course_schema = CourseSchema()
@@ -214,6 +216,17 @@ def _open_question(current_user, question, course):
     }
     question.update(updated_data)
 
+    # push question to students using socketIO
+    socketio.emit('server message', 'question ' + question.id + ' has been opened!', room=course.id)
+
+    if question.question_type == 'multiple_choice':
+        detailed_schema = MultipleChoiceSchema(exclude=['correct_answer'])  # TODO: maybe separate schemas to send questions to students vs. to profs?
+    elif question.question_type == 'free_text':
+        detailed_schema = FreeTextSchema(exclude=['correct_answer'])
+    
+    detailed_data = detailed_schema.dump(question).data
+    socketio.emit('question opened', detailed_data, room=course.id)
+    
     return custom_response({'message': 'question opened'}, 200)
 
 def _close_question(current_user, question, course):
@@ -227,6 +240,8 @@ def _close_question(current_user, question, course):
         'closed_at': datetime.datetime.utcnow()
     }
     question.update(updated_data)
+
+    socketio.emit('server message', 'question ' + question.id + ' has been closed!', room=course.id)
 
     return custom_response({'message': 'question closed'}, 200)
 

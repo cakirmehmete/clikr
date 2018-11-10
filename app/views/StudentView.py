@@ -8,10 +8,18 @@ from ..models.QuestionModel import QuestionModel, QuestionSchema
 from .. import db
 from ..shared.Authentication import Auth
 
+from flask_socketio import send, emit, join_room
+from .. import socketio
+
 student_api = Blueprint('students', __name__)
 student_schema = StudentSchema()
 course_schema = CourseSchema()
 question_schema = QuestionSchema()
+
+@socketio.on('subscribe')
+def on_join(course_id):
+    join_room(course_id)
+    emit('server message', 'you joined the room ' + course_id)
 
 @student_api.route('/courses', methods=['GET'])
 @Auth.student_token_required
