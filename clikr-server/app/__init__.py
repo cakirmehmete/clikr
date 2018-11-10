@@ -2,13 +2,13 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from flask_socketio import SocketIO
+from flask_socketio import SocketIO
 
 from .config import app_config
 
 # flask extensions
 db = SQLAlchemy()
-# socketio = SocketIO()
+socketio = SocketIO()
 
 # import models such that they are registered with sqlalchemy
 from .models.StudentModel import StudentModel, StudentSchema
@@ -28,7 +28,7 @@ def create_app(env_name):
     
     # initialize flask extensions
     db.init_app(app)
-    # socketio.init_app(app)
+    socketio.init_app(app)
 
     # register blueprints
     from .views.StudentView import student_api as student_blueprint
