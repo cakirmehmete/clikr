@@ -40,12 +40,12 @@ def enroll_in_course(current_user):
     enrolls the current student in a course
     """
     req_data = request.get_json()
-    enroll_code = req_data.get("enroll_code")
+    course_id = req_data.get("course_id")
 
     # retrieve course and check if valid
-    course = CourseModel.get_course_by_code(enroll_code)
+    course = CourseModel.get_course_by_uuid(course_id)
     if not course:
-        return custom_response({'error': 'invalid enrollment code'}, 400)
+        return custom_response({'error': 'course_id does not exist'}, 400)
     if course in current_user.courses:
         return custom_response({'error': 'already enrolled in this course'}, 400)
 
@@ -155,7 +155,7 @@ def submit_answer(current_user, question_id):
 @student_api.route('/login', methods=['POST'])
 def login():
     """
-    Does not provide authentication at the moment!
+    Does not provide authentication at the moment! 
     Its only purpose is to obtain a jwt token for a student, which is used to identify the user in subsequent API calls.
     """
     # for testing purposes, the user only needs to supply his netId (no password required)

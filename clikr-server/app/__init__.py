@@ -42,7 +42,6 @@ def create_app(env_name):
     app.register_blueprint(admin_blueprint, url_prefix='/api/v1/admin')
 
     CORS(app)
-
     @app.route('/', methods=['GET'])
     def index():
         """
