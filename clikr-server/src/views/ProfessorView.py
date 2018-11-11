@@ -53,6 +53,37 @@ def create_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
 
+@admin_api.route('/courses/<course_id>', methods=['GET'])
+def get_course_info():
+
+
+@admin_api.route('/courses/<course_id>', methods=['POST'])
+def add_professor():
+    """
+    add professor to a course
+    """
+    req_data = request.get_json()
+    data, error = professor_schema.load(req_data)
+
+    if error:
+        return custom_response(error, 400)
+
+@admin_api.route('/courses/<course_id>/code', methods=['GET'])
+def get_enrollment_code(current_user, course_id):
+    """
+    gives course an enrollment code
+    """
+    course = CourseModel.get_course_by_uuid(course_id)
+
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    enroll_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    course['enroll_code'] = enroll_code
+    
+    return custom_response(enroll_code, 200)
+
 @professor_api.route('/courses/<course_id>/lectures', methods=['GET'])
 @Auth.professor_token_required
 def get_lectures(current_user, course_id):
@@ -175,6 +206,10 @@ def create_question(current_user, lecture_id):
     # prepare response
     question_data = question_schema.dump(question).data
     return custom_response({'message': 'question created', 'id': question_data['id'], 'lecture_id': question_data['lecture_id'], 'question_type': question_data['question_type']}, 201)
+
+@professor_api.route('/questions/<question_id>', methods=['GET'])
+@Auth.professor_token_required
+def
 
 @professor_api.route('/questions/<question_id>', methods=['POST'])
 @Auth.professor_token_required
