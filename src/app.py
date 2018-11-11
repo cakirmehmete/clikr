@@ -1,6 +1,7 @@
 #src/app.py
 
 from flask import Flask
+from flask_cors import CORS
 
 from .config import app_config
 from .models import db
@@ -23,6 +24,8 @@ def create_app(env_name):
   app.register_blueprint(student_blueprint, url_prefix='/api/v1/student')
   app.register_blueprint(professor_blueprint, url_prefix='/api/v1/professor')
   app.register_blueprint(admin_blueprint, url_prefix='/api/v1/admin')
+
+  CORS(app)
 
   @app.route('/', methods=['GET'])
   def index():
