@@ -7,6 +7,7 @@ from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema
+from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
 
@@ -19,6 +20,7 @@ lecture_schema = LectureSchema()
 question_schema = QuestionSchema()
 multiple_choice_schema = MultipleChoiceSchema()
 free_text_schema = FreeTextSchema()
+answer_schema = AnswerSchema()
 
 @professor_api.route('/courses', methods=['GET'])
 @Auth.professor_token_required
@@ -178,9 +180,31 @@ def create_question(current_user, lecture_id):
     question_data = question_schema.dump(question).data
     return custom_response({'message': 'question created', 'id': question_data['id'], 'lecture_id': question_data['lecture_id'], 'question_type': question_data['question_type']}, 201)
 
+@professor_api.route('/questions/<question_id>/answers', methods=['GET'])
+@Auth.professor_token_required
+def get_answers(current_user, question_id):
+    """
+    returns all student answers for this question
+    """
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # retrieve answers and return
+    answer_data = answer_schema.dump(question.answers, many=True).data
+    return custom_response(answer_data, 200)
+
 @professor_api.route('/questions/<question_id>', methods=['POST'])
 @Auth.professor_token_required
 def handle_question_action(current_user, question_id):
+    """
+    open or close this question
+    """
     # retrieve question and check if valid
     question = QuestionModel.get_question_by_uuid(question_id)
     if not question:

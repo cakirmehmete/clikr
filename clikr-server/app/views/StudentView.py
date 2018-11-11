@@ -5,6 +5,7 @@ import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
+from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
 
@@ -15,6 +16,7 @@ student_api = Blueprint('students', __name__)
 student_schema = StudentSchema()
 course_schema = CourseSchema()
 question_schema = QuestionSchema()
+answer_schema = AnswerSchema()
 
 @socketio.on('subscribe')
 def on_join(course_id):
@@ -74,6 +76,81 @@ def get_open_questions(current_user, course_id):
     open_questions = QuestionModel.query.filter_by(is_open=True)
     question_data = question_schema.dump(open_questions, many=True).data
     return custom_response(question_data, 200)
+
+@student_api.route('/questions/<question_id>', methods=['GET'])
+@Auth.student_token_required
+def get_answer(current_user, question_id):
+    """
+    get the previously submitted answer to this question
+    """
+    # retrieve question and check if valid
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question_id does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.students:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # retrieve previous answer
+    answer = AnswerModel.query.filter_by(question_id=question_id, student_id=current_user.id).first()
+    if not answer:
+        return custom_response({'error': 'no previous answer found'}, 400)
+    
+    answer_data = answer_schema.dump(answer).data
+    return custom_response(answer_data, 200)
+
+@student_api.route('/questions/<question_id>', methods=['POST'])
+@Auth.student_token_required
+def submit_answer(current_user, question_id):
+    """
+    submit an answer to the question
+    """
+    # retrieve question and check if valid
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question_id does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.students:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # check if question is open
+    if not question.is_open:
+        return custom_response({'error': 'question is not open'}, 400)
+
+    # get data from request body
+    req_data = request.get_json()
+    req_data['student_id'] = current_user.id
+    req_data['question_id'] = question_id
+    data, error = answer_schema.load(req_data)
+
+    if error:
+        return custom_response({'error': error}, 400)
+
+    # check if student has already answered this question
+    answer = AnswerModel.query.filter_by(question_id=question_id, student_id=current_user.id).first()
+    print(answer)
+    if answer:
+        # update existing answer
+        answer.update(data)
+        message = 'answer updated'
+    else:
+        # create new answer
+        answer = AnswerModel(data)
+        answer.save()
+
+        # add the answer to this question's list of answers and this student's list of answers
+        question.answers.append(answer)
+        current_user.answers.append(answer)
+        db.session.commit()
+        message = 'answer created'
+
+    # prepare response
+    answer_data = answer_schema.dump(answer).data
+    return custom_response({'message': message, 'id': answer_data['id'], 'question_id': answer_data['question_id']}, 200)
 
 @student_api.route('/login', methods=['POST'])
 def login():
