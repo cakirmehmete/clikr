@@ -9,6 +9,7 @@ import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import { observer, inject } from 'mobx-react';
+import Button from '@material-ui/core/Button';
 
 const drawerWidth = 240;
 
@@ -65,19 +66,11 @@ const ProfessorHome = inject("classStore")(observer(class ProfessorHome extends 
                     <div className={this.classes.toolbar} />
                     <Divider />
                     <List>
-                        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                            <ListItem button key={text}>
-                                <ListItemText primary={text} />
-                            </ListItem>
-                        ))}
-                    </List>
-                    <Divider />
-                    <List>
-                        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                            <ListItem button key={text}>
-                                <ListItemText primary={text} />
-                            </ListItem>
-                        ))}
+                        {this.props.classStore.classes.map(function (classObj, index) {
+                            return (<ListItem button key={index} >
+                                <ListItemText primary={classObj.name} />
+                            </ListItem>)
+                        })}
                     </List>
                 </Drawer>
                 <main className={this.classes.content}>
@@ -85,13 +78,15 @@ const ProfessorHome = inject("classStore")(observer(class ProfessorHome extends 
                         Courses
                 </Typography>
                     <List component="nav">
-                        <ListItem button>
-                            <ListItemText primary={this.props.classStore.classes[0].name} />
-                        </ListItem>
-                        <ListItem button>
-                            <ListItemText primary="Drafts" />
-                        </ListItem>
+                        {this.props.classStore.classes.map(function (classObj, index) {
+                            return (<ListItem button key={index} >
+                                <ListItemText primary={classObj.name} />
+                            </ListItem>)
+                        })}
                     </List>
+                    <Button variant="outlined" color="primary" className={this.classes.button}>
+                        Add Class
+                    </Button>
                 </main>
             </div>
         );
