@@ -31,8 +31,8 @@ const styles = theme => ({
     },
     toolbar: theme.mixins.toolbar,
     content: {
+        marginLeft: drawerWidth,
         flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
         padding: theme.spacing.unit * 3,
     },
 });
@@ -75,15 +75,19 @@ function ProfessorHome(props) {
                     ))}
                 </List>
             </Drawer>
-            Courses
+            <main className={classes.content}>
+                <Typography variant="h6" color="inherit">
+                    Courses
+                </Typography>
                 <List component="nav">
-                <ListItem button>
-                    <ListItemText primary="Inbox" />
-                </ListItem>
-                <ListItem button>
-                    <ListItemText primary="Drafts" />
-                </ListItem>
-            </List>
+                    <ListItem button>
+                        <ListItemText primary="Inbox" />
+                    </ListItem>
+                    <ListItem button>
+                        <ListItemText primary="Drafts" />
+                    </ListItem>
+                </List>
+            </main>
         </div>
     );
 }
