@@ -3,6 +3,7 @@
 from flask import request, json, Response, Blueprint
 import uuid
 import datetime
+import random, string
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
@@ -53,6 +54,24 @@ def create_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
 
+@professor_api.route('/courses/<course_id>/code', methods=['GET'])
+@Auth.professor_token_required
+def get_enrollment_code(current_user, course_id):
+    """
+    get a (new) enrollment code for the course
+    """
+    course = CourseModel.get_course_by_uuid(course_id)
+
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    enroll_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    updated_data = {'enroll_code' : enroll_code}
+    course.update(updated_data)
+
+    return custom_response({'message': 'code created', 'enroll_code': enroll_code}, 200)
+
 @professor_api.route('/courses/<course_id>/lectures', methods=['GET'])
 @Auth.professor_token_required
 def get_lectures(current_user, course_id):
@@ -68,7 +87,7 @@ def get_lectures(current_user, course_id):
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
-    
+
     # retrieve and return lectures
     lectures = course.lectures
     lecture_data = lecture_schema.dump(lectures, many=True).data
@@ -119,18 +138,18 @@ def get_questions(current_user, lecture_id):
     lecture = LectureModel.get_lecture_by_uuid(lecture_id)
     if not lecture:
         return custom_response({'error': 'lecture does not exist'}, 400)
-    
+
     # retrieve course and check permissions
     course = lecture.course
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
-    
+
     # retrieve questions and return
     questions = lecture.questions
     question_data = question_schema.dump(questions, many=True).data
     return custom_response(question_data, 200)
 
-@professor_api.route('/lectures/<lecture_id>/questions', methods=['POST']) 
+@professor_api.route('/lectures/<lecture_id>/questions', methods=['POST'])
 @Auth.professor_token_required
 def create_question(current_user, lecture_id):
     """
@@ -140,12 +159,12 @@ def create_question(current_user, lecture_id):
     lecture = LectureModel.get_lecture_by_uuid(lecture_id)
     if not lecture:
         return custom_response({'error': 'lecture does not exist'}, 400)
-    
+
     # retrieve course and check permissions
     course = lecture.course
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
-    
+
     # get data from request body
     req_data = request.get_json()
     req_data['creator_id'] = current_user.id
@@ -156,7 +175,7 @@ def create_question(current_user, lecture_id):
     if question_type == 'multiple_choice':
         data, error = multiple_choice_schema.load(req_data)
         if error:
-            return custom_response(error, 400) 
+            return custom_response(error, 400)
         question = MultipleChoiceModel(data)
     elif question_type == 'free_text':
         data, error = free_text_schema.load(req_data)
@@ -205,7 +224,7 @@ def _open_question(current_user, question, course):
     # check if question is opened already
     if question.is_open:
         return custom_response({'error': 'question is open already'}, 400)
-    
+
     # open the question (note that that questions can be opened and closed multiple times)
     updated_data = {
         'is_open': True,
@@ -233,7 +252,7 @@ def _close_question(current_user, question, course):
 @professor_api.route('/login', methods=['POST'])
 def login():
     """
-    Does not provide authentication at the moment! 
+    Does not provide authentication at the moment!
     Its only purpose is to obtain a jwt token for a prof, which is used to identify the user in subsequent API calls.
     """
     # for testing purposes, the user only needs to supply his netId (no password required)
