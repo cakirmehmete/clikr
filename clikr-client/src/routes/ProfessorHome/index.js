@@ -41,8 +41,7 @@ const styles = theme => ({
 const ProfessorHome = inject("classStore")(observer(class ProfessorHome extends React.Component {
     constructor(props) {
         super(props)
-        this.classes = props
-        console.log(props)
+        this.classes = props.classes
     }
 
     render() {
