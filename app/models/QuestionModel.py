@@ -28,6 +28,9 @@ class QuestionModel(db.Model):
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
 
+    # relationships
+    answers = db.relationship('AnswerModel', backref='question', lazy=True)
+
     # for inheritance
     __mapper_args__ = {
         'polymorphic_on': question_type,
