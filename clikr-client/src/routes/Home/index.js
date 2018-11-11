@@ -4,6 +4,7 @@ import './style.css'; // Not our preferred way of importing style
 import Button from '@material-ui/core/Button'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import ProfessorHome from '../ProfessorHome/'
+import { Switch } from '@material-ui/core';
 
 class Home extends Component {
   render() {
@@ -11,10 +12,10 @@ class Home extends Component {
       <div>
         <header>
           <Router>
-            <div>
+            <Switch>
               <Route exact path="/student" />
               <Route path="/professor" component={ProfessorHome} />
-            </div>
+            </Switch>
           </Router>
         </header>
       </div>
