@@ -10,6 +10,7 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import { observer, inject } from 'mobx-react';
 import Button from '@material-ui/core/Button';
+import APIService from '../../services/APIService';
 
 const drawerWidth = 240;
 
@@ -43,6 +44,11 @@ const ProfessorHome = inject("classStore")(observer(class ProfessorHome extends 
     constructor(props) {
         super(props)
         this.classes = props.classes
+        this.apiService = new APIService()
+    }
+
+    componentDidMount() {
+        this.props.classStore.loadClasses()
     }
 
     render() {
