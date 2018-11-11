@@ -5,7 +5,9 @@ import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import { baseURL } from '../../constants/api';
+import APIService from '../../services/APIService';
+import ClassObj from '../../models/ClassObj';
+import { observer, inject } from 'mobx-react';
 
 function getModalStyle() {
     const top = 50;
@@ -43,13 +45,18 @@ const styles = theme => ({
     },
 });
 
-class AddCourseModal extends React.Component {
+const AddCourseModal = inject("classStore")(observer(class AddCourseModal extends React.Component {
     state = {
         open: false,
         name: '',
         coursenum: '',
         dept: ''
     };
+
+    constructor(props) {
+        super(props)
+        this.apiService = new APIService()
+    }
 
     handleChange = name => event => {
         this.setState({
@@ -67,7 +74,9 @@ class AddCourseModal extends React.Component {
 
     handleSubmit = () => {
         // Send course to API
-
+        this.apiService.addCourse(new ClassObj(this.state.name, this.state.coursenum, this.state.dept, null))
+        // Make sure to update the courses
+        this.props.classStore.loadClasses()
         // Close modal 
         this.setState({ open: false });
     }
@@ -84,7 +93,7 @@ class AddCourseModal extends React.Component {
                     onClose={this.handleClose}
                 >
                     <div style={getModalStyle()} className={classes.paper}>
-                        <Typography variant="h6" id="modal-title">
+                        <Typography variant="h6">
                             Add Course
                         </Typography>
                         <form className={classes.container} noValidate autoComplete="off">
@@ -119,7 +128,7 @@ class AddCourseModal extends React.Component {
             </div>
         );
     }
-}
+}))
 
 AddCourseModal.propTypes = {
     classes: PropTypes.object.isRequired,

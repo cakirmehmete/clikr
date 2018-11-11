@@ -14,7 +14,7 @@ export default class ClassStore {
 
   async loadClasses() {
     const data = await this.apiService.getClassesAPI();
-
+    this.classes = [];
     (data).forEach(element => {
       this.addClass(new ClassObj(element.title, null))
     });

@@ -21,7 +21,18 @@ export default class APIService {
         axios.defaults.headers.common['x-access-token'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImF3ZXNvbWVwcm9mIiwicm9sZSI6InByb2Zlc3NvciIsImV4cCI6MTU0MTk5Nzc0MH0.jvoDM5yLj0qePZQ5w__JWs-u3npZNgFzhJFtQmv18lU'
         // Call Server to get classes
         const res = await axios.get(baseURL + '/api/v1/professor/courses')
-        
+
+        return await res.data;
+    }
+
+    async addCourse(course) {
+        // Call Server to get classes
+        const res = await axios.post(baseURL + '/api/v1/professor/courses', {
+            coursenum: course.num,
+            title: course.name,
+            dept: course.dept
+        })
+
         return await res.data;
     }
 }
