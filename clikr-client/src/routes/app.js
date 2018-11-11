@@ -7,8 +7,9 @@ import createHistory from 'history/createBrowserHistory';
 import Home from "./Home";
 import Login from "./Login";
 import StudentDashboard from './StudentDashboard'
+import StudentAddCourse from './StudentAddCourse'
 
-import typeographytheme from '../components/Themes/typeographytheme';
+import typeographytheme from '../constants/Themes/typeographytheme';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 
 const history = createHistory();
@@ -22,6 +23,7 @@ class App extends Component {
                         <Route exact path="/" component={Home} />
                         <Route path="/student/login" component={Login} />
                         <Route path="/student/dashboard" component={StudentDashboard} />
+                        <Route path="/student/addcourse" component={StudentAddCourse} />
                     </Switch>
                 </Router>
             </MuiThemeProvider>

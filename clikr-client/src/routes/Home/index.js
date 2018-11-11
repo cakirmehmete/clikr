@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './style.css'; // Not our preferred way of importing style
 import Button from '@material-ui/core/Button';
-import colortheme from '../../components/Themes/colortheme';
+import colortheme from '../../constants/Themes/colortheme';
 import HomePageHeader from '../../components/Header/HomePageHeader';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 
