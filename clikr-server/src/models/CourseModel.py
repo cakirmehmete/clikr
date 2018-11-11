@@ -24,6 +24,7 @@ class CourseModel(db.Model):
     creator_id = db.Column(db.String(36), db.ForeignKey('professors.id'))  # TODO: on update, on delete behavior
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
+    enroll_code = db.Column(db.String(8), nullable=True)
 
     # relationships
     lectures = db.relationship('LectureModel', backref='course', lazy=True)
