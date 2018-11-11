@@ -45,6 +45,7 @@ class CourseModel(db.Model):
         timestamp = datetime.datetime.utcnow()
         self.created_at = timestamp
         self.modified_at = timestamp
+        self.enroll_code = None
 
     def save(self):
         db.session.add(self)
@@ -68,6 +69,10 @@ class CourseModel(db.Model):
     def get_course_by_uuid(value):
         return CourseModel.query.filter_by(id=value).first()
 
+    @staticmethod
+    def get_course_by_code(value):
+        return CourseModel.query.filter_by(enroll_code=value).first()
+
     def __repr__(self):
         return '<Course(title {})>'.format(self.title)
 
@@ -85,3 +90,4 @@ class CourseSchema(Schema):
     creator_id = fields.Str()
     created_at = fields.DateTime(dump_only=True)
     modified_at = fields.DateTime(dump_only=True)
+    enroll_code = fields.Str(dump_only=True)
