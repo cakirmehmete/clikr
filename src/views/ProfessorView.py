@@ -73,12 +73,25 @@ def create_course(current_user):
 
 
 # @professor_api.route('/courses/<course_id>', methods=['POST'])
-# def add_professor():
+# def add_professor(course_id):
 #     """
-#     add professor to a course
+#     add professor to a course by adding a course to the professor's courses
 #     """
 #     req_data = request.get_json()
 #     data, error = professor_schema.load(req_data)
+#
+#     course = CourseModel.get_course_by_uuid(course_id)
+#
+#     # check if professor already part of course
+#     professor = ProfessorModel.get_professor_by_netId(data.get('netId'))
+#     if course in professor.courses:
+#         return custom_response({'error': 'already professor in this course'}, 400)
+#
+#
+#
+#     professor_data = professor_schema.dump(professor).data
+#
+#     return custom_response({'message': 'professor created', 'id': professor_data.get('id')}, 201)
 #
 #     if error:
 #         return custom_response(error, 400)
