@@ -1,11 +1,14 @@
-import {observable, action} from 'mobx-react';
-import {ClassObj} from '../models/ClassObj';
+import { observable, action, decorate } from "mobx";
+import ClassObj from '../models/ClassObj';
 
 export default class ClassStore {
-    @observable classes = [new ClassObj("Test", "adasdasd")];
+    classes = [new ClassObj("Test", "adasdasd")];
 
-    @action
     addClass(classObj) {
       this.classes.push(classObj)
     }
   }
+  decorate(ClassStore, {
+    classes: observable,
+    addClass: action
+  });
