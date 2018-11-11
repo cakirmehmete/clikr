@@ -28,13 +28,13 @@ def create_professor():
 
     if error:
         return custom_response(error, 400)
-    
+
     # check if professor already exists in the db
     professor_in_database = ProfessorModel.get_professor_by_netId(data.get('netId'))
     if professor_in_database:
         message = {'error': 'Professor already exists, please supply another netId'}
         return custom_response(message, 400)
-    
+
     professor = ProfessorModel(data)
     professor.save()
 
@@ -58,13 +58,13 @@ def create_student():
 
     if error:
         return custom_response(error, 400)
-    
+
     # check if student already exists in the db
     student_in_database = StudentModel.get_student_by_netId(data.get('netId'))
     if student_in_database:
         message = {'error': 'Student already exists, please supply another netId'}
         return custom_response(message, 400)
-    
+
     student = StudentModel(data)
     student.save()
 
