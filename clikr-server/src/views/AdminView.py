@@ -48,17 +48,6 @@ def get_professors():
     professor_data = professor_schema.dump(professors, many=True).data
     return custom_response(professor_data, 200)
 
-@admin_api.route('/courses', methods=['GET'])
-def get_admin_courses():
-    """
-    Returns all courses that the current prof is admin for
-    """
-    courses = current_user.courses
-    for course in courses:
-        
-    course_data = course_schema.dump(courses, many=True).data
-    return custom_response(course_data, 200)
-
 @admin_api.route('/students', methods=['POST'])
 def create_student():
     """

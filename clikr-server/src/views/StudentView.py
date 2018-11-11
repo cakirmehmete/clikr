@@ -35,7 +35,7 @@ def enroll_in_course(current_user):
     # retrieve course and check if valid
     course = CourseModel.get_course_by_code(enroll_code)
     if not course:
-        return custom_response({'error': 'nonexistent enrollment code'}, 400)
+        return custom_response({'error': 'invalid enrollment code'}, 400)
     if course in current_user.courses:
         return custom_response({'error': 'already enrolled in this course'}, 400)
 
