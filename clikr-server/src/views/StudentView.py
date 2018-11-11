@@ -70,7 +70,7 @@ def get_open_questions(current_user, course_id):
 @student_api.route('/login', methods=['POST'])
 def login():
     """
-    Does not provide authentication at the moment! 
+    Does not provide authentication at the moment!
     Its only purpose is to obtain a jwt token for a student, which is used to identify the user in subsequent API calls.
     """
     # for testing purposes, the user only needs to supply his netId (no password required)

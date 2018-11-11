@@ -28,13 +28,13 @@ def create_professor():
 
     if error:
         return custom_response(error, 400)
-    
+
     # check if professor already exists in the db
     professor_in_database = ProfessorModel.get_professor_by_netId(data.get('netId'))
     if professor_in_database:
         message = {'error': 'Professor already exists, please supply another netId'}
         return custom_response(message, 400)
-    
+
     professor = ProfessorModel(data)
     professor.save()
 
@@ -48,6 +48,17 @@ def get_professors():
     professor_data = professor_schema.dump(professors, many=True).data
     return custom_response(professor_data, 200)
 
+@admin_api.route('/courses', methods=['GET'])
+def get_admin_courses():
+    """
+    Returns all courses that the current prof is admin for
+    """
+    courses = current_user.courses
+    for course in courses:
+        
+    course_data = course_schema.dump(courses, many=True).data
+    return custom_response(course_data, 200)
+
 @admin_api.route('/students', methods=['POST'])
 def create_student():
     """
@@ -58,13 +69,13 @@ def create_student():
 
     if error:
         return custom_response(error, 400)
-    
+
     # check if student already exists in the db
     student_in_database = StudentModel.get_student_by_netId(data.get('netId'))
     if student_in_database:
         message = {'error': 'Student already exists, please supply another netId'}
         return custom_response(message, 400)
-    
+
     student = StudentModel(data)
     student.save()
 
