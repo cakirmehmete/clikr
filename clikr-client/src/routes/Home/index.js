@@ -1,30 +1,31 @@
 import React, { Component } from 'react';
-import logo from '../../assets/logo.svg';
 import './style.css'; // Not our preferred way of importing style
-import Button from '../../components/Button'
+import Button from '@material-ui/core/Button';
+import colortheme from '../../components/Themes/colortheme';
+import HomePageHeader from '../../components/Header/HomePageHeader';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+
 
 class Home extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <Button text="Test 123" />
-        </header>
-      </div>
-    );
-  }
-}
+
+
+      handleClick = (e) => {
+          this.props.history.replace('/student/login')
+      }
+  
+
+    render() {
+        return (
+            <MuiThemeProvider theme={colortheme}>
+            <HomePageHeader/>
+            <div style={{display: 'flex', justifyContent:'center', alignItems:'center', height: '50vh'}}>
+                <Button size="large" color='secondary' onClick={this.handleClick}>Student Login</Button>
+                <Button size="large" color='secondary'>Instructor Login</Button>
+            </div>
+            </MuiThemeProvider>
+            
+            );
+        }
+    }
 
 export default Home;
