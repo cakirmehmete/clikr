@@ -28,6 +28,7 @@ class StudentModel(db.Model):
 
     # relationships
     courses = db.relationship('CourseModel', secondary=courses_students, lazy=True, backref='students')
+    answers = db.relationship('AnswerModel', backref='answers', lazy=True)
 
     # class constructor
     def __init__(self, data):
