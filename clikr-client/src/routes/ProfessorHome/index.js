@@ -9,8 +9,8 @@ import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import { observer, inject } from 'mobx-react';
-import Button from '@material-ui/core/Button';
 import APIService from '../../services/APIService';
+import AddCourseModalWrapped from '../../components/addCourseModal';
 
 const drawerWidth = 240;
 
@@ -90,9 +90,7 @@ const ProfessorHome = inject("classStore")(observer(class ProfessorHome extends 
                             </ListItem>)
                         })}
                     </List>
-                    <Button variant="outlined" color="primary" className={this.classes.button}>
-                        Add Class
-                    </Button>
+                    <AddCourseModalWrapped></AddCourseModalWrapped>
                 </main>
             </div>
         );
