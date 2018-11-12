@@ -40,12 +40,12 @@ def enroll_in_course(current_user):
     enrolls the current student in a course
     """
     req_data = request.get_json()
-    course_id = req_data.get("course_id")
+    enroll_code = req_data.get("enroll_code")
 
     # retrieve course and check if valid
-    course = CourseModel.get_course_by_uuid(course_id)
+    course = CourseModel.get_course_by_code(enroll_code)
     if not course:
-        return custom_response({'error': 'course_id does not exist'}, 400)
+        return custom_response({'error': 'invalid enrollment code'}, 400)
     if course in current_user.courses:
         return custom_response({'error': 'already enrolled in this course'}, 400)
 
