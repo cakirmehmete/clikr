@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import logo from '../../assets/logo.svg';
 import './style.css'; // Not our preferred way of importing style
-import Button from '@material-ui/core/Button'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ProfessorHome from '../ProfessorHome/'
-import { Switch } from '@material-ui/core';
+import {Provider} from 'mobx-react';
+import ClassStore from '../../stores/ClassStore';
 
 class Home extends Component {
   render() {
@@ -14,7 +13,9 @@ class Home extends Component {
           <Router>
             <Switch>
               <Route exact path="/student" />
-              <Route path="/professor" component={ProfessorHome} />
+              <Provider classStore={new ClassStore()}>
+                <Route path="/professor" component={ProfessorHome} />
+              </Provider>
             </Switch>
           </Router>
         </header>
