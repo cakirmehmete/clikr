@@ -58,23 +58,6 @@ def create_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
 
-@professor_api.route('/courses/<course_id>', methods=['GET'])
-@Auth.professor_token_required
-def get_course_info(current_user, course_id):
-    """
-    self.id = str(uuid.uuid4())
-    self.dept = data.get('dept')
-    self.coursenum = data.get('coursenum')
-    self.title = data.get('title')
-    self.description = data.get('description')
-    self.year = data.get('year')
-    self.term = data.get('term')
-    self.creator_id = data.get('creator_id')
-    timestamp = datetime.datetime.utcnow()
-    self.created_at = timestamp
-    self.modified_at = timestamp
-    """
-
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
 @Auth.professor_token_required
