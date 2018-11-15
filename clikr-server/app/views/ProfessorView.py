@@ -48,6 +48,10 @@ def create_course(current_user):
         return custom_response(error, 400)
 
     course = CourseModel(data)
+
+    # generate enrollment code and save to database
+    enroll_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    course.enroll_code = enroll_code
     course.save()
 
     # add the course to the prof's list of courses
@@ -57,6 +61,35 @@ def create_course(current_user):
     # prepare response
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
+
+@professor_api.route('/courses/<course_id>', methods=['POST'])
+@Auth.professor_token_required
+def add_professor(current_user, course_id):
+    """
+    add professor to an existing course
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    req_data = request.get_json()
+    new_professor_netId = req_data.get("netId")
+
+    # check if professor already part of course
+    new_professor = ProfessorModel.get_professor_by_netId(new_professor_netId)
+    if new_professor in course.professors:
+        return custom_response({'error': 'already teaching this course'}, 400)
+
+    # append new prof to the course's list of professors
+    course.professors.append(new_professor)
+    db.session.commit()
+
+    return custom_response({'message': 'professor added to course', 'netId': new_professor_netId}, 201)
 
 @professor_api.route('/courses/<course_id>/code', methods=['GET'])
 @Auth.professor_token_required
