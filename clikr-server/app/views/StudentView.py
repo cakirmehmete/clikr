@@ -7,6 +7,7 @@ from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
+from .. import cas
 from ..shared.Authentication import Auth
 
 from flask_socketio import send, emit, join_room

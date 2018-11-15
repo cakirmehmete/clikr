@@ -6,10 +6,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 
 from .config import app_config
+from .shared.CASClient import CASClient
 
 # flask extensions
 db = SQLAlchemy()
 socketio = SocketIO()
+
+# CAS authentication
+cas = CASClient()   # TODO: should use env variable for CAS server
 
 # import models such that they are registered with sqlalchemy
 from .models.StudentModel import StudentModel, StudentSchema
