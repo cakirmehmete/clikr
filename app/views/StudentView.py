@@ -1,13 +1,12 @@
 #/src/views/StudentView
 
-from flask import request, json, Response, Blueprint
+from flask import request, json, Response, Blueprint, session, redirect, render_template
 import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
-from .. import db
-from .. import cas
+from .. import db, cas
 from ..shared.Authentication import Auth
 
 from flask_socketio import send, emit, join_room
@@ -170,6 +169,12 @@ def login():
 
     token = Auth.generate_token(netId, 'student')
     return custom_response({'x-acess-token': token}, 200)
+
+@student_api.route('/logincas', methods=['GET'])
+def login_cas():
+    username = cas.authenticate(request, redirect, session)
+
+    return render_template('login_test.html', username=username)
 
 def custom_response(res, status_code):
     """

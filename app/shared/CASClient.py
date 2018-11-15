@@ -8,6 +8,7 @@
 #-----------------------------------------------------------------------------------
 
 import urllib, re
+from flask import session, request, redirect
 
 class CASClient:
     
@@ -30,16 +31,16 @@ class CASClient:
     # valid, return the user's username; otherwise, return None.
     def validate(self, ticket, request):
         val_url = self.cas_url + 'validate' + \
-            '?service=' + urllib.quote(self.strip_ticket(request)) + \
-            '&ticket=' + urllib.quote(ticket)
-        r = urllib.urlopen(val_url).readlines() # returns 2 lines # TODO: only for Princeton CAS or always?
+            '?service=' + urllib.parse.quote(self.strip_ticket(request)) + \
+            '&ticket=' + urllib.parsequote(ticket)
+        r = urllib.request.urlopen(val_url).readlines() # returns 2 lines # TODO: only for Princeton CAS or always?
         if len(r) == 2 and re.match('yes', r[0]) != None:
             return r[1].strip()
         return None
 
     # Authenticate the remote user, and return the user's username.
     # Do not return unless the user is successfully authenticated.
-    def authenticate(self, request, redirect, session):
+    def authenticate(self):
         # If the user's username is in the session, then the user was
         # authenticated previously. So return the user's username.
         username = session.get('username')
@@ -60,9 +61,19 @@ class CASClient:
         # The request does not contain a valid login ticket, so
         # redirect the browser to the login page to get one.
         login_url = self.cas_url + 'login' + \
-            '?server=' + urllib.quote(self.strip_ticket(request))
+            '?server=' + urllib.parse.quote(self.strip_ticket(request))
 
-        redirect(login_url)
+        return redirect(login_url)
+
+    def cas_required(function):
+    @wraps(function)
+    def wrap(*args, **kwargs):
+        if 'username' not in session:
+            session['CAS_AFTER_LOGIN_SESSION_URL'] = request.path
+            return login()
+        else:
+            return function(*args, **kwargs)
+    return wrap
 
 def main():
     print('CASClient does not run standalone')
