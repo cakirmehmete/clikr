@@ -1,10 +1,13 @@
 import React from 'react'
 import styles from './Button.module.css'
+import Button from '@material-ui/core/Button'
 
-export default class Button extends React.Component {
+export default class ButtonTest extends React.Component {
   render() {
     return (
-      <button className={styles.red}>{this.props.text}</button>
+      <Button variant="contained" color="primary">
+        Go to Professor Page
+      </Button>
     )
   }
 }

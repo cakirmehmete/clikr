@@ -1,7 +1,7 @@
 # src/models/StudentModel.py
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
 # helper table for the many-to-many relationship courses-students
@@ -28,6 +28,7 @@ class StudentModel(db.Model):
 
     # relationships
     courses = db.relationship('CourseModel', secondary=courses_students, lazy=True, backref='students')
+    answers = db.relationship('AnswerModel', backref='answers', lazy=True)
 
     # class constructor
     def __init__(self, data):

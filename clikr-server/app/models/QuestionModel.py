@@ -3,7 +3,7 @@
 
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
 class QuestionModel(db.Model):
@@ -27,6 +27,9 @@ class QuestionModel(db.Model):
     closed_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
+
+    # relationships
+    answers = db.relationship('AnswerModel', backref='question', lazy=True)
 
     # for inheritance
     __mapper_args__ = {
@@ -122,6 +125,7 @@ class QuestionSchema(Schema):
     question_type = fields.Str(required=True)
     question_title = fields.Str()
     question_text = fields.Str()
+    correct_answer = fields.Str()
     creator_id = fields.Str()
     is_open = fields.Bool(dump_only=True)
     opened_at = fields.DateTime(dump_only=True)
