@@ -8,8 +8,11 @@ from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema
-from ..models import db
+from ..models.AnswerModel import AnswerModel, AnswerSchema
+from .. import db
 from ..shared.Authentication import Auth
+
+from .. import socketio
 
 professor_api = Blueprint('professors', __name__)
 professor_schema = ProfessorSchema()
@@ -18,6 +21,7 @@ lecture_schema = LectureSchema()
 question_schema = QuestionSchema()
 multiple_choice_schema = MultipleChoiceSchema()
 free_text_schema = FreeTextSchema()
+answer_schema = AnswerSchema()
 
 @professor_api.route('/courses', methods=['GET'])
 @Auth.professor_token_required
@@ -58,7 +62,6 @@ def create_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
 
-
 @professor_api.route('/courses/<course_id>', methods=['POST'])
 @Auth.professor_token_required
 def add_professor(current_user, course_id):
@@ -92,7 +95,7 @@ def add_professor(current_user, course_id):
 @Auth.professor_token_required
 def get_enrollment_code(current_user, course_id):
     """
-    gives course an enrollment code
+    get a (new) enrollment code for the course
     """
     course = CourseModel.get_course_by_uuid(course_id)
 
@@ -104,7 +107,7 @@ def get_enrollment_code(current_user, course_id):
     updated_data = {'enroll_code' : enroll_code}
     course.update(updated_data)
 
-    return custom_response(updated_data, 200)
+    return custom_response({'message': 'code created', 'enroll_code': enroll_code}, 200)
 
 @professor_api.route('/courses/<course_id>/lectures', methods=['GET'])
 @Auth.professor_token_required
@@ -229,13 +232,31 @@ def create_question(current_user, lecture_id):
     question_data = question_schema.dump(question).data
     return custom_response({'message': 'question created', 'id': question_data['id'], 'lecture_id': question_data['lecture_id'], 'question_type': question_data['question_type']}, 201)
 
-# @professor_api.route('/questions/<question_id>', methods=['GET'])
-# @Auth.professor_token_required
-# def
+@professor_api.route('/questions/<question_id>/answers', methods=['GET'])
+@Auth.professor_token_required
+def get_answers(current_user, question_id):
+    """
+    returns all student answers for this question
+    """
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # retrieve answers and return
+    answer_data = answer_schema.dump(question.answers, many=True).data
+    return custom_response(answer_data, 200)
 
 @professor_api.route('/questions/<question_id>', methods=['POST'])
 @Auth.professor_token_required
 def handle_question_action(current_user, question_id):
+    """
+    open or close this question
+    """
     # retrieve question and check if valid
     question = QuestionModel.get_question_by_uuid(question_id)
     if not question:
@@ -271,6 +292,17 @@ def _open_question(current_user, question, course):
     }
     question.update(updated_data)
 
+    # push question to students using socketIO
+    socketio.emit('server message', 'question ' + question.id + ' has been opened!', room=course.id)
+
+    if question.question_type == 'multiple_choice':
+        detailed_schema = MultipleChoiceSchema(exclude=['correct_answer'])  # TODO: maybe separate schemas to send questions to students vs. to profs?
+    elif question.question_type == 'free_text':
+        detailed_schema = FreeTextSchema(exclude=['correct_answer'])
+    
+    detailed_data = detailed_schema.dump(question).data
+    socketio.emit('question opened', detailed_data, room=course.id)
+    
     return custom_response({'message': 'question opened'}, 200)
 
 def _close_question(current_user, question, course):
@@ -284,6 +316,8 @@ def _close_question(current_user, question, course):
         'closed_at': datetime.datetime.utcnow()
     }
     question.update(updated_data)
+
+    socketio.emit('server message', 'question ' + question.id + ' has been closed!', room=course.id)
 
     return custom_response({'message': 'question closed'}, 200)
 

@@ -2,7 +2,7 @@
 
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
 # helper table for the many-to-many relationship courses_profs
