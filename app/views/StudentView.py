@@ -8,6 +8,7 @@ from ..models.QuestionModel import QuestionModel, QuestionSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db, cas
 from ..shared.Authentication import Auth
+from ..shared.CASClient import CASClient
 
 from flask_socketio import send, emit, join_room
 from .. import socketio
@@ -172,9 +173,18 @@ def login():
 
 @student_api.route('/logincas', methods=['GET'])
 def login_cas():
-    username = cas.authenticate(request, redirect, session)
+    auth_response = cas.authenticate()
 
-    return render_template('login_test.html', username=username)
+    if isinstance(auth_response, str):
+        return render_template('login_test.html', username=session['username'])
+    else:
+        return auth_response
+
+@student_api.route('/secure', methods=['GET'])
+@cas.cas_required
+def secure():
+    return render_template('login_test.html', username=session['username'])
+
 
 def custom_response(res, status_code):
     """

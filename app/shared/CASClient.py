@@ -9,6 +9,7 @@
 
 import urllib, re
 from flask import session, request, redirect
+from functools import wraps
 
 class CASClient:
     
@@ -29,17 +30,17 @@ class CASClient:
 
     # Validate a login ticket by contacting the CAS server. If
     # valid, return the user's username; otherwise, return None.
-    def validate(self, ticket, request):
+    def validate(self, ticket):
         val_url = self.cas_url + 'validate' + \
             '?service=' + urllib.parse.quote(self.strip_ticket(request)) + \
-            '&ticket=' + urllib.parsequote(ticket)
+            '&ticket=' + urllib.parse.quote(ticket)
         r = urllib.request.urlopen(val_url).readlines() # returns 2 lines # TODO: only for Princeton CAS or always?
-        if len(r) == 2 and re.match('yes', r[0]) != None:
-            return r[1].strip()
+        if len(r) == 2 and re.match('yes', r[0].decode('utf-8')) != None:
+            return r[1].decode('utf-8').strip()
         return None
 
     # Authenticate the remote user, and return the user's username.
-    # Do not return unless the user is successfully authenticated.
+    # If authentication fails, return None.
     def authenticate(self):
         # If the user's username is in the session, then the user was
         # authenticated previously. So return the user's username.
@@ -51,29 +52,35 @@ class CASClient:
         # validate it.
         ticket = request.values.get('ticket')
         if ticket:
-            username = self.validate(ticket, request)
+            username = self.validate(ticket)
             if username:
                 # The user is authenticated, so store the user's
                 # username in the session.
                 session['username'] = username
                 return username
 
-        # The request does not contain a valid login ticket, so
-        # redirect the browser to the login page to get one.
-        login_url = self.cas_url + 'login' + \
-            '?server=' + urllib.parse.quote(self.strip_ticket(request))
+        # The request does not contain a valid login ticket
+        return None
 
+    def return_redirect(self):
+        print('in return_redirect()')
+        print('request.url = ' + request.url)
+        print('after strip_ticket: ' + self.strip_ticket(request))
+        login_url = self.cas_url + 'login' + \
+        '?service=' + urllib.parse.quote(self.strip_ticket(request))
         return redirect(login_url)
 
-    def cas_required(function):
-    @wraps(function)
-    def wrap(*args, **kwargs):
-        if 'username' not in session:
-            session['CAS_AFTER_LOGIN_SESSION_URL'] = request.path
-            return login()
-        else:
-            return function(*args, **kwargs)
-    return wrap
+    def cas_required(self, function):
+        print('in cas_required()')
+        @wraps(function)
+        def wrap(*args, **kwargs):
+            username = self.authenticate()
+            if not username:
+                print('not username')
+                return self.return_redirect()
+            else:
+                return function(*args, **kwargs)
+        return wrap
 
 def main():
     print('CASClient does not run standalone')
