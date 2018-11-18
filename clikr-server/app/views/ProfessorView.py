@@ -58,9 +58,10 @@ def create_course(current_user):
     current_user.courses.append(course)
     db.session.commit()
 
-    # prepare response
-    course_data = course_schema.dump(course).data
-    return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
+    # response returns all courses
+    all_courses = current_user.courses
+    all_courses_data = course_schema.dump(all_courses, many=True).data
+    return custom_response({'message': 'course created', 'id': course.id, 'courses': all_courses_data}, 201)
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
 @Auth.professor_token_required
