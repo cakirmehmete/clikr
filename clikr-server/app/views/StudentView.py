@@ -209,7 +209,7 @@ def login():
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login_student.html')
     else:
         netId = request.form.get('netId')
 
@@ -222,7 +222,15 @@ def login():
         session['username'] = netId
         session['role'] = 'student'
 
-        return render_template('logged_in.html', role=session['role'], netId=session['username'])
+        service_url = request.args.get('service')
+
+        if service_url:
+            print('redirecting to' + service_url)
+            return redirect(service_url)
+        else:
+            return render_template('logged_in.html', role=session['role'], netId=session['username'])
+            
+
 
 @student_api.route('/logincas', methods=['GET'])
 def login_cas():
