@@ -93,7 +93,7 @@ def add_professor(current_user, course_id):
     return custom_response({'message': 'professor added to course', 'netId': new_professor_netId}, 201)
 
 @professor_api.route('/courses/<course_id>', methods=['DELETE'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def delete_course(current_user, course_id):
     """
     delete this course
@@ -188,7 +188,7 @@ def create_lecture(current_user, course_id):
     return custom_response({'message': 'lecture created', 'id': lecture_data['id'], 'course_id': lecture_data['course_id']}, 200)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['DELETE'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def delete_lecture(current_user, lecture_id):
     """
     delete this lecture
@@ -274,7 +274,7 @@ def create_question(current_user, lecture_id):
     return custom_response({'message': 'question created', 'id': question_data['id'], 'lecture_id': question_data['lecture_id'], 'question_type': question_data['question_type']}, 201)
 
 @professor_api.route('/questions/<question_id>', methods=['DELETE'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def delete_question(current_user, question_id):
     """
     delete this question

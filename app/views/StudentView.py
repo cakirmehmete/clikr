@@ -59,7 +59,7 @@ def enroll_in_course(current_user):
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
 
 @student_api.route('/courses/<course_id>', methods=['DELETE'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def drop_course(current_user, course_id):
     """
     drop this course
@@ -174,7 +174,7 @@ def submit_answer(current_user, question_id):
     return custom_response({'message': message, 'id': answer_data['id'], 'question_id': answer_data['question_id']}, 200)
 
 @student_api.route('/questions/<question_id>', methods=['DELETE'])
-@Auth.student_token_required
+@Auth.student_aut_required
 def delete_answer(current_user, question_id):
     """
     delete previous answer to the question (also works if question is closed)
