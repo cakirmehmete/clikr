@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './style.css'; // Not our preferred way of importing style
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import ProfessorHome from '../ProfessorHome/'
+import ProfessorHome from '../ProfessorHome'
 import { Provider } from 'mobx-react';
 import ClassStore from '../../stores/ClassStore';
 
