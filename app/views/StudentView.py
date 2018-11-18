@@ -174,7 +174,7 @@ def submit_answer(current_user, question_id):
     return custom_response({'message': message, 'id': answer_data['id'], 'question_id': answer_data['question_id']}, 200)
 
 @student_api.route('/questions/<question_id>', methods=['DELETE'])
-@Auth.student_aut_required
+@Auth.student_auth_required
 def delete_answer(current_user, question_id):
     """
     delete previous answer to the question (also works if question is closed)
