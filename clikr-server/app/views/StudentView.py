@@ -153,23 +153,28 @@ def submit_answer(current_user, question_id):
     answer_data = answer_schema.dump(answer).data
     return custom_response({'message': message, 'id': answer_data['id'], 'question_id': answer_data['question_id']}, 200)
 
-@student_api.route('/login', methods=['POST'])
+@student_api.route('/login', methods=['GET', 'POST'])
 def login():
     """
     Does not provide authentication at the moment! 
     Its only purpose is to obtain a jwt token for a student, which is used to identify the user in subsequent API calls.
     """
+
     # for testing purposes, the user only needs to supply his netId (no password required)
-    req_data = request.get_json()
-    netId = req_data['netId']
+    if request.method == 'GET':
+        return render_template(login.html)
+    else:
+        netId = request.form.get('netId')
 
-    # check if student exists in DB
-    student = StudentModel.get_student_by_netId(netId)
-    if not student:
-        return custom_response({'error': 'invalid user'}, 400) # FIXME: returns null token if user doesn't exist
+        # check if student exists in DB
+        student = StudentModel.get_student_by_netId(netId)
+        if not student:
+            return render_template(logged_in.html, error='Invalid netId')
+        
+        # create a session for the user
+        session['username'] = netId
 
-    token = Auth.generate_token(netId, 'student')
-    return custom_response({'x-acess-token': token}, 200)
+        return render_template(logged_in.html, netId=netId)
 
 @student_api.route('/logincas', methods=['GET'])
 def login_cas():

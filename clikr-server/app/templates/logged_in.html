@@ -1,0 +1,11 @@
+<html>
+<head>
+<title>Logged in</title>
+</head>
+<body>
+    % if error:
+    <h1>{{ error }}</h1>
+    % else:
+    <h1>You are logged in as {{ netId }}.</h1>
+    % end
+</body>
