@@ -1,6 +1,6 @@
 #/src/views/ProfessorView
 
-from flask import request, json, Response, Blueprint, session, render_template
+from flask import request, json, Response, Blueprint, session, render_template, redirect
 import uuid
 import datetime
 import random, string
@@ -390,7 +390,7 @@ def login():
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login_professor.html')
     else:
         netId = request.form.get('netId')
 
@@ -403,7 +403,13 @@ def login():
         session['username'] = netId
         session['role'] = 'professor'
 
-        return render_template('logged_in.html', role=session['role'], netId=session['username'])
+        service_url = request.args.get('service')
+
+        if service_url:
+            print('redirecting to' + service_url)
+            return redirect(service_url)
+        else:
+            return render_template('logged_in.html', role=session['role'], netId=session['username'])
 
 def custom_response(res, status_code):
     """
