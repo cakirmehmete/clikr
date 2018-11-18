@@ -18,7 +18,7 @@ export default class APIService {
 
     async getClassesAPI() {
         // TODO: Find a better way to handle this login
-        axios.defaults.headers.common['x-access-token'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImF3ZXNvbWVwcm9mIiwicm9sZSI6InByb2Zlc3NvciIsImV4cCI6MTU0MTk5Nzc0MH0.jvoDM5yLj0qePZQ5w__JWs-u3npZNgFzhJFtQmv18lU'
+        axios.defaults.headers.common['x-access-token'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImVtcmUiLCJyb2xlIjoicHJvZmVzc29yIiwiZXhwIjoxNTQyMjQwNTMyfQ.jOQv688kiHogQ6jmnLVOzeMItIdhStD_kRzJChnzkvY'
         // Call Server to get classes
         const res = await axios.get(baseURL + '/api/v1/professor/courses')
 
