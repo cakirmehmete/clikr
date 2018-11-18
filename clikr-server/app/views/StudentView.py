@@ -1,13 +1,14 @@
 #/src/views/StudentView
 
-from flask import request, json, Response, Blueprint
+from flask import request, json, Response, Blueprint, session, redirect, render_template
 import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
-from .. import db
+from .. import db, cas
 from ..shared.Authentication import Auth
+from ..shared.CASClient import CASClient
 
 from flask_socketio import send, emit, join_room
 from .. import socketio
@@ -24,7 +25,7 @@ def on_join(course_id):
     emit('server message', 'you joined the room ' + course_id)
 
 @student_api.route('/courses', methods=['GET'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def get_courses(current_user):
     """
     returns all courses of the current student
@@ -34,7 +35,7 @@ def get_courses(current_user):
     return custom_response(course_data, 200)
 
 @student_api.route('/courses', methods=['POST'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def enroll_in_course(current_user):
     """
     enrolls the current student in a course
@@ -58,7 +59,7 @@ def enroll_in_course(current_user):
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
 
 @student_api.route('/courses/<course_id>', methods=['DELETE'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def drop_course(current_user, course_id):
     """
     drop this course
@@ -79,7 +80,7 @@ def drop_course(current_user, course_id):
     return custom_response({'message': 'dropped course'}, 200)
 
 @student_api.route('/courses/<course_id>/questions', methods=['GET'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def get_open_questions(current_user, course_id):
     """
     returns all open questions for this course
@@ -99,7 +100,7 @@ def get_open_questions(current_user, course_id):
     return custom_response(question_data, 200)
 
 @student_api.route('/questions/<question_id>', methods=['GET'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def get_answer(current_user, question_id):
     """
     get the previously submitted answer to this question
@@ -123,7 +124,7 @@ def get_answer(current_user, question_id):
     return custom_response(answer_data, 200)
 
 @student_api.route('/questions/<question_id>', methods=['POST'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def submit_answer(current_user, question_id):
     """
     submit an answer to the question
@@ -173,7 +174,7 @@ def submit_answer(current_user, question_id):
     return custom_response({'message': message, 'id': answer_data['id'], 'question_id': answer_data['question_id']}, 200)
 
 @student_api.route('/questions/<question_id>', methods=['DELETE'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def delete_answer(current_user, question_id):
     """
     delete previous answer to the question (also works if question is closed)
@@ -199,23 +200,44 @@ def delete_answer(current_user, question_id):
 
     return custom_response({'message': 'answer deleted'}, 200)
 
-@student_api.route('/login', methods=['POST'])
+@student_api.route('/login', methods=['GET', 'POST'])
 def login():
     """
     Does not provide authentication at the moment! 
-    Its only purpose is to obtain a jwt token for a student, which is used to identify the user in subsequent API calls.
+    Its only purpose is to obtain a session (cookie) for a student, which is used to identify the user in subsequent API calls.
     """
+
     # for testing purposes, the user only needs to supply his netId (no password required)
-    req_data = request.get_json()
-    netId = req_data['netId']
+    if request.method == 'GET':
+        return render_template('login.html')
+    else:
+        netId = request.form.get('netId')
 
-    # check if student exists in DB
-    student = StudentModel.get_student_by_netId(netId)
-    if not student:
-        return custom_response({'error': 'invalid user'}, 400) # FIXME: returns null token if user doesn't exist
+        # check if student exists in DB
+        student = StudentModel.get_student_by_netId(netId)
+        if not student:
+            return render_template('logged_in.html', error='Invalid netId')
+        
+        # create a session for the user
+        session['username'] = netId
+        session['role'] = 'student'
 
-    token = Auth.generate_token(netId, 'student')
-    return custom_response({'x-acess-token': token}, 200)
+        return render_template('logged_in.html', role=session['role'], netId=session['username'])
+
+@student_api.route('/logincas', methods=['GET'])
+def login_cas():
+    auth_response = cas.authenticate()
+
+    if isinstance(auth_response, str):
+        return render_template('login_test.html', username=session['username'])
+    else:
+        return auth_response
+
+@student_api.route('/secure', methods=['GET'])
+@cas.cas_required
+def secure():
+    return render_template('login_test.html', username=session['username'])
+
 
 def custom_response(res, status_code):
     """
