@@ -325,7 +325,7 @@ def _close_question(current_user, question, course):
 def login():
     """
     Does not provide authentication at the moment! 
-    Its only purpose is to obtain a jwt token for a student, which is used to identify the user in subsequent API calls.
+    Its only purpose is to create a session (cookie) for a professor, which is used to identify the user in subsequent API calls.
     """
 
     # for testing purposes, the user only needs to supply his netId (no password required)
