@@ -1,6 +1,6 @@
 #/src/views/ProfessorView
 
-from flask import request, json, Response, Blueprint
+from flask import request, json, Response, Blueprint, session, render_template
 import uuid
 import datetime
 import random, string
@@ -24,7 +24,7 @@ free_text_schema = FreeTextSchema()
 answer_schema = AnswerSchema()
 
 @professor_api.route('/courses', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_courses(current_user):
     """
     Returns all courses of the current prof
@@ -34,7 +34,7 @@ def get_courses(current_user):
     return custom_response(course_data, 200)
 
 @professor_api.route('/courses', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def create_course(current_user):
     """
     Creates a new course of the current prof
@@ -63,7 +63,7 @@ def create_course(current_user):
     return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def add_professor(current_user, course_id):
     """
     add professor to an existing course
@@ -92,7 +92,7 @@ def add_professor(current_user, course_id):
     return custom_response({'message': 'professor added to course', 'netId': new_professor_netId}, 201)
 
 @professor_api.route('/courses/<course_id>/code', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_enrollment_code(current_user, course_id):
     """
     get a (new) enrollment code for the course
@@ -110,7 +110,7 @@ def get_enrollment_code(current_user, course_id):
     return custom_response({'message': 'code created', 'enroll_code': enroll_code}, 200)
 
 @professor_api.route('/courses/<course_id>/lectures', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_lectures(current_user, course_id):
     """
     Returns all lectures for a course
@@ -131,7 +131,7 @@ def get_lectures(current_user, course_id):
     return custom_response(lecture_data, 200)
 
 @professor_api.route('/courses/<course_id>/lectures', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def create_lecture(current_user, course_id):
     """
     Create a new lecture in a course
@@ -166,7 +166,7 @@ def create_lecture(current_user, course_id):
     return custom_response({'message': 'lecture created', 'id': lecture_data['id'], 'course_id': lecture_data['course_id']}, 200)
 
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_questions(current_user, lecture_id):
     """
     Returns all questions for a lecture
@@ -187,7 +187,7 @@ def get_questions(current_user, lecture_id):
     return custom_response(question_data, 200)
 
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def create_question(current_user, lecture_id):
     """
     Create a new question in a lecture
@@ -233,7 +233,7 @@ def create_question(current_user, lecture_id):
     return custom_response({'message': 'question created', 'id': question_data['id'], 'lecture_id': question_data['lecture_id'], 'question_type': question_data['question_type']}, 201)
 
 @professor_api.route('/questions/<question_id>/answers', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_answers(current_user, question_id):
     """
     returns all student answers for this question
@@ -252,7 +252,7 @@ def get_answers(current_user, question_id):
     return custom_response(answer_data, 200)
 
 @professor_api.route('/questions/<question_id>', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def handle_question_action(current_user, question_id):
     """
     open or close this question
@@ -321,23 +321,29 @@ def _close_question(current_user, question, course):
 
     return custom_response({'message': 'question closed'}, 200)
 
-@professor_api.route('/login', methods=['POST'])
+@professor_api.route('/login', methods=['GET', 'POST'])
 def login():
     """
-    Does not provide authentication at the moment!
-    Its only purpose is to obtain a jwt token for a prof, which is used to identify the user in subsequent API calls.
+    Does not provide authentication at the moment! 
+    Its only purpose is to obtain a jwt token for a student, which is used to identify the user in subsequent API calls.
     """
+
     # for testing purposes, the user only needs to supply his netId (no password required)
-    req_data = request.get_json()
-    netId = req_data['netId']
+    if request.method == 'GET':
+        return render_template('login.html')
+    else:
+        netId = request.form.get('netId')
 
-    # check if prof exists in DB
-    professor = ProfessorModel.get_professor_by_netId(netId)
-    if not professor:
-        return custom_response({'error': 'invalid user'}, 400)
+        # check if student exists in DB
+        professor = ProfessorModel.get_professor_by_netId(netId)
+        if not professor:
+            return render_template('logged_in.html', error='Invalid netId')
+        
+        # create a session for the user
+        session['username'] = netId
+        session['role'] = 'professor'
 
-    token = Auth.generate_token(netId, 'professor')
-    return custom_response({'x-access-token': token}, 200)
+        return render_template('logged_in.html', role=session['role'], netId=session['username'])
 
 def custom_response(res, status_code):
     """

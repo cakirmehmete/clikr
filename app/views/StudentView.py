@@ -25,7 +25,7 @@ def on_join(course_id):
     emit('server message', 'you joined the room ' + course_id)
 
 @student_api.route('/courses', methods=['GET'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def get_courses(current_user):
     """
     returns all courses of the current student
@@ -35,7 +35,7 @@ def get_courses(current_user):
     return custom_response(course_data, 200)
 
 @student_api.route('/courses', methods=['POST'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def enroll_in_course(current_user):
     """
     enrolls the current student in a course
@@ -59,7 +59,7 @@ def enroll_in_course(current_user):
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
 
 @student_api.route('/courses/<course_id>/questions', methods=['GET'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def get_open_questions(current_user, course_id):
     """
     returns all open questions for this course
@@ -79,7 +79,7 @@ def get_open_questions(current_user, course_id):
     return custom_response(question_data, 200)
 
 @student_api.route('/questions/<question_id>', methods=['GET'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def get_answer(current_user, question_id):
     """
     get the previously submitted answer to this question
@@ -103,7 +103,7 @@ def get_answer(current_user, question_id):
     return custom_response(answer_data, 200)
 
 @student_api.route('/questions/<question_id>', methods=['POST'])
-@Auth.student_token_required
+@Auth.student_auth_required
 def submit_answer(current_user, question_id):
     """
     submit an answer to the question
@@ -162,19 +162,20 @@ def login():
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        return render_template(login.html)
+        return render_template('login.html')
     else:
         netId = request.form.get('netId')
 
         # check if student exists in DB
         student = StudentModel.get_student_by_netId(netId)
         if not student:
-            return render_template(logged_in.html, error='Invalid netId')
+            return render_template('logged_in.html', error='Invalid netId')
         
         # create a session for the user
         session['username'] = netId
+        session['role'] = 'student'
 
-        return render_template(logged_in.html, netId=netId)
+        return render_template('logged_in.html', role=session['role'], netId=session['username'])
 
 @student_api.route('/logincas', methods=['GET'])
 def login_cas():

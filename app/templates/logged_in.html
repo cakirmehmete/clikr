@@ -3,9 +3,11 @@
 <title>Logged in</title>
 </head>
 <body>
-    % if error:
+    {% if error: %}
     <h1>{{ error }}</h1>
-    % else:
-    <h1>You are logged in as {{ netId }}.</h1>
-    % end
+    {% else: %}
+    <h1>You are logged in as {{ role }} {{ netId }}.</h1>
+    {% endif %}
+
+    <p><a href='/api/v1/student/login'>back to login</a></p>
 </body>

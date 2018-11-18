@@ -3,8 +3,13 @@
 <title>Login</title>
 </head>
 <body>
-    <form action="/login" method="POST">
-        netId:<br>
+    <form action="/api/v1/student/login" method="POST">
+        student netId:<br>
+        <input type="text" name="netId"><br>
+    </form>
+
+    <form action="/api/v1/professor/login" method="POST">
+        professor netId:<br>
         <input type="text" name="netId"><br>
     </form>
 </body>
