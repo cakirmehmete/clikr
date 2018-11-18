@@ -15,8 +15,8 @@ class AnswerModel(db.Model):
 
     # columns
     id = db.Column(db.String(36), primary_key=True) # uuid
-    student_id = db.Column(db.String(36), db.ForeignKey('students.id')) # TODO: on update, on delete behavior
-    question_id = db.Column(db.String(36), db.ForeignKey('questions.id')) # TODO: on update, on delete behavior
+    student_id = db.Column(db.String(36), db.ForeignKey('students.id', onupdate='CASCADE', ondelete='CASCADE'))
+    question_id = db.Column(db.String(36), db.ForeignKey('questions.id', onupdate='CASCADE', ondelete='CASCADE'))
     answer = db.Column(db.String(), nullable=False)
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)

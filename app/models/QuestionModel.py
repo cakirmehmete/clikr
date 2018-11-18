@@ -16,12 +16,12 @@ class QuestionModel(db.Model):
 
     # columns
     id = db.Column(db.String(36), primary_key=True) # uuid
-    lecture_id = db.Column(db.String(36), db.ForeignKey('lectures.id')) # TODO: on update, on delete behavior
+    lecture_id = db.Column(db.String(36), db.ForeignKey('lectures.id', onupdate='CASCADE', ondelete='CASCADE'))
     question_type = db.Column(db.String(32), nullable=False)
     question_title = db.Column(db.String(256), nullable=True)
     question_text = db.Column(db.String(1024), nullable=True)
     correct_answer = db.Column(db.String(1024), nullable=True)
-    creator_id = db.Column(db.String(36), db.ForeignKey('professors.id'))  # TODO: on update, on delete behavior
+    creator_id = db.Column(db.String(36), db.ForeignKey('professors.id', onupdate='CASCADE', ondelete='SET NULL'))
     is_open = db.Column(db.Boolean, nullable=False, default=False)
     opened_at = db.Column(db.DateTime, nullable=True)
     closed_at = db.Column(db.DateTime, nullable=True)
@@ -29,7 +29,7 @@ class QuestionModel(db.Model):
     modified_at = db.Column(db.DateTime)
 
     # relationships
-    answers = db.relationship('AnswerModel', backref='question', lazy=True)
+    answers = db.relationship('AnswerModel', backref='question', lazy=True, passive_deletes=True)
 
     # for inheritance
     __mapper_args__ = {

@@ -58,6 +58,27 @@ def enroll_in_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
 
+@student_api.route('/courses/<course_id>', methods=['DELETE'])
+@Auth.student_token_required
+def drop_course(current_user, course_id):
+    """
+    drop this course
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check enrollment
+    if not current_user in course.students:
+        return custom_response({'error': 'not enrolled in this course'}, 400)
+
+    # remove current user from the course's list of students
+    course.students.remove(current_user)
+    db.session.commit()
+
+    return custom_response({'message': 'dropped course'}, 200)
+
 @student_api.route('/courses/<course_id>/questions', methods=['GET'])
 @Auth.student_auth_required
 def get_open_questions(current_user, course_id):
@@ -74,7 +95,7 @@ def get_open_questions(current_user, course_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     # query database and return result
-    open_questions = QuestionModel.query.filter_by(is_open=True)
+    open_questions = QuestionModel.query.filter_by(is_open=True) # FIXME: returns open questions for ALL courses!
     question_data = question_schema.dump(open_questions, many=True).data
     return custom_response(question_data, 200)
 
@@ -133,7 +154,6 @@ def submit_answer(current_user, question_id):
 
     # check if student has already answered this question
     answer = AnswerModel.query.filter_by(question_id=question_id, student_id=current_user.id).first()
-    print(answer)
     if answer:
         # update existing answer
         answer.update(data)
@@ -152,6 +172,33 @@ def submit_answer(current_user, question_id):
     # prepare response
     answer_data = answer_schema.dump(answer).data
     return custom_response({'message': message, 'id': answer_data['id'], 'question_id': answer_data['question_id']}, 200)
+
+@student_api.route('/questions/<question_id>', methods=['DELETE'])
+@Auth.student_token_required
+def delete_answer(current_user, question_id):
+    """
+    delete previous answer to the question (also works if question is closed)
+    """
+    # retrieve question and check if valid
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question_id does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.students:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # check if student has already answered this question
+    answer = AnswerModel.query.filter_by(question_id=question_id, student_id=current_user.id).first()
+    if not answer:
+        return custom_response({'error': 'no answer to this question found'}, 400)
+
+    # delete answer from the question's list of answers
+    question.answers.remove(answer)
+    db.session.commit()
+
+    return custom_response({'message': 'answer deleted'}, 200)
 
 @student_api.route('/login', methods=['GET', 'POST'])
 def login():
