@@ -5,6 +5,7 @@ import uuid
 import datetime
 import random, string
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
+from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema
@@ -13,6 +14,7 @@ from ..shared.Authentication import Auth
 
 professor_api = Blueprint('professors', __name__)
 professor_schema = ProfessorSchema()
+student_schema = StudentSchema()
 course_schema = CourseSchema()
 lecture_schema = LectureSchema()
 question_schema = QuestionSchema()
@@ -56,8 +58,25 @@ def create_course(current_user):
 
     # prepare response
     course_data = course_schema.dump(course).data
-    return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
+    return custom_response({'message': 'course created', 'id': course_data.get('id'),
+                            'creator_id': course_data.get('creator_id')}, 201)
 
+@professor_api.route('/courses/<course_id>', methods=['GET'])
+@Auth.professor_token_required
+def get_course_info(current_user, course_id):
+    course = CourseModel.get_course_by_uuid(course_id)
+
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    course_data = course_schema.dump(course).data
+    course_data_reduced = {'dept':course_data['dept'], 'coursenum':course_data['coursenum'],
+                            'title':course_data['title'], 'description':course_data['description'],
+                            'year':course_data['year'],'term':course_data['term'],
+                            'created_at':course_data['created_at'], 'modified_at':course_data['modified_at']}
+    return custom_response(course_data_reduced, 200)
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
 @Auth.professor_token_required
@@ -68,6 +87,8 @@ def add_professor(current_user, course_id):
     course = CourseModel.get_course_by_uuid(course_id)
 
     # check permissions
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
@@ -84,7 +105,8 @@ def add_professor(current_user, course_id):
     professor.courses.append(course)
     db.session.commit()
 
-    return custom_response({'message': 'professor added to course', 'netId': new_professor}, 201)
+    return custom_response({'message': 'professor added to course',
+                            'netId': new_professor}, 201)
 
     if error:
         return custom_response(error, 400)
@@ -97,6 +119,8 @@ def get_enrollment_code(current_user, course_id):
     """
     course = CourseModel.get_course_by_uuid(course_id)
 
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
@@ -106,6 +130,50 @@ def get_enrollment_code(current_user, course_id):
     course.update(updated_data)
 
     return custom_response(updated_data, 200)
+
+@professor_api.route('/courses/<course_id>/students', methods=['GET'])
+@Auth.professor_token_required
+def get_students(current_user, course_id):
+    """
+    gets list of students enrolled in courses
+    """
+    course = CourseModel.get_course_by_uuid(course_id)
+
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    students = course.students
+    students_data = student_schema.dump(students, many=True).data
+
+    return custom_response(students_data, 200)
+
+@professor_api.route('/courses/<course_id>/students', methods=['POST'])
+@Auth.professor_token_required
+def enroll_student(current_user, course_id):
+    """
+    manually enrolls student
+    """
+    req_data = request.get_json()
+    netId = req_data.get("netId")
+    student = StudentModel.get_student_by_netId(netId)
+
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # add the course to the student's list of courses
+    student.courses.append(course)
+    db.session.commit()
+
+    # prepare response
+    course_data = course_schema.dump(course).data
+    return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 200)
 
 @professor_api.route('/courses/<course_id>/lectures', methods=['GET'])
 @Auth.professor_token_required
@@ -161,7 +229,9 @@ def create_lecture(current_user, course_id):
 
     # prepare response
     lecture_data = lecture_schema.dump(lecture).data
-    return custom_response({'message': 'lecture created', 'id': lecture_data['id'], 'course_id': lecture_data['course_id']}, 200)
+    return custom_response({'message': 'lecture created',
+                            'id': lecture_data['id'],
+                            'course_id': lecture_data['course_id']}, 200)
 
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['GET'])
 @Auth.professor_token_required
@@ -228,7 +298,10 @@ def create_question(current_user, lecture_id):
 
     # prepare response
     question_data = question_schema.dump(question).data
-    return custom_response({'message': 'question created', 'id': question_data['id'], 'lecture_id': question_data['lecture_id'], 'question_type': question_data['question_type']}, 201)
+    return custom_response({'message': 'question created',
+                            'id': question_data['id'],
+                            'lecture_id': question_data['lecture_id'],
+                            'question_type': question_data['question_type']}, 201)
 
 # @professor_api.route('/questions/<question_id>', methods=['GET'])
 # @Auth.professor_token_required
