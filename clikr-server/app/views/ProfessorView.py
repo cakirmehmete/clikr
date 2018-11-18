@@ -58,9 +58,10 @@ def create_course(current_user):
     current_user.courses.append(course)
     db.session.commit()
 
-    # prepare response
-    course_data = course_schema.dump(course).data
-    return custom_response({'message': 'course created', 'id': course_data.get('id'), 'creator_id': course_data.get('creator_id')}, 201)
+    # response returns all courses
+    all_courses = current_user.courses
+    all_courses_data = course_schema.dump(all_courses, many=True).data
+    return custom_response({'message': 'course created', 'id': course.id, 'courses': all_courses_data}, 201)
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
 @Auth.professor_auth_required
@@ -91,13 +92,34 @@ def add_professor(current_user, course_id):
 
     return custom_response({'message': 'professor added to course', 'netId': new_professor_netId}, 201)
 
+@professor_api.route('/courses/<course_id>', methods=['DELETE'])
+@Auth.professor_token_required
+def delete_course(current_user, course_id):
+    """
+    delete this course
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    course.delete()
+    return custom_response({'message': 'course deleted'}, 200)
+
 @professor_api.route('/courses/<course_id>/code', methods=['GET'])
 @Auth.professor_auth_required
 def get_enrollment_code(current_user, course_id):
     """
     get a (new) enrollment code for the course
     """
+    # retrieve course and check if valid
     course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
 
     # check permissions
     if not current_user in course.professors:
@@ -165,6 +187,25 @@ def create_lecture(current_user, course_id):
     lecture_data = lecture_schema.dump(lecture).data
     return custom_response({'message': 'lecture created', 'id': lecture_data['id'], 'course_id': lecture_data['course_id']}, 200)
 
+@professor_api.route('/lectures/<lecture_id>', methods=['DELETE'])
+@Auth.professor_token_required
+def delete_lecture(current_user, lecture_id):
+    """
+    delete this lecture
+    """
+    # retrieve lecture and check if valid
+    lecture = LectureModel.get_lecture_by_uuid(lecture_id)
+    if not lecture:
+        return custom_response({'error': 'lecture does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    lecture.delete()
+    return custom_response({'message': 'lecture deleted'}, 200)
+
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['GET'])
 @Auth.professor_auth_required
 def get_questions(current_user, lecture_id):
@@ -231,6 +272,25 @@ def create_question(current_user, lecture_id):
     # prepare response
     question_data = question_schema.dump(question).data
     return custom_response({'message': 'question created', 'id': question_data['id'], 'lecture_id': question_data['lecture_id'], 'question_type': question_data['question_type']}, 201)
+
+@professor_api.route('/questions/<question_id>', methods=['DELETE'])
+@Auth.professor_token_required
+def delete_question(current_user, question_id):
+    """
+    delete this question
+    """
+    # retrieve question and check if valid
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    question.delete()
+    return custom_response({'message': 'question deleted'}, 200)
 
 @professor_api.route('/questions/<question_id>/answers', methods=['GET'])
 @Auth.professor_auth_required
