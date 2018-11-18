@@ -209,7 +209,7 @@ def login():
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login_student.html')
     else:
         netId = request.form.get('netId')
 
