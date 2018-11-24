@@ -1,1 +1,1 @@
-export const baseURL = "https://clikr.herokuapp.com";
+export const baseURL = "http://localhost:5000";
