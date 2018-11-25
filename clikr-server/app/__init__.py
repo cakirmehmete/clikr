@@ -45,7 +45,7 @@ def create_app(env_name):
     from .views.AdminView import admin_api as admin_blueprint
     app.register_blueprint(admin_blueprint, url_prefix='/api/v1/admin')
 
-    CORS(app)
+    CORS(app, supports_credentials=True)
     @app.route('/', methods=['GET'])
     def index():
         """
