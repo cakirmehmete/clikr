@@ -40,7 +40,9 @@ const styles = theme => ({
     },
 });
 
-const ProfessorHome = inject("classStore")(observer(class ProfessorHome extends React.Component {
+@inject("classStore")
+@observer
+class ProfessorHome extends React.Component {
     constructor(props) {
         super(props)
         this.classes = props.classes
@@ -95,6 +97,6 @@ const ProfessorHome = inject("classStore")(observer(class ProfessorHome extends 
             </div>
         );
     }
-}))
+}
 
 export default withStyles(styles)(ProfessorHome);

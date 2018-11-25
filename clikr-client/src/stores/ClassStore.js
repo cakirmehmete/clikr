@@ -1,4 +1,4 @@
-import { observable, action, decorate } from "mobx";
+import { observable, action } from "mobx";
 import ClassObj from '../models/ClassObj';
 import APIService from "../services/APIService";
 
@@ -6,12 +6,16 @@ export default class ClassStore {
   constructor() {
     this.apiService = new APIService()
   }
+
+  @observable
   classes = [];
 
+  @action
   addClass(classObj) {
     this.classes.push(classObj)
   }
 
+  @action
   async loadClasses() {
     const data = await this.apiService.getClassesAPI();
     this.classes = [];
@@ -20,8 +24,3 @@ export default class ClassStore {
     });
   }
 }
-decorate(ClassStore, {
-  classes: observable,
-  addClass: action,
-  loadClasses: action
-});

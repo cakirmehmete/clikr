@@ -45,7 +45,9 @@ const styles = theme => ({
     },
 });
 
-const AddCourseModal = inject("classStore")(observer(class AddCourseModal extends React.Component {
+@inject("classStore")
+@observer 
+class AddCourseModal extends React.Component {
     state = {
         open: false,
         name: '',
@@ -128,7 +130,7 @@ const AddCourseModal = inject("classStore")(observer(class AddCourseModal extend
             </div>
         );
     }
-}))
+}
 
 AddCourseModal.propTypes = {
     classes: PropTypes.object.isRequired,
