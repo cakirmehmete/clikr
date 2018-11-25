@@ -1,6 +1,6 @@
 #/src/views/ProfessorView
 
-from flask import request, json, Response, Blueprint, session, render_template, redirect
+from flask import request, Response, Blueprint, session, render_template, redirect
 import uuid
 import datetime
 import random, string
@@ -11,6 +11,7 @@ from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoice
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
+from ..shared.Util import custom_response
 
 from .. import socketio
 
@@ -41,6 +42,7 @@ def create_course(current_user):
     """
     # get data from request body and create new course
     req_data = request.get_json()
+    print('req_data = ' + str(req_data))
     req_data['creator_id'] = current_user.id
     data, error = course_schema.load(req_data)
 
@@ -410,13 +412,3 @@ def login():
             return redirect(service_url)
         else:
             return render_template('logged_in.html', role=session['role'], netId=session['username'])
-
-def custom_response(res, status_code):
-    """
-    Custom Response Function
-    """
-    return Response(
-        mimetype="application/json",
-        response=json.dumps(res),
-        status=status_code
-    )
