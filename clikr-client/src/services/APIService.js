@@ -20,9 +20,16 @@ export default class APIService {
         // TODO: Find a better way to handle this login
         axios.defaults.withCredentials = true;
         // Call Server to get classes
-        const res = await axios.get(baseURL + 'professor/courses')
-
-        return await res.data;
+        return await axios.get(baseURL + 'professor/courses')
+            .then(function (response) {
+                // Update axios with the proper token
+                return response.data
+            })
+            .catch(function (error) {
+                console.log(error);
+                window.location.replace('/login-prof')
+                return [];
+            });
     }
 
     async addCourse(course) {
