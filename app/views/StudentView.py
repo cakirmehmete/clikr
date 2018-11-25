@@ -209,14 +209,24 @@ def login():
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        return render_template('login_student.html')
+        if 'username' in session:
+            netId = session['username']
+        else:
+            netId = None
+
+        if 'role' in session:
+            role = session['role']
+        else:
+            role = ''
+
+        return render_template('login_student.html', role=role, netId=netId)
     else:
         netId = request.form.get('netId')
 
         # check if student exists in DB
         student = StudentModel.get_student_by_netId(netId)
         if not student:
-            return render_template('logged_in.html', error='Invalid netId')
+            return render_template('login_student.html', error='Invalid netId')
         
         # create a session for the user
         session['username'] = netId
@@ -228,7 +238,21 @@ def login():
             print('redirecting to' + service_url)
             return redirect(service_url)
         else:
-            return render_template('logged_in.html', role=session['role'], netId=session['username'])
+            return render_template('login_student.html', role=session['role'], netId=session['username'])
+
+@student_api.route('/logout', methods=['GET'])
+def logout():
+    """
+    deletes the session cookie
+    """
+    session.pop('username', None)
+
+    service_url = request.args.get('service')
+
+    if service_url:
+        return redirect(service_url)
+    else:
+        return custom_response({'message': 'logged out'}, 200)
             
 
 
