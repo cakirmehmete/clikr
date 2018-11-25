@@ -3,7 +3,11 @@ import { baseURL } from '../constants/api'
 
 export default class APIService {
     async login(netId) {
-        return axios.post(baseURL + '/api/v1/professor/login', {
+        var url_add_on = 'student';
+        if (window.location.href.split('login-')[1].valueOf() === 'prof'.valueOf()) {
+            url_add_on = 'professor';
+        }
+        return axios.post(baseURL + '/api/v1/' + url_add_on + '/login', {
             netId: netId
         })
             .then(function (response) {
