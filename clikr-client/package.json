@@ -5,6 +5,7 @@
   "dependencies": {
     "@babel/core": "7.1.0",
     "@babel/plugin-proposal-decorators": "^7.1.2",
+    "@babel/plugin-syntax-json-strings": "^7.0.0",
     "@material-ui/core": "^3.4.0",
     "@svgr/webpack": "2.4.1",
     "axios": "^0.18.0",
