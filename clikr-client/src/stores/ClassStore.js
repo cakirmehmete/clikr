@@ -19,7 +19,16 @@ export default class ClassStore {
       this.addClass(new ClassObj(element.title, null))
     });
   }
+  async loadClassesStudent() {
+    const data = await this.apiService.getClassesAPIStudent();
+    this.classes = [];
+    (data).forEach(element => {
+      this.addClass(new ClassObj(element.title, null))
+    });
+  }
 }
+
+
 decorate(ClassStore, {
   classes: observable,
   addClass: action,
