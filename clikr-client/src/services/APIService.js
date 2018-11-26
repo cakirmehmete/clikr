@@ -35,6 +35,31 @@ export default class APIService {
                 return [];
             });
     }
+    async getClassesAPIStudent() {
+        axios.defaults.withCredentials = true;
+
+        return await axios.get(baseURL + 'student/courses')
+            .then(function (response) {
+                // Update axios with the proper token
+                return response.data
+            })
+            .catch(function (error) {
+                console.log(error);
+                window.location.replace('/login-student')
+                return [];
+            });
+    }
+    
+    async enrollCourse(code) {
+        axios.defaults.withCredentials = true;
+        // Call Server to get classes
+        const res = await axios.post(baseURL + 'student/courses', {
+            enroll_code: code,
+        })
+
+        return await res.data;
+    }
+
 
     async addCourse(course) {
         // Call Server to get classes
