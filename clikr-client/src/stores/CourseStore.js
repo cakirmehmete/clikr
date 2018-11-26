@@ -11,7 +11,6 @@ export default class CourseStore {
 
     courses.forEach(element => {
       // id: any, title: any, num: any, dept: any, description: any, term: any, joinCode: any, year: any
-      console.log(element)
       this.courses.push(new CourseObj(element.id, element.title, element.coursenum,
         element.dept, element.description, element.term, element.enroll_code, element.year))
     })
