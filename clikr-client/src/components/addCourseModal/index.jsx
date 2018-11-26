@@ -54,7 +54,7 @@ class AddCourseModal extends React.Component {
 
     constructor(props) {
         super(props)
-        this.apiService = props.apiService
+        this.apiProfService = props.apiProfService
     }
 
     handleChange = name => event => {
@@ -73,7 +73,7 @@ class AddCourseModal extends React.Component {
 
     handleSubmit = () => {
         // Send course to API
-        this.apiService.addCourse(new CourseObj(this.state.name, this.state.coursenum, this.state.dept, null))
+        this.apiProfService.addCourse(new CourseObj(this.state.name, this.state.coursenum, this.state.dept, null))
         // Close modal 
         this.setState({ open: false });
     }

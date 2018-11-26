@@ -1,6 +1,6 @@
 import { getStudentCoursesAPI, postEnrollStudentAPI } from '../utils/api-facade';
 
-export default class APIService {
+export default class APIStudentService {
     constructor(studentStore) {
         this.studentStore = studentStore;
     }

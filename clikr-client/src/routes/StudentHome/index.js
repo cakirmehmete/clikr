@@ -17,11 +17,11 @@ class StudentHome extends Component {
     constructor(props) {
         super(props)
         this.store = props.store
-        this.apiService = new APIStudentService(this.store)
+        this.apiStudentService = new APIStudentService(this.store)
     }
 
     componentDidMount() {
-        this.apiService.loadAllCourses()
+        this.apiStudentService.loadAllCourses()
     }
 
     render() {
