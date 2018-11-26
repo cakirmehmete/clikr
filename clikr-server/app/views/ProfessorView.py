@@ -78,11 +78,7 @@ def get_course_info(current_user, course_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     course_data = course_schema.dump(course).data
-    course_data_reduced = {'dept':course_data['dept'], 'coursenum':course_data['coursenum'],
-                            'title':course_data['title'], 'description':course_data['description'],
-                            'year':course_data['year'],'term':course_data['term'],
-                            'created_at':course_data['created_at'], 'modified_at':course_data['modified_at']}
-    return custom_response(course_data_reduced, 200)
+    return custom_response(course_data, 200)
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
 @Auth.professor_auth_required
@@ -118,7 +114,7 @@ def add_professor(current_user, course_id):
 @professor_api.route('/courses/<course_id>', methods=['PATCH'])
 @Auth.professor_auth_required
 def update_course(current_user, course_id):
-    # retrive course and check if valid, permissions
+    # retrieve course and check if valid, permissions
     course = CourseModel.get_course_by_uuid(course_id)
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
@@ -178,10 +174,11 @@ def get_students(current_user, course_id):
     """
     gets list of students enrolled in courses
     """
+    # retrieve course and check if valid
     course = CourseModel.get_course_by_uuid(course_id)
-
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
+    
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
@@ -197,22 +194,26 @@ def enroll_student(current_user, course_id):
     """
     manually enrolls student
     """
+    # retrieve student and check if valid
     req_data = request.get_json()
     netId = req_data.get("netId")
     student = StudentModel.get_student_by_netId(netId)
-
     if not student:
         return custom_response({'error': 'student netId does not exist'}, 400)
 
+    # retrieve course and check if valid
     course = CourseModel.get_course_by_uuid(course_id)
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
+    
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
+    
     # check if student is already enrolled
     if course in student.courses:
         return custom_response({'error': 'already enrolled in this course'}, 400)
+    
     # add the course to the student's list of courses
     student.courses.append(course)
     db.session.commit()
@@ -235,11 +236,16 @@ def remove_student(current_user, course_id, student_id):
     course = CourseModel.get_course_by_uuid(course_id)
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
+    
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
-    # add the course to the student's list of courses
+    # check if student enrolled
+    if not course in student.courses:
+        return custom_response({'error': 'student not enrolled in this course'}, 400)
+
+    # remove the course from the student's list of courses
     student.courses.remove(course) 
     db.session.commit()
 
@@ -340,7 +346,7 @@ def update_lecture(current_user, lecture_id):
     updated_data = request.get_json()
     lecture.update(updated_data)
 
-    return custom_response({'message': 'lecture updated'}, 201)
+    return custom_response({'message': 'lecture updated'}, 200)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['DELETE'])
 @Auth.professor_auth_required
@@ -444,8 +450,6 @@ def get_question_info(current_user, question_id):
 
     # retrieve course and check permissions
     course = question.lecture.course
-    if not course:
-        return custom_response({'error': 'course_id does not exist'}, 400)
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
@@ -544,7 +548,7 @@ def update_question(current_user, question_id):
     updated_data = request.get_json()
     question.update(updated_data)
 
-    return custom_response({'message': 'question updated'}, 201)
+    return custom_response({'message': 'question updated'}, 200)
 
 def _open_question(current_user, question, course):
     # check if question is opened already

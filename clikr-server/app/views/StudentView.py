@@ -69,12 +69,9 @@ def get_course_info(current_user, course_id):
     if not current_user in course.students:
         return custom_response({'error': 'permission denied'}, 400)
 
-    course_data = course_schema.dump(course).data
-    course_data_reduced = {'dept':course_data['dept'], 'coursenum':course_data['coursenum'],
-                            'title':course_data['title'], 'description':course_data['description'],
-                            'year':course_data['year'],'term':course_data['term'],
-                            'created_at':course_data['created_at'], 'modified_at':course_data['modified_at']}
-    return custom_response(course_data_reduced, 200)
+    reduced_course_schema = CourseSchema(exclude=['creator_id', 'created_at', 'modified_at', 'enroll_code'])
+    course_data = reduced_course_schema.dump(course).data
+    return custom_response(course_data, 200)
 
 @student_api.route('/courses/<course_id>', methods=['DELETE'])
 @Auth.student_auth_required
