@@ -1,6 +1,6 @@
 #/src/views/StudentView
 
-from flask import request, json, Response, Blueprint, session, redirect, render_template
+from flask import request, Response, Blueprint, session, redirect, render_template
 import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
@@ -8,7 +8,8 @@ from ..models.QuestionModel import QuestionModel, QuestionSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db, cas
 from ..shared.Authentication import Auth
-from ..shared.CASClient import CASClient
+# from ..shared.CASClient import CASClient
+from ..shared.Util import custom_response
 
 from flask_socketio import send, emit, join_room
 from .. import socketio
@@ -245,14 +246,3 @@ def login_cas():
 @cas.cas_required
 def secure():
     return render_template('login_test.html', username=session['username'])
-
-
-def custom_response(res, status_code):
-    """
-    Custom Response Function
-    """
-    return Response(
-        mimetype="application/json",
-        response=json.dumps(res),
-        status=status_code
-    )

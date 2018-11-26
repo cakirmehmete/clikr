@@ -7,7 +7,6 @@ export default class APIService {
     }
 
     loadAllCourses() {
-        // Call Server to get classes
         getCoursesAPI()
             .then(res => {
                 this.courseStore.updateAllCourses(res.data)
@@ -19,7 +18,6 @@ export default class APIService {
     }
 
     addCourse(course) {
-        // Call Server to get classes
         postNewCourseAPI(course)
             .then(res => {
                 this.courseStore.updateAllCourses(res.data.courses)

@@ -7,12 +7,22 @@ export function getCoursesAPI() {
     return axios.get(baseURL + 'professor/courses');
 }
 
+export function getStudentCoursesAPI() {
+    return axios.get(baseURL + 'student/courses');
+}
+
 // course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {
         coursenum: course.num,
         title: course.name,
         dept: course.dept
+    });
+}
+
+export function postEnrollStudentAPI(code) {
+    return axios.post(baseURL + 'student/courses', {
+        enroll_code: code
     });
 }
 
