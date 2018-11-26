@@ -1,13 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import APIService from '../../services/APIService';
-import ClassObj from '../../models/ClassObj';
-import { observer, inject } from 'mobx-react';
+import CourseObj from '../../models/CourseObj';
+import { observer } from 'mobx-react';
 
 function getModalStyle() {
     const top = 50;
@@ -45,7 +43,8 @@ const styles = theme => ({
     },
 });
 
-const AddCourseModal = inject("classStore")(observer(class AddCourseModal extends React.Component {
+@observer
+class AddCourseModal extends React.Component {
     state = {
         open: false,
         name: '',
@@ -55,7 +54,7 @@ const AddCourseModal = inject("classStore")(observer(class AddCourseModal extend
 
     constructor(props) {
         super(props)
-        this.apiService = new APIService()
+        this.apiProfService = props.apiProfService
     }
 
     handleChange = name => event => {
@@ -74,12 +73,11 @@ const AddCourseModal = inject("classStore")(observer(class AddCourseModal extend
 
     handleSubmit = () => {
         // Send course to API
-        this.apiService.addCourse(new ClassObj(this.state.name, this.state.coursenum, this.state.dept, null))
-        // Make sure to update the courses
-        this.props.classStore.loadClasses()
+        this.apiProfService.addCourse(new CourseObj(this.state.name, this.state.coursenum, this.state.dept, null))
         // Close modal 
         this.setState({ open: false });
     }
+
     render() {
         const { classes } = this.props;
 
@@ -128,11 +126,7 @@ const AddCourseModal = inject("classStore")(observer(class AddCourseModal extend
             </div>
         );
     }
-}))
-
-AddCourseModal.propTypes = {
-    classes: PropTypes.object.isRequired,
-};
+}
 
 // We need an intermediary variable for handling the recursive nesting.
 const AddCourseModalWrapped = withStyles(styles)(AddCourseModal);

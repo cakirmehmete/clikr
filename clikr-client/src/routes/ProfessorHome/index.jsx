@@ -1,38 +1,19 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItemText from '@material-ui/core/ListItemText';
-import Drawer from '@material-ui/core/Drawer';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
 import { observer, inject } from 'mobx-react';
-import APIService from '../../services/APIService';
-import AddCourseModalWrapped from '../../components/addCourseModal';
+import APIProfService from '../../services/APIProfService';
+import SideMenuBar from '../../components/SideMenuBar';
+import TopMenuBar from '../../components/TopMenuBar';
+import AllCoursesFrame from '../../components/AllCoursesFrame';
+import Grid from '@material-ui/core/Grid';
 
 const drawerWidth = 240;
 
 const styles = theme => ({
     root: {
         flexGrow: 1,
-        width: '100%',
-        maxWidth: 360,
         backgroundColor: theme.palette.background.paper,
     },
-    appBar: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: drawerWidth,
-    },
-    drawer: {
-        width: drawerWidth,
-        flexShrink: 0,
-    },
-    drawerPaper: {
-        width: drawerWidth,
-    },
-    toolbar: theme.mixins.toolbar,
     content: {
         marginLeft: drawerWidth,
         flexGrow: 1,
@@ -40,61 +21,38 @@ const styles = theme => ({
     },
 });
 
-const ProfessorHome = inject("classStore")(observer(class ProfessorHome extends React.Component {
+@inject("profStore")
+@observer
+class ProfessorHome extends React.Component {
     constructor(props) {
         super(props)
-        this.classes = props.classes
-        this.apiService = new APIService()
+        this.styles = props.classes
+        this.profStore = props.profStore
+        this.apiProfService = new APIProfService(this.profStore)
     }
 
     componentDidMount() {
-        this.props.classStore.loadClasses()
+        this.apiProfService.loadAllCourses()
     }
 
     render() {
         return (
-            <div>
-                <AppBar position="static" color="primary" className={this.classes.appBar}>
-                    <Toolbar>
-                        <Typography variant="h6" color="inherit">
-                            Professor Home Page
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
-                <Drawer
-                    className={this.classes.drawer}
-                    variant="permanent"
-                    classes={{
-                        paper: this.classes.drawerPaper,
-                    }}
-                    anchor="left"
-                >
-                    <div className={this.classes.toolbar} />
-                    <Divider />
-                    <List>
-                        {this.props.classStore.classes.map(function (classObj, index) {
-                            return (<ListItem button key={index} >
-                                <ListItemText primary={classObj.name} />
-                            </ListItem>)
-                        })}
-                    </List>
-                </Drawer>
-                <main className={this.classes.content}>
-                    <Typography variant="h6" color="inherit">
-                        Courses
-                </Typography>
-                    <List component="nav">
-                        {this.props.classStore.classes.map(function (classObj, index) {
-                            return (<ListItem button key={index} >
-                                <ListItemText primary={classObj.name} />
-                            </ListItem>)
-                        })}
-                    </List>
-                    <AddCourseModalWrapped></AddCourseModalWrapped>
+            <div className={this.styles.root}>
+                <TopMenuBar />
+                <SideMenuBar profStore={this.profStore} />
+                <main className={this.styles.content}>
+                    <Grid container spacing={24}>
+                        <Grid item xs={6}>
+                            <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+                        </Grid>
+                    </Grid>
                 </main>
             </div>
         );
     }
-}))
+}
 
 export default withStyles(styles)(ProfessorHome);
