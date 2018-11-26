@@ -1,7 +1,7 @@
 import jwt
 import os
 import datetime
-from flask import json, jsonify, Response, request
+from flask import json, jsonify, Response, request, session
 from functools import wraps
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
@@ -84,19 +84,44 @@ class Auth():
 
         return decorated
 
-    # @staticmethod
-    # def decode_token(token):
-    #     """
-    #     Decode token method
-    #     """
-    #     re = {'data': {}, 'error': {}}
-    #     try:
-    #         payload = jwt.decode(token, os.getenv('JWT_SECRET_KEY'))
-    #         re['data'] = {'id': payload['id']}
-    #         return re
-    #     except jwt.ExpiredSignatureError as e1:
-    #         re['error'] = {'message': 'token expired, please login again'}
-    #         return re
-    #         except jwt.InvalidTokenError:
-    #         re['error'] = {'message': 'Invalid token, please try again with a new token'}
-    #         return re
+    @staticmethod
+    def professor_auth_required(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+
+            if (not 'username' in session) or (not 'role' in session):
+                return jsonify({'error': 'not logged in'}), 401
+            
+            username = session['username']
+            role = session['role']
+
+            if role != 'professor':
+                return jsonify({'error': 'permission denied'}), 401
+            
+            current_user = ProfessorModel.get_professor_by_netId(username)
+            
+            print('current user: ' + str(current_user))
+            return f(current_user, *args, **kwargs)
+
+        return decorated
+
+    @staticmethod
+    def student_auth_required(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+
+            if (not 'username' in session) or (not 'role' in session):
+                return jsonify({'error': 'not logged in'}), 401
+            
+            username = session['username']
+            role = session['role']
+
+            if role != 'student':
+                return jsonify({'error': 'permission denied'}), 401
+            
+            current_user = StudentModel.get_student_by_netId(username)
+            
+            print('current user: ' + str(current_user))
+            return f(current_user, *args, **kwargs)
+
+        return decorated

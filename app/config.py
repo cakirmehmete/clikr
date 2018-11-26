@@ -10,6 +10,7 @@ class Development(object):
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv('SECRET_KEY') # for Flask sessions
 
 class Production(object):
     """
@@ -19,6 +20,7 @@ class Production(object):
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv('SECRET_KEY') # for Flask sessions
 
 app_config = {
     'development': Development,

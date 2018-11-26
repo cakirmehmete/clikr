@@ -2,7 +2,7 @@
 
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
 class LectureModel(db.Model):
@@ -15,16 +15,16 @@ class LectureModel(db.Model):
 
     # columns
     id = db.Column(db.String(36), primary_key=True) # uuid
-    course_id = db.Column(db.String(36), db.ForeignKey('courses.id')) # TODO: on update, on delete behavior
+    course_id = db.Column(db.String(36), db.ForeignKey('courses.id', onupdate='CASCADE', ondelete='CASCADE'))
     date = db.Column(db.Date, nullable=True)
     title = db.Column(db.String(256), nullable=True)
     description = db.Column(db.String(1024), nullable=True)
-    creator_id = db.Column(db.String(36), db.ForeignKey('professors.id'))  # TODO: on update, on delete behavior
+    creator_id = db.Column(db.String(36), db.ForeignKey('professors.id', onupdate='CASCADE', ondelete='SET NULL'))
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
 
     # relationships
-    questions = db.relationship('QuestionModel', backref='lecture', lazy=True)
+    questions = db.relationship('QuestionModel', backref='lecture', lazy=True, passive_deletes=True)
 
     # class constructor
     def __init__(self, data):

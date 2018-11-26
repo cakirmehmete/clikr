@@ -1,15 +1,16 @@
 #/src/views/AdminView
 # This module is meant for development/testing purposes (no authentication). It allows for creation of new users.
 
-from flask import request, json, Response, Blueprint
+from flask import request, Response, Blueprint
 import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
-from ..models import db
+from .. import db
 from ..shared.Authentication import Auth
+from ..shared.Util import custom_response
 
 admin_api = Blueprint('admins', __name__)
 student_schema = StudentSchema()
@@ -77,13 +78,3 @@ def get_students():
     students = StudentModel.get_all_students()
     students_data = student_schema.dump(students, many=True).data
     return custom_response(students_data, 200)
-
-def custom_response(res, status_code):
-    """
-    Custom Response Function
-    """
-    return Response(
-        mimetype="application/json",
-        response=json.dumps(res),
-        status=status_code
-    )

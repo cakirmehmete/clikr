@@ -2,13 +2,13 @@
 
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
 # helper table for the many-to-many relationship courses_profs
 courses_profs = db.Table('courses_profs',
-    db.Column('course_id', db.String(36), db.ForeignKey('courses.id'), primary_key=True),
-    db.Column('professor_id', db.String(36), db.ForeignKey('professors.id'), primary_key=True)
+    db.Column('course_id', db.String(36), db.ForeignKey('courses.id', onupdate='CASCADE', ondelete='CASCADE'), primary_key=True),
+    db.Column('professor_id', db.String(36), db.ForeignKey('professors.id', onupdate='CASCADE', ondelete='CASCADE'), primary_key=True)
 )
 
 class ProfessorModel(db.Model):
@@ -28,8 +28,8 @@ class ProfessorModel(db.Model):
     modified_at = db.Column(db.DateTime)
 
     # relationships
-    created_courses = db.relationship('CourseModel', backref='creator', lazy=True) # TODO: is lazy really the best option here?
-    courses = db.relationship('CourseModel', secondary=courses_profs, lazy=True, backref='professors')
+    created_courses = db.relationship('CourseModel', backref='creator', lazy=True, passive_deletes=True)
+    courses = db.relationship('CourseModel', secondary=courses_profs, lazy=True, backref='professors', passive_deletes=True)
 
     # class constructor
     def __init__(self, data):

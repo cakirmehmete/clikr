@@ -1,13 +1,13 @@
 # src/models/StudentModel.py
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
 # helper table for the many-to-many relationship courses-students
 courses_students = db.Table('courses_students',
-    db.Column('course_id', db.String(36), db.ForeignKey('courses.id'), primary_key=True),
-    db.Column('student_id', db.String(36), db.ForeignKey('students.id'), primary_key=True)
+    db.Column('course_id', db.String(36), db.ForeignKey('courses.id', onupdate='CASCADE', ondelete='CASCADE'), primary_key=True),
+    db.Column('student_id', db.String(36), db.ForeignKey('students.id', onupdate='CASCADE', ondelete='CASCADE'), primary_key=True)
 )
 
 class StudentModel(db.Model):
@@ -27,7 +27,8 @@ class StudentModel(db.Model):
     modified_at = db.Column(db.DateTime)
 
     # relationships
-    courses = db.relationship('CourseModel', secondary=courses_students, lazy=True, backref='students')
+    courses = db.relationship('CourseModel', secondary=courses_students, lazy=True, backref='students', passive_deletes=True)
+    answers = db.relationship('AnswerModel', backref='answers', lazy=True, passive_deletes=True)
 
     # class constructor
     def __init__(self, data):

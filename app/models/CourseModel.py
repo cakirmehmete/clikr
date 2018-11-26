@@ -2,7 +2,7 @@
 
 from marshmallow import fields, Schema
 import datetime
-from . import db
+from .. import db
 import uuid
 
 class CourseModel(db.Model):
@@ -21,13 +21,13 @@ class CourseModel(db.Model):
     description = db.Column(db.String(1024), nullable=True)
     year = db.Column(db.Integer, nullable=True)
     term = db.Column(db.String(32), nullable=True)
-    creator_id = db.Column(db.String(36), db.ForeignKey('professors.id'))  # TODO: on update, on delete behavior
+    creator_id = db.Column(db.String(36), db.ForeignKey('professors.id', onupdate='CASCADE', ondelete='SET NULL'))  # TODO: should delete the course when the last prof for that course is deleted
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
     enroll_code = db.Column(db.String(8), nullable=True)
 
     # relationships
-    lectures = db.relationship('LectureModel', backref='course', lazy=True)
+    lectures = db.relationship('LectureModel', backref='course', lazy=True, passive_deletes=True)
 
     # class constructor
     def __init__(self, data):

@@ -1,6 +1,6 @@
 #/src/views/ProfessorView
 
-from flask import request, json, Response, Blueprint
+from flask import request, Response, Blueprint, session, render_template, redirect
 import uuid
 import datetime
 import random, string
@@ -9,8 +9,12 @@ from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema
-from ..models import db
+from ..models.AnswerModel import AnswerModel, AnswerSchema
+from .. import db
 from ..shared.Authentication import Auth
+from ..shared.Util import custom_response
+
+from .. import socketio
 
 professor_api = Blueprint('professors', __name__)
 professor_schema = ProfessorSchema()
@@ -20,9 +24,10 @@ lecture_schema = LectureSchema()
 question_schema = QuestionSchema()
 multiple_choice_schema = MultipleChoiceSchema()
 free_text_schema = FreeTextSchema()
+answer_schema = AnswerSchema()
 
 @professor_api.route('/courses', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_courses(current_user):
     """
     Returns all courses of the current prof
@@ -32,13 +37,14 @@ def get_courses(current_user):
     return custom_response(course_data, 200)
 
 @professor_api.route('/courses', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def create_course(current_user):
     """
     Creates a new course of the current prof
     """
     # get data from request body and create new course
     req_data = request.get_json()
+    print('req_data = ' + str(req_data))
     req_data['creator_id'] = current_user.id
     data, error = course_schema.load(req_data)
 
@@ -46,25 +52,25 @@ def create_course(current_user):
         return custom_response(error, 400)
 
     course = CourseModel(data)
-    course.save()
 
+    # generate enrollment code and save to database
     enroll_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-    updated_data = {'enroll_code' : enroll_code}
-    course.update(updated_data)
+    course.enroll_code = enroll_code
+    course.save()
 
     # add the course to the prof's list of courses
     current_user.courses.append(course)
     db.session.commit()
 
-    # prepare response
-    course_data = course_schema.dump(course).data
-    return custom_response({'message': 'course created', 'id': course_data.get('id'),
-                            'creator_id': course_data.get('creator_id')}, 201)
+    # response returns all courses
+    all_courses = current_user.courses
+    all_courses_data = course_schema.dump(all_courses, many=True).data
+    return custom_response({'message': 'course created', 'id': course.id, 'courses': all_courses_data}, 201)
 
 @professor_api.route('/courses/<course_id>', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_course_info(current_user, course_id):
-    # retrive course and check if valid, permissions
+    # retrieve course and check if valid, permissions
     course = CourseModel.get_course_by_uuid(course_id)
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
@@ -79,12 +85,15 @@ def get_course_info(current_user, course_id):
     return custom_response(course_data_reduced, 200)
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def add_professor(current_user, course_id):
     """
-    add professor to a course by adding a course to the professor's courses
+    add professor to an existing course
     """
+    # retrieve course and check if valid
     course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
 
     # check permissions
     if not course:
@@ -93,23 +102,21 @@ def add_professor(current_user, course_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     req_data = request.get_json()
-    new_professor = req_data.get("netId")
-
-    course = CourseModel.get_course_by_uuid(course_id)
+    new_professor_netId = req_data.get("netId")
 
     # check if professor already part of course
-    professor = ProfessorModel.get_professor_by_netId(new_professor)
-    if course in professor.courses:
+    new_professor = ProfessorModel.get_professor_by_netId(new_professor_netId)
+    if new_professor in course.professors:
         return custom_response({'error': 'already teaching this course'}, 400)
 
-    professor.courses.append(course)
+    # append new prof to the course's list of professors
+    course.professors.append(new_professor)
     db.session.commit()
 
-    return custom_response({'message': 'professor added to course',
-                            'netId': new_professor}, 201)
+    return custom_response({'message': 'professor added to course', 'netId': new_professor_netId}, 201)
 
 @professor_api.route('/courses/<course_id>', methods=['PATCH'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def update_course(current_user, course_id):
     # retrive course and check if valid, permissions
     course = CourseModel.get_course_by_uuid(course_id)
@@ -123,14 +130,35 @@ def update_course(current_user, course_id):
     course.update(updated_data)
 
     return custom_response({'message': 'course updated'}, 201)
+    
+@professor_api.route('/courses/<course_id>', methods=['DELETE'])
+@Auth.professor_auth_required
+def delete_course(current_user, course_id):
+    """
+    delete this course
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    course.delete()
+    return custom_response({'message': 'course deleted'}, 200)
 
 @professor_api.route('/courses/<course_id>/code', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_enrollment_code(current_user, course_id):
     """
-    gives course an enrollment code
+    get a (new) enrollment code for the course
     """
+    # retrieve course and check if valid
     course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
 
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
@@ -142,10 +170,10 @@ def get_enrollment_code(current_user, course_id):
     updated_data = {'enroll_code' : enroll_code}
     course.update(updated_data)
 
-    return custom_response(updated_data, 200)
+    return custom_response({'message': 'code created', 'enroll_code': enroll_code}, 200)
 
 @professor_api.route('/courses/<course_id>/students', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_students(current_user, course_id):
     """
     gets list of students enrolled in courses
@@ -164,7 +192,7 @@ def get_students(current_user, course_id):
     return custom_response(students_data, 200)
 
 @professor_api.route('/courses/<course_id>/students', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def enroll_student(current_user, course_id):
     """
     manually enrolls student
@@ -194,7 +222,7 @@ def enroll_student(current_user, course_id):
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 200)
 
 @professor_api.route('/courses/<course_id>/students/<student_id>', methods=['DELETE'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def remove_student(current_user, course_id, student_id):
     """
     manually deletes student
@@ -222,7 +250,7 @@ def remove_student(current_user, course_id, student_id):
                             'netId': student_netId}, 200)
 
 @professor_api.route('/courses/<course_id>/lectures', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_lectures(current_user, course_id):
     """
     Returns all lectures for a course
@@ -243,7 +271,7 @@ def get_lectures(current_user, course_id):
     return custom_response(lecture_data, 200)
 
 @professor_api.route('/courses/<course_id>/lectures', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def create_lecture(current_user, course_id):
     """
     Create a new lecture in a course
@@ -280,7 +308,7 @@ def create_lecture(current_user, course_id):
                             'course_id': lecture_data['course_id']}, 200)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_lecture_info(current_user, lecture_id):
     # retrieve lecture and check if valid
     lecture = LectureModel.get_lecture_by_uuid(lecture_id)
@@ -296,7 +324,7 @@ def get_lecture_info(current_user, lecture_id):
     return custom_response(lecture_data, 200)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['PATCH'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def update_lecture(current_user, lecture_id):
     # retrieve lecture and check if valid
     lecture = LectureModel.get_lecture_by_uuid(lecture_id)
@@ -314,8 +342,27 @@ def update_lecture(current_user, lecture_id):
 
     return custom_response({'message': 'lecture updated'}, 201)
 
+@professor_api.route('/lectures/<lecture_id>', methods=['DELETE'])
+@Auth.professor_auth_required
+def delete_lecture(current_user, lecture_id):
+    """
+    delete this lecture
+    """
+    # retrieve lecture and check if valid
+    lecture = LectureModel.get_lecture_by_uuid(lecture_id)
+    if not lecture:
+        return custom_response({'error': 'lecture does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    lecture.delete()
+    return custom_response({'message': 'lecture deleted'}, 200)
+
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_questions(current_user, lecture_id):
     """
     Returns all questions for a lecture
@@ -336,7 +383,7 @@ def get_questions(current_user, lecture_id):
     return custom_response(question_data, 200)
 
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def create_question(current_user, lecture_id):
     """
     Create a new question in a lecture
@@ -388,7 +435,7 @@ def create_question(current_user, lecture_id):
                             'question_type': question_data['question_type']}, 201)
 
 @professor_api.route('/questions/<question_id>', methods=['GET'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def get_question_info(current_user, question_id):
     # retrieve question and check if valid
     question = QuestionModel.get_question_by_uuid(question_id)
@@ -411,9 +458,50 @@ def get_question_info(current_user, question_id):
         return custom_response({'error': 'question_type not found'}, 400)
     return custom_response(question_data, 200)
 
+@professor_api.route('/questions/<question_id>', methods=['DELETE'])
+@Auth.professor_auth_required
+def delete_question(current_user, question_id):
+    """
+    delete this question
+    """
+    # retrieve question and check if valid
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    question.delete()
+    return custom_response({'message': 'question deleted'}, 200)
+
+@professor_api.route('/questions/<question_id>/answers', methods=['GET'])
+@Auth.professor_auth_required
+def get_answers(current_user, question_id):
+    """
+    returns all student answers for this question
+    """
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # retrieve answers and return
+    answer_data = answer_schema.dump(question.answers, many=True).data
+    return custom_response(answer_data, 200)
+
 @professor_api.route('/questions/<question_id>', methods=['POST'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def handle_question_action(current_user, question_id):
+    """
+    open or close this question
+    """
     # retrieve question and check if valid
     question = QuestionModel.get_question_by_uuid(question_id)
     if not question:
@@ -440,7 +528,7 @@ def handle_question_action(current_user, question_id):
         return custom_response({'error': 'invalid action'}, 400)
 
 @professor_api.route('/questions/<question_id>', methods=['PATCH'])
-@Auth.professor_token_required
+@Auth.professor_auth_required
 def update_question(current_user, question_id):
     # retrieve question and check if valid
     question = QuestionModel.get_question_by_uuid(question_id)
@@ -471,6 +559,17 @@ def _open_question(current_user, question, course):
     }
     question.update(updated_data)
 
+    # push question to students using socketIO
+    socketio.emit('server message', 'question ' + question.id + ' has been opened!', room=course.id)
+
+    if question.question_type == 'multiple_choice':
+        detailed_schema = MultipleChoiceSchema(exclude=['correct_answer'])  # TODO: maybe separate schemas to send questions to students vs. to profs?
+    elif question.question_type == 'free_text':
+        detailed_schema = FreeTextSchema(exclude=['correct_answer'])
+    
+    detailed_data = detailed_schema.dump(question).data
+    socketio.emit('question opened', detailed_data, room=course.id)
+    
     return custom_response({'message': 'question opened'}, 200)
 
 def _close_question(current_user, question, course):
@@ -485,32 +584,36 @@ def _close_question(current_user, question, course):
     }
     question.update(updated_data)
 
+    socketio.emit('server message', 'question ' + question.id + ' has been closed!', room=course.id)
+
     return custom_response({'message': 'question closed'}, 200)
 
-@professor_api.route('/login', methods=['POST'])
+@professor_api.route('/login', methods=['GET', 'POST'])
 def login():
     """
-    Does not provide authentication at the moment!
-    Its only purpose is to obtain a jwt token for a prof, which is used to identify the user in subsequent API calls.
+    Does not provide authentication at the moment! 
+    Its only purpose is to create a session (cookie) for a professor, which is used to identify the user in subsequent API calls.
     """
+
     # for testing purposes, the user only needs to supply his netId (no password required)
-    req_data = request.get_json()
-    netId = req_data['netId']
+    if request.method == 'GET':
+        return render_template('login_professor.html')
+    else:
+        netId = request.form.get('netId')
 
-    # check if prof exists in DB
-    professor = ProfessorModel.get_professor_by_netId(netId)
-    if not professor:
-        return custom_response({'error': 'invalid user'}, 400)
+        # check if student exists in DB
+        professor = ProfessorModel.get_professor_by_netId(netId)
+        if not professor:
+            return render_template('logged_in.html', error='Invalid netId')
+        
+        # create a session for the user
+        session['username'] = netId
+        session['role'] = 'professor'
 
-    token = Auth.generate_token(netId, 'professor')
-    return custom_response({'x-access-token': token}, 200)
+        service_url = request.args.get('service')
 
-def custom_response(res, status_code):
-    """
-    Custom Response Function
-    """
-    return Response(
-        mimetype="application/json",
-        response=json.dumps(res),
-        status=status_code
-    )
+        if service_url:
+            print('redirecting to' + service_url)
+            return redirect(service_url)
+        else:
+            return render_template('logged_in.html', role=session['role'], netId=session['username'])
