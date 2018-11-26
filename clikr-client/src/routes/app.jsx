@@ -16,10 +16,10 @@ class App extends Component {
                     <Router>
                         <Switch>
                             <Route exact path='/' component={Home} />
-                            <Route path='/login-prof' component={Login} />
+                            <Route exact path='/login-prof' component={Login} />
                             <Route exact path="/student" />
                             <Provider courseStore={this.courseStore}>
-                                <Route path="/professor" component={ProfessorHome} />
+                                <Route exact path="/professor" component={ProfessorHome} />
                             </Provider>
                         </Switch>
                     </Router>
