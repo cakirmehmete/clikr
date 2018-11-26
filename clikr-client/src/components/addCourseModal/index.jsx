@@ -5,7 +5,7 @@ import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import CourseObj from '../../models/CourseObj';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 
 function getModalStyle() {
     const top = 50;
@@ -43,7 +43,6 @@ const styles = theme => ({
     },
 });
 
-@inject("courseStore")
 @observer
 class AddCourseModal extends React.Component {
     state = {
@@ -55,7 +54,7 @@ class AddCourseModal extends React.Component {
 
     constructor(props) {
         super(props)
-        this.apiService = props.apiService
+        this.apiProfService = props.apiProfService
     }
 
     handleChange = name => event => {
@@ -74,7 +73,7 @@ class AddCourseModal extends React.Component {
 
     handleSubmit = () => {
         // Send course to API
-        this.apiService.addCourse(new CourseObj(this.state.name, this.state.coursenum, this.state.dept, null))
+        this.apiProfService.addCourse(new CourseObj(this.state.name, this.state.coursenum, this.state.dept, null))
         // Close modal 
         this.setState({ open: false });
     }

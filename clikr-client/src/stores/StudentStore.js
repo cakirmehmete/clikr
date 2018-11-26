@@ -1,7 +1,7 @@
 import { observable, action } from "mobx";
 import CourseObj from '../models/CourseObj';
 
-export default class CourseStore {
+export default class StudentStore {
   @observable
   courses = []; // CourseObj[]
 

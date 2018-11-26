@@ -1,10 +1,11 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { observer, inject } from 'mobx-react';
-import APIService from '../../services/APIService';
+import APIProfService from '../../services/APIProfService';
 import SideMenuBar from '../../components/SideMenuBar';
 import TopMenuBar from '../../components/TopMenuBar';
 import AllCoursesFrame from '../../components/AllCoursesFrame';
+import Grid from '@material-ui/core/Grid';
 
 const drawerWidth = 240;
 
@@ -20,27 +21,34 @@ const styles = theme => ({
     },
 });
 
-@inject("courseStore")
+@inject("profStore")
 @observer
 class ProfessorHome extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.courseStore = props.courseStore
-        this.apiService = new APIService(this.courseStore)
+        this.profStore = props.profStore
+        this.apiProfService = new APIProfService(this.profStore)
     }
 
     componentDidMount() {
-        this.apiService.loadAllCourses()
+        this.apiProfService.loadAllCourses()
     }
 
     render() {
         return (
             <div className={this.styles.root}>
                 <TopMenuBar />
-                <SideMenuBar courseStore={this.courseStore} />
+                <SideMenuBar profStore={this.profStore} />
                 <main className={this.styles.content}>
-                    <AllCoursesFrame courseStore={this.courseStore} apiService={this.apiService} />
+                    <Grid container spacing={24}>
+                        <Grid item xs={6}>
+                            <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+                        </Grid>
+                    </Grid>
                 </main>
             </div>
         );

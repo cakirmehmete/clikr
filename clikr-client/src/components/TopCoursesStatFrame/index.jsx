@@ -7,7 +7,6 @@ import ListItem from '@material-ui/core/ListItem';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { observer } from 'mobx-react';
-import AddCourseModalWrapped from '../../components/addCourseModal';
 
 const styles = theme => ({
     card: {

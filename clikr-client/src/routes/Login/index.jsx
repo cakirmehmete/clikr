@@ -3,7 +3,16 @@ import { baseURL } from '../../constants/api';
 
 class Login extends Component {
     componentDidMount() {
-        window.location.replace(baseURL + 'professor/login?service=' + window.location.href.substring(0, window.location.href.length - 11) + '/professor')
+        var url_add_on_1 = 'student/login?service=';
+        var url_add_on_2 = '/student';
+        var end_sub = 14;
+        if (window.location.href.split('login-')[1].valueOf() === 'prof'.valueOf()) {
+            url_add_on_1 = 'professor/login?service=';
+            url_add_on_2 = '/professor';
+            end_sub = 11;
+        }
+
+        window.location.replace(baseURL + url_add_on_1 + window.location.href.substring(0, window.location.href.length - end_sub) + url_add_on_2);
     }
 
     render() {
