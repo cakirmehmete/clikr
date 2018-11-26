@@ -8,6 +8,9 @@ import APIProfService from '../../services/APIProfService';
 import ProfessorHome from './Home';
 import ProfessorNewCourse from './NewCourse';
 import ProfessorAddStudent from './AddStudents';
+import ProfessorViewLectures from './ViewLectures';
+import ProfessorViewQuestions from './ViewQuestions';
+import ProfessorAddMCQuestion from './AddMCQuestion';
 
 const drawerWidth = 240;
 
@@ -47,6 +50,9 @@ class ProfessorRoutes extends React.Component {
                             <Route exact path='/professor' component={ProfessorHome} />
                             <Route path='/professor/new-course' component={ProfessorNewCourse} />
                             <Route path='/professor/add-students' component={ProfessorAddStudent} />
+                            <Route path='/professor/view-lectures' component={ProfessorViewLectures} />
+                            <Route exact path='/professor/view-questions' component={ProfessorViewQuestions} />
+                            <Route path='/professor/view-questions/add-mc-question' component={ProfessorAddMCQuestion} />
                         </Switch>
                     </Router>
                 </main>
