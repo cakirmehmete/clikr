@@ -1,4 +1,4 @@
-export default class QuestionObj {
+export class QuestionObj {
     constructor(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at) {
         
         this.id = id;
@@ -17,7 +17,7 @@ export default class QuestionObj {
 
 }
 
-export default class MultipleChoiceQuestionObj extends QuestionObj {
+export class MultipleChoiceQuestionObj extends QuestionObj {
 
     constructor(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at, option1, option2, option3, option4, option5, number_of_options) {
         
@@ -32,7 +32,7 @@ export default class MultipleChoiceQuestionObj extends QuestionObj {
     }
 }
 
-export default class FreeTextQuestionObj extends QuestionObj {
+export class FreeTextQuestionObj extends QuestionObj {
 
     constructor(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at, word_limit) {
 
