@@ -59,6 +59,20 @@ def enroll_in_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
 
+@student_api.route('/courses/<course_id>', methods=['GET'])
+@Auth.student_auth_required
+def get_course_info(current_user, course_id):
+    course = CourseModel.get_course_by_uuid(course_id)
+
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+    if not current_user in course.students:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    reduced_course_schema = CourseSchema(exclude=['creator_id', 'created_at', 'modified_at', 'enroll_code'])
+    course_data = reduced_course_schema.dump(course).data
+    return custom_response(course_data, 200)
+
 @student_api.route('/courses/<course_id>', methods=['DELETE'])
 @Auth.student_auth_required
 def drop_course(current_user, course_id):
