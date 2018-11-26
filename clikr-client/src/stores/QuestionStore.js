@@ -1,5 +1,5 @@
 import { observable, action } from "mobx";
-import LectureObj from '../models/LectureObj';
+import { QuestionObj } from "../models/QuestionObj";
 
 export default class QuestionsStore {
     constructor(lecture_id) {
@@ -7,14 +7,14 @@ export default class QuestionsStore {
     }
 
     @observable
-    lectures = []; // LectureObj[]
+    questions = []; // QuestionObj[]
 
     @action
-    updateAllQuestions(lectures) {
-        this.lectures = []
+    updateAllQuestions(questions) {
+        this.questions = []
 
-        lectures.forEach(element => {
-            this.lectures.push(new LectureObj(element.title, null))
-        })
+        questions.forEach(element => {
+            this.questions.push(new QuestionObj(element.id, element.lecture_id, element.question_type, element.question_title, element.question_text, element.correct_answer, element.creator_id, element.is_open, element.opened_at, element.closed_at, element.created_at, element.modified_at))
+        });
     }
 }
