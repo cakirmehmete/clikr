@@ -16,6 +16,12 @@ export function postNewCourseAPI(course) {
     });
 }
 
+export function postEnrollStudentAPI(code) {
+    return axios.post(baseURL + 'student/courses', {
+        enroll_code: code
+    });
+}
+
 export function postNewQuestionAPI(question) {
     return axios.post(baseURL + 'professor/lectures/' + question.lecture_id + '/questions', {
         lecture_id: question.lecture_id,

@@ -20,7 +20,7 @@ class App extends Component {
                             <Route exact path='/' component={Home} />
                             <Route path='/login-(prof|student)' component={Login} />
                             <Route path="/student/enroll" component={StudentEnroll} />
-                            <Provider classStore={this.classStore}>
+                            <Provider courseStore={this.classStore}>
                                 <Route path="/student" component={StudentHome} />
                             </Provider>
                             <Provider courseStore={this.courseStore}>

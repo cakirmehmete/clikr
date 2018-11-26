@@ -1,4 +1,4 @@
-import { getCoursesAPI, postNewCourseAPI } from '../utils/api-facade';
+import { getCoursesAPI, postNewCourseAPI, postEnrollStudentAPI } from '../utils/api-facade';
 
 export default class APIService {
     constructor(courseStore) {
@@ -6,7 +6,6 @@ export default class APIService {
     }
 
     loadAllCourses() {
-        // Call Server to get classes
         getCoursesAPI()
             .then(res => {
                 this.courseStore.updateAllCourses(res.data)
@@ -18,17 +17,18 @@ export default class APIService {
     }
 
     async enrollCourse(code) {
-        axios.defaults.withCredentials = true;
-        // Call Server to get classes
-        const res = await axios.post(baseURL + 'student/courses', {
-            enroll_code: code,
-        })
 
-        return await res.data;
+        postEnrollStudentAPI(code)
+            .then(res => {
+                return res.data
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth();
+            })
     }
 
     addCourse(course) {
-        // Call Server to get classes
         postNewCourseAPI(course)
             .then(res => {
                 this.courseStore.updateAllCourses(res.data.courses)
