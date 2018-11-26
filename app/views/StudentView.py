@@ -1,6 +1,6 @@
 #/src/views/StudentView
 
-from flask import request, json, Response, Blueprint, session, redirect, render_template
+from flask import request, Response, Blueprint, session, redirect, render_template
 import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
@@ -8,7 +8,8 @@ from ..models.QuestionModel import QuestionModel, QuestionSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db, cas
 from ..shared.Authentication import Auth
-from ..shared.CASClient import CASClient
+# from ..shared.CASClient import CASClient
+from ..shared.Util import custom_response
 
 from flask_socketio import send, emit, join_room
 from .. import socketio
@@ -57,6 +58,20 @@ def enroll_in_course(current_user):
     # prepare response
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
+
+@student_api.route('/courses/<course_id>', methods=['GET'])
+@Auth.student_auth_required
+def get_course_info(current_user, course_id):
+    course = CourseModel.get_course_by_uuid(course_id)
+
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+    if not current_user in course.students:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    reduced_course_schema = CourseSchema(exclude=['creator_id', 'created_at', 'modified_at', 'enroll_code'])
+    course_data = reduced_course_schema.dump(course).data
+    return custom_response(course_data, 200)
 
 @student_api.route('/courses/<course_id>', methods=['DELETE'])
 @Auth.student_auth_required
@@ -269,14 +284,3 @@ def login_cas():
 @cas.cas_required
 def secure():
     return render_template('login_test.html', username=session['username'])
-
-
-def custom_response(res, status_code):
-    """
-    Custom Response Function
-    """
-    return Response(
-        mimetype="application/json",
-        response=json.dumps(res),
-        status=status_code
-    )
