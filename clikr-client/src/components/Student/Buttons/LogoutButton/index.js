@@ -6,9 +6,10 @@ export default class LogoutButton extends React.Component {
 
     render() {
         return (
-            <Button onClick={this.handleClick}>
-                <Link to='/' style={{"color":"black", "text-decoration": "none"}}>logout</Link>
-            </Button>
+            <Link to='/' style={{"color":"black", "text-decoration": "none"}}>
+                <Button>logout</Button>
+            </Link>
+           
         );
     }
 }
