@@ -6,6 +6,7 @@ import SideMenuBar from '../../components/SideMenuBar';
 import TopMenuBar from '../../components/TopMenuBar';
 import AllCoursesFrame from '../../components/AllCoursesFrame';
 import Grid from '@material-ui/core/Grid';
+import TopCoursesStatFrame from '../../components/TopCoursesStatFrame';
 
 const drawerWidth = 240;
 
@@ -42,11 +43,11 @@ class ProfessorHome extends React.Component {
                 <SideMenuBar profStore={this.profStore} />
                 <main className={this.styles.content}>
                     <Grid container spacing={24}>
-                        <Grid item xs={6}>
+                        <Grid item xs={8}>
                             <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
                         </Grid>
-                        <Grid item xs={6}>
-                            <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+                        <Grid item xs={4}>
+                            <TopCoursesStatFrame profStore={this.profStore} apiProfService={this.apiProfService} />
                         </Grid>
                     </Grid>
                 </main>
