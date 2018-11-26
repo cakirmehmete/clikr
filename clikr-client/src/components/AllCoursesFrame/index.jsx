@@ -1,13 +1,14 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
+import { Redirect } from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
+import Button from '@material-ui/core/Button';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItem from '@material-ui/core/ListItem';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { observer } from 'mobx-react';
-import AddCourseModalWrapped from '../../components/addCourseModal';
 
 const styles = theme => ({
     card: {
@@ -17,6 +18,10 @@ const styles = theme => ({
 
 @observer
 class AllCoursesFrame extends React.Component {
+    state = {
+        toNewCourse: false,
+    }
+
     constructor(props) {
         super(props)
         this.styles = props.classes
@@ -24,7 +29,17 @@ class AllCoursesFrame extends React.Component {
         this.apiProfService = props.apiProfService
     }
 
+    handleNewCourseClick = () => {
+        this.setState(() => ({
+            toNewCourse: true
+        }))
+    }
+
     render() {
+        if (this.state.toNewCourse === true) {
+            return <Redirect to='/professor/new-course' />
+        }
+
         return (
             <div>
                 <Typography variant="subtitle1" color="textPrimary">
@@ -42,7 +57,7 @@ class AllCoursesFrame extends React.Component {
                                 </ListItem>)
                             })}
                         </List>
-                        <AddCourseModalWrapped apiProfService={this.apiProfService}></AddCourseModalWrapped>
+                        <Button onClick={this.handleNewCourseClick} variant="outlined" color="primary">Add Class</Button>
                     </CardContent>
                 </Card>
             </div>
