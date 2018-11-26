@@ -1,8 +1,9 @@
-import { getCoursesAPI, postNewCourseAPI } from '../utils/api-facade';
+import { getCoursesAPI, postNewCourseAPI, postNewQuestionAPI } from '../utils/api-facade';
 
 export default class APIService {
-    constructor(courseStore) {
+    constructor(courseStore, questionStore) {
         this.courseStore = courseStore;
+        this.questionStore = questionStore;
     }
 
     loadAllCourses() {
@@ -22,6 +23,18 @@ export default class APIService {
         postNewCourseAPI(course)
             .then(res => {
                 this.courseStore.updateAllCourses(res.data.courses)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth();
+            })
+    }
+
+    addQuestion(question) {
+        // post new question
+        postNewQuestionAPI(question)
+            .then(res => {
+                this.questionStore.updateAllQuestions(res.data.questions)
             })
             .catch(error => {
                 console.log(error);
