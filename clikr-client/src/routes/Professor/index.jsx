@@ -1,12 +1,12 @@
 import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
-import { observer, inject } from 'mobx-react';
-import APIProfService from '../../services/APIProfService';
 import SideMenuBar from '../../components/SideMenuBar';
 import TopMenuBar from '../../components/TopMenuBar';
-import AllCoursesFrame from '../../components/AllCoursesFrame';
-import Grid from '@material-ui/core/Grid';
-import TopCoursesStatFrame from '../../components/TopCoursesStatFrame';
+import ProfessorHome from './Home';
+import ProfessorNewCourse from './NewCourse';
+import APIProfService from '../../services/APIProfService';
+import { inject } from 'mobx-react';
 
 const drawerWidth = 240;
 
@@ -22,9 +22,8 @@ const styles = theme => ({
     },
 });
 
-@inject("profStore")
-@observer
-class ProfessorHome extends React.Component {
+@inject('profStore')
+class ProfessorRoutes extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
@@ -40,20 +39,18 @@ class ProfessorHome extends React.Component {
         return (
             <div className={this.styles.root}>
                 <TopMenuBar />
-                <SideMenuBar profStore={this.profStore} />
+                <SideMenuBar profStore={this.props.profStore} />
                 <main className={this.styles.content}>
-                    <Grid container spacing={24}>
-                        <Grid item xs={8}>
-                            <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <TopCoursesStatFrame profStore={this.profStore} apiProfService={this.apiProfService} />
-                        </Grid>
-                    </Grid>
+                    <Router>
+                        <Switch>
+                            <Route exact path='/professor' component={ProfessorHome} />
+                            <Route path='/professor/new-course' component={ProfessorNewCourse} />
+                        </Switch>
+                    </Router>
                 </main>
             </div>
         );
     }
 }
 
-export default withStyles(styles)(ProfessorHome);
+export default withStyles(styles)(ProfessorRoutes);

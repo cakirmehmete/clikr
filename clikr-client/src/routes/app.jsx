@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import ProfessorHome from './ProfessorHome'
+import ProfessorRoutes from './Professor'
 import StudentHome from './StudentHome'
 import StudentEnroll from './StudentEnrollment'
 import { Provider } from 'mobx-react';
@@ -23,7 +23,7 @@ class App extends Component {
                             <Route exact path='/login-(prof|student)' component={Login} />
                             <Route exact path="/student/enroll" component={StudentEnroll} />
                             <Provider profStore={this.professorStore}>
-                                <Route exact path="/professor" component={ProfessorHome} />
+                                <Route path="/professor" component={ProfessorRoutes} />
                             </Provider>
                             <Provider store={this.studentStore}>
                                 <Route exact path="/student" component={StudentHome} />
