@@ -1,7 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { observer, inject } from 'mobx-react';
-import APIService from '../../services/APIService';
+import APIProfService from '../../services/APIProfService';
 import SideMenuBar from '../../components/SideMenuBar';
 import TopMenuBar from '../../components/TopMenuBar';
 import AllCoursesFrame from '../../components/AllCoursesFrame';
@@ -20,14 +20,14 @@ const styles = theme => ({
     },
 });
 
-@inject("courseStore")
+@inject("store")
 @observer
 class ProfessorHome extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.courseStore = props.courseStore
-        this.apiService = new APIService(this.courseStore)
+        this.store = props.store
+        this.apiService = new APIProfService(this.store)
     }
 
     componentDidMount() {
@@ -38,9 +38,9 @@ class ProfessorHome extends React.Component {
         return (
             <div className={this.styles.root}>
                 <TopMenuBar />
-                <SideMenuBar courseStore={this.courseStore} />
+                <SideMenuBar store={this.store} />
                 <main className={this.styles.content}>
-                    <AllCoursesFrame courseStore={this.courseStore} apiService={this.apiService} />
+                    <AllCoursesFrame store={this.store} apiService={this.apiService} />
                 </main>
             </div>
         );

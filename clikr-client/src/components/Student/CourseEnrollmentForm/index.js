@@ -3,13 +3,13 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom'
 import Grid from '@material-ui/core/Grid';
-import APIService from '../../../services/APIService';
+import APIProfService from '../../../services/APIProfService';
 
 class CourseEnrollmentForm extends Component {
 
     constructor(props) {
         super(props)
-        this.apiService = new APIService()
+        this.apiService = new APIProfService()
     }
 
     state = {

@@ -5,7 +5,7 @@ import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import CourseObj from '../../models/CourseObj';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 
 function getModalStyle() {
     const top = 50;
@@ -43,7 +43,6 @@ const styles = theme => ({
     },
 });
 
-@inject("courseStore")
 @observer
 class AddCourseModal extends React.Component {
     state = {

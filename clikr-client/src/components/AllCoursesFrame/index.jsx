@@ -27,7 +27,7 @@ class AllCoursesFrame extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.courseStore = props.courseStore
+        this.store = props.store
         this.apiService = props.apiService
     }
 
@@ -43,7 +43,7 @@ class AllCoursesFrame extends React.Component {
                             Courses
                         </Typography>
                         <List component="nav">
-                            {this.courseStore.courses.map(function (courseObj, index) {
+                            {this.store.courses.map(function (courseObj, index) {
                                 return (<ListItem button key={index} >
                                     <ListItemText primary={courseObj.title} />
                                 </ListItem>)

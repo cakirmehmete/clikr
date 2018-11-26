@@ -8,14 +8,14 @@ import Typography from '@material-ui/core/Typography';
 import typeographytheme from '../../../constants/themes/typographytheme'
 import { Link } from 'react-router-dom'
 import { observer, inject } from 'mobx-react';
-import APIService from '../../../services/APIService';
+import APIProfService from '../../../services/APIProfService';
 import PropTypes from 'prop-types';
 
 const ClassCard = inject("classStore")(observer(class ClassCard extends React.Component {
 
     constructor(props) {
         super(props)
-        this.apiService = new APIService()
+        this.apiService = new APIProfService()
     }
 
     render () {

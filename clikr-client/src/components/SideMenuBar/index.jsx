@@ -25,7 +25,7 @@ class SideMenuBar extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.courseStore = props.courseStore
+        this.store = props.store
     }
 
     render() {
@@ -41,7 +41,7 @@ class SideMenuBar extends React.Component {
                 <div className={this.styles.toolbar} />
                 <Divider />
                 <List>
-                    {this.courseStore.courses.map(function (courseObj, index) {
+                    {this.store.courses.map(function (courseObj, index) {
                         return (<ListItem button key={index} >
                             <ListItemText primary={courseObj.title} />
                         </ListItem>)
