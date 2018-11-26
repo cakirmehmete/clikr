@@ -59,6 +59,20 @@ def enroll_in_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
 
+@student_api.route('/courses/<course_id>', methods=['GET'])
+@Auth.student_auth_required
+def get_course_info(current_user, course_id):
+    course = CourseModel.get_course_by_uuid(course_id)
+
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+    if not current_user in course.students:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    reduced_course_schema = CourseSchema(exclude=['creator_id', 'created_at', 'modified_at', 'enroll_code'])
+    course_data = reduced_course_schema.dump(course).data
+    return custom_response(course_data, 200)
+
 @student_api.route('/courses/<course_id>', methods=['DELETE'])
 @Auth.student_auth_required
 def drop_course(current_user, course_id):
@@ -210,14 +224,24 @@ def login():
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        return render_template('login_student.html')
+        if 'username' in session:
+            netId = session['username']
+        else:
+            netId = None
+
+        if 'role' in session:
+            role = session['role']
+        else:
+            role = ''
+
+        return render_template('login_student.html', role=role, netId=netId)
     else:
         netId = request.form.get('netId')
 
         # check if student exists in DB
         student = StudentModel.get_student_by_netId(netId)
         if not student:
-            return render_template('logged_in.html', error='Invalid netId')
+            return render_template('login_student.html', error='Invalid netId')
         
         # create a session for the user
         session['username'] = netId
@@ -229,7 +253,21 @@ def login():
             print('redirecting to' + service_url)
             return redirect(service_url)
         else:
-            return render_template('logged_in.html', role=session['role'], netId=session['username'])
+            return render_template('login_student.html', role=session['role'], netId=session['username'])
+
+@student_api.route('/logout', methods=['GET'])
+def logout():
+    """
+    deletes the session cookie
+    """
+    session.pop('username', None)
+
+    service_url = request.args.get('service')
+
+    if service_url:
+        return redirect(service_url)
+    else:
+        return custom_response({'message': 'logged out'}, 200)
             
 
 
