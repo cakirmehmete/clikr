@@ -4,15 +4,14 @@ import ProfessorHome from './ProfessorHome'
 import StudentHome from './StudentHome'
 import StudentEnroll from './StudentEnrollment'
 import { Provider } from 'mobx-react';
-import ClassStore from './../stores/ClassStore';
+import CourseStore from './../stores/CourseStore';
 import Home from './Home';
 import Login from './Login'
 
 class App extends Component {
-   
-    classStore = new ClassStore()
-   
-    render() {  
+    courseStore = new CourseStore()
+
+    render() {
         return (
             <div>
                 <header>
@@ -24,11 +23,9 @@ class App extends Component {
                             <Provider classStore={this.classStore}>
                                 <Route path="/student" component={StudentHome} />
                             </Provider>
-                            <Provider classStore={this.classStore}>
-                                <Route path="/professor" component={ProfessorHome} />
+                            <Provider courseStore={this.courseStore}>
+                                <Route exact path="/professor" component={ProfessorHome} />
                             </Provider>
-            
-                            
                         </Switch>
                     </Router>
                 </header>
