@@ -7,6 +7,10 @@ export function getCoursesAPI() {
     return axios.get(baseURL + 'professor/courses');
 }
 
+export function getStudentCoursesAPI() {
+    return axios.get(baseURL + 'student/courses');
+}
+
 // course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {

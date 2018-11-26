@@ -1,14 +1,14 @@
-import { getCoursesAPI, postNewCourseAPI } from '../utils/api-facade';
+import { getStudentCoursesAPI, postEnrollStudentAPI } from '../utils/api-facade';
 
 export default class APIService {
-    constructor(courseStore) {
-        this.courseStore = courseStore;
+    constructor(studentStore) {
+        this.studentStore = studentStore;
     }
 
     loadAllCourses() {
-        getCoursesAPI()
+        getStudentCoursesAPI()
             .then(res => {
-                this.courseStore.updateAllCourses(res.data)
+                this.studentStore.updateAllCourses(res.data)
             })
             .catch(error => {
                 console.log(error);
@@ -16,10 +16,10 @@ export default class APIService {
             })
     }
 
-    addCourse(course) {
-        postNewCourseAPI(course)
+    async enrollCourse(code) {
+        postEnrollStudentAPI(code)
             .then(res => {
-                this.courseStore.updateAllCourses(res.data.courses)
+                return res.data
             })
             .catch(error => {
                 console.log(error);
@@ -28,6 +28,6 @@ export default class APIService {
     }
 
     _checkAuth() {
-        window.location.replace('/login-prof')
+        window.location.replace('/login-student')
     }
 }

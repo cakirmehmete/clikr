@@ -9,19 +9,19 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import AddCourseButton from '../../components/Student/Buttons/AddCourseButton';
 import { observer, inject } from 'mobx-react';
-import APIService from '../../services/APIService';
+import APIStudentService from '../../services/APIStudentService';
 
-@inject("courseStore")
+@inject("store")
 @observer
 class StudentHome extends Component {
     constructor(props) {
         super(props)
-        this.courseStore = props.courseStore
-        this.apiService = new APIService(this.courseStore)
+        this.store = props.store
+        this.apiService = new APIStudentService(this.store)
     }
 
     componentDidMount() {
-        this.courseStore.loadCoursesStudent()
+        this.apiService.loadAllCourses()
     }
 
     render() {
@@ -37,7 +37,7 @@ class StudentHome extends Component {
                                     <AddCourseButton />
                                 </Grid>
                                 <Grid container justify="center" alignItems="flex-end" style={{ paddingTop: "1%" }}>
-                                    {this.courseStore.courses.map(function (courseObj, index) {
+                                    {this.store.courses.map(function (courseObj, index) {
                                         return (
                                             <ClassCard key={index} name={courseObj.title} number={courseObj.number} />
                                         );
