@@ -1,0 +1,14 @@
+<html>
+<head>
+<title>Logged in</title>
+</head>
+<body>
+    {% if error: %}
+    <h1>{{ error }}</h1>
+    {% else: %}
+    <h1>You are logged in as {{ role }} {{ netId }}.</h1>
+    {% endif %}
+
+    <a href='/api/v1/student/login'>student login</a> <br>
+    <a href='/api/v1/professor/login'>professor login</a>
+</body>

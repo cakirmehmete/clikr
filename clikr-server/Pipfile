@@ -13,6 +13,8 @@ marshmallow = "*"
 flask-bcrypt = "*"
 pyjwt = "*"
 gunicorn = "*"
+flask-cors = "*"
+flask-socketio = "*"
 
 [dev-packages]
 
