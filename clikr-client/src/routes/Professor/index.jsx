@@ -1,12 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
+import { inject } from 'mobx-react';
 import SideMenuBar from '../../components/SideMenuBar';
 import TopMenuBar from '../../components/TopMenuBar';
+import APIProfService from '../../services/APIProfService';
 import ProfessorHome from './Home';
 import ProfessorNewCourse from './NewCourse';
-import APIProfService from '../../services/APIProfService';
-import { inject } from 'mobx-react';
+import ProfessorAddStudent from './AddStudents';
 
 const drawerWidth = 240;
 
@@ -45,6 +46,7 @@ class ProfessorRoutes extends React.Component {
                         <Switch>
                             <Route exact path='/professor' component={ProfessorHome} />
                             <Route path='/professor/new-course' component={ProfessorNewCourse} />
+                            <Route path='/professor/add-students' component={ProfessorAddStudent} />
                         </Switch>
                     </Router>
                 </main>
