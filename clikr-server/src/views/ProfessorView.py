@@ -173,13 +173,18 @@ def enroll_student(current_user, course_id):
     netId = req_data.get("netId")
     student = StudentModel.get_student_by_netId(netId)
 
+    if not student:
+        return custom_response({'error': 'student netId does not exist'}, 400)
+
     course = CourseModel.get_course_by_uuid(course_id)
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
-
+    # check if student is already enrolled
+    if course in student.courses:
+        return custom_response({'error': 'already enrolled in this course'}, 400)
     # add the course to the student's list of courses
     student.courses.append(course)
     db.session.commit()
@@ -195,6 +200,8 @@ def remove_student(current_user, course_id, student_id):
     manually deletes student
     """
     student = StudentModel.get_student_by_uuid(student_id)
+    if not student:
+        return custom_response({'error': 'student does not exist'}, 400)
     student_netId = student.netId
 
     course = CourseModel.get_course_by_uuid(course_id)
@@ -205,7 +212,7 @@ def remove_student(current_user, course_id, student_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     # add the course to the student's list of courses
-    student.courses.remove(course) # TODO: blacklist student? would need record
+    student.courses.remove(course) 
     db.session.commit()
 
     # prepare response
@@ -350,7 +357,10 @@ def create_question(current_user, lecture_id):
     req_data['lecture_id'] = lecture_id
 
     # load the appropriate schema and create new question
-    question_type = req_data['question_type']
+    try:
+        question_type = req_data['question_type']
+    except:
+        return custom_response({'error': 'question type required'}, 400)
     if question_type == 'multiple_choice':
         data, error = multiple_choice_schema.load(req_data)
         if error:
@@ -418,7 +428,10 @@ def handle_question_action(current_user, question_id):
     req_data = request.get_json()
 
     # call the appropriate handler
-    action = req_data['action']
+    try:
+        action = req_data['action']
+    except:
+        return custom_response({'error': 'action required'}, 400)
     if action == 'open':
         return _open_question(current_user, question, course)
     elif action == 'close':
