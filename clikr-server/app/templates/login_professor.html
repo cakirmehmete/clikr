@@ -3,8 +3,15 @@
 <title>Professor Login</title>
 </head>
 <body>
+    {% if error: %}
+    <h1>{{ error }}</h1>
+    {% elif netId: %}
+    <h1>You are logged in as {{ role }} {{ netId }}.</h1>
+    <p><a href=/api/v1/professor/logout?service=/api/v1/professor/login>logout</a></p>
+    {% endif %}
     <form method="POST">
         professor netId:<br>
         <input type="text" name="netId"><br>
     </form>
+
 </body>
