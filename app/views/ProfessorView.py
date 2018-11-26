@@ -307,11 +307,10 @@ def create_lecture(current_user, course_id):
     course.lectures.append(lecture)
     db.session.commit()
 
-    # prepare response
-    lecture_data = lecture_schema.dump(lecture).data
-    return custom_response({'message': 'lecture created',
-                            'id': lecture_data['id'],
-                            'course_id': lecture_data['course_id']}, 200)
+    # response returns all lectures for this course
+    all_lectures = course.lectures
+    all_lectures_data = lecture_schema.dump(all_lectures, many=True).data
+    return custom_response({'message': 'lecture created', 'id': lecture.id, 'lectures': all_lectures_data}, 201)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['GET'])
 @Auth.professor_auth_required
@@ -433,12 +432,9 @@ def create_question(current_user, lecture_id):
     lecture.questions.append(question)
     db.session.commit()
 
-    # prepare response
-    question_data = question_schema.dump(question).data
-    return custom_response({'message': 'question created',
-                            'id': question_data['id'],
-                            'lecture_id': question_data['lecture_id'],
-                            'question_type': question_data['question_type']}, 201)
+    all_questions = lecture.questions
+    all_questions_data = question_schema.dump(all_questions, many=True).data
+    return custom_response({'message': 'question created', 'id': question.id, 'questions': all_questions_data}, 201)
 
 @professor_api.route('/questions/<question_id>', methods=['GET'])
 @Auth.professor_auth_required
