@@ -1,4 +1,4 @@
-export default class ClassObj {
+export default class CourseObj {
     constructor(name, num, dept, joinCode) {
         this.name = name;
         this.num = num;

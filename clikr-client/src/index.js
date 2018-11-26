@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './config/serviceWorker';
 import App from './routes/app';
+import { configure } from 'mobx';
+
+// enable MobX strict mode
+configure({ enforceActions: "observed" });
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

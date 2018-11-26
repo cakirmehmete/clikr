@@ -40,23 +40,24 @@ const styles = theme => ({
     },
 });
 
-@inject("classStore")
+@inject("courseStore")
 @observer
 class ProfessorHome extends React.Component {
     constructor(props) {
         super(props)
-        this.classes = props.classes
-        this.apiService = new APIService()
+        this.styles = props.classes
+        this.courseStore = props.courseStore
+        this.apiService = new APIService(this.courseStore)
     }
 
     componentDidMount() {
-        this.props.classStore.loadClasses()
+        this.apiService.loadAllCourses()
     }
 
     render() {
         return (
             <div>
-                <AppBar position="static" color="primary" className={this.classes.appBar}>
+                <AppBar position="static" color="primary" className={this.styles.appBar}>
                     <Toolbar>
                         <Typography variant="h6" color="inherit">
                             Professor Home Page
@@ -64,35 +65,35 @@ class ProfessorHome extends React.Component {
                     </Toolbar>
                 </AppBar>
                 <Drawer
-                    className={this.classes.drawer}
+                    className={this.styles.drawer}
                     variant="permanent"
                     classes={{
-                        paper: this.classes.drawerPaper,
+                        paper: this.styles.drawerPaper,
                     }}
                     anchor="left"
                 >
-                    <div className={this.classes.toolbar} />
+                    <div className={this.styles.toolbar} />
                     <Divider />
                     <List>
-                        {this.props.classStore.classes.map(function (classObj, index) {
+                        {this.courseStore.courses.map(function (courseObj, index) {
                             return (<ListItem button key={index} >
-                                <ListItemText primary={classObj.name} />
+                                <ListItemText primary={courseObj.name} />
                             </ListItem>)
                         })}
                     </List>
                 </Drawer>
-                <main className={this.classes.content}>
+                <main className={this.styles.content}>
                     <Typography variant="h6" color="inherit">
                         Courses
                 </Typography>
                     <List component="nav">
-                        {this.props.classStore.classes.map(function (classObj, index) {
+                        {this.courseStore.courses.map(function (courseObj, index) {
                             return (<ListItem button key={index} >
-                                <ListItemText primary={classObj.name} />
+                                <ListItemText primary={courseObj.name} />
                             </ListItem>)
                         })}
                     </List>
-                    <AddCourseModalWrapped></AddCourseModalWrapped>
+                    <AddCourseModalWrapped apiService={this.apiService}></AddCourseModalWrapped>
                 </main>
             </div>
         );
