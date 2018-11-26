@@ -77,7 +77,7 @@ class ProfessorHome extends React.Component {
                     <List>
                         {this.courseStore.courses.map(function (courseObj, index) {
                             return (<ListItem button key={index} >
-                                <ListItemText primary={courseObj.name} />
+                                <ListItemText primary={courseObj.title} />
                             </ListItem>)
                         })}
                     </List>
@@ -89,7 +89,7 @@ class ProfessorHome extends React.Component {
                     <List component="nav">
                         {this.courseStore.courses.map(function (courseObj, index) {
                             return (<ListItem button key={index} >
-                                <ListItemText primary={courseObj.name} />
+                                <ListItemText primary={courseObj.title} />
                             </ListItem>)
                         })}
                     </List>
