@@ -3,7 +3,7 @@ import CourseObj from '../models/CourseObj';
 
 export default class CourseStore {
   @observable
-  courses = [];
+  courses = []; // CourseObj[]
 
   @action
   updateAllCourses(courses) {

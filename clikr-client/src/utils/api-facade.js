@@ -7,6 +7,7 @@ export function getCoursesAPI() {
     return axios.get(baseURL + 'professor/courses');
 }
 
+// course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {
         coursenum: course.num,
