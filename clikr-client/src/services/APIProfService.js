@@ -1,4 +1,4 @@
-import { getCoursesAPI, postNewCourseAPI, postNewQuestionAPI, getLecturesAPI } from '../utils/api-facade';
+import { getCoursesAPI, postNewCourseAPI, postNewQuestionAPI, getLecturesAPI, postNewLectureAPI } from '../utils/api-facade';
 
 export default class APIProfService {
     constructor(professorStore) {
@@ -20,6 +20,17 @@ export default class APIProfService {
         getLecturesAPI(course_id)
             .then(res => {
                 this.professorStore.updateAllLectures(res.data)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
+    addLecture(lecture) {
+        postNewLectureAPI(lecture)
+            .then(res => {
+                this.professorStore.updateAllLectures(res.data.lectures)
             })
             .catch(error => {
                 console.log(error);

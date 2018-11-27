@@ -27,6 +27,15 @@ export function postNewCourseAPI(course) {
     });
 }
 
+// lecture: LectureObj
+export function postNewLectureAPI(lecture) {
+    return axios.post(baseURL + 'professor/courses/' + lecture.course_id + '/lectures', {
+        title: lecture.title,
+        description: lecture.description,
+        date: lecture.date,
+    });
+}
+
 export function postEnrollStudentAPI(code) {
     return axios.post(baseURL + 'student/courses', {
         enroll_code: code

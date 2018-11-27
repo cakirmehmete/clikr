@@ -30,8 +30,6 @@ export default class ProfessorStore {
     }
 
     getCourseWithId(course_id) {
-        console.log(course_id)
-        console.log(this.courses.find(x => x.id === course_id))
         return this.courses.find(x => x.id === course_id)
     }
 
@@ -41,7 +39,8 @@ export default class ProfessorStore {
 
         lectures.forEach(element => {
             // course_id: any, date: any, description: any, id: any, title: any
-            this.lectures.push(new LectureObj(element.title, null))
+            this.lectures.push(new LectureObj(element.title, element.description, 
+                element.date, element.id, element.course_id))
         })
     }
 

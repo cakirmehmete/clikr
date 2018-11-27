@@ -17,10 +17,10 @@ const styles = theme => ({
 });
 
 @observer
-class AllLecturesFrame extends React.Component {
+class AllQuestionsFrame extends React.Component {
     state = {
-        toNewLecture: false,
-        referrerLectureIndex: -1
+        toNewQuestion: false,
+        referrerQuestionIndex: -1
     }
 
     constructor(props) {
@@ -51,9 +51,6 @@ class AllLecturesFrame extends React.Component {
         // Handle routes
         if (this.state.toNewLecture === true) {
             return <Redirect to='/professor/add-lecture' />
-        } else if (this.state.referrerLectureIndex !== -1) {
-            this.profStore.lecture_id = this.state.referrerLectureIndex
-            return <Redirect to='/professor/view-questions' />
         }
 
         return (
@@ -83,4 +80,4 @@ class AllLecturesFrame extends React.Component {
     }
 }
 
-export default withStyles(styles)(AllLecturesFrame);
+export default withStyles(styles)(AllQuestionsFrame);
