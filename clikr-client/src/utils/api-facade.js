@@ -11,6 +11,10 @@ export function getLecturesAPI(course_id) {
     return axios.get(baseURL + 'professor/courses/' + course_id + '/lectures');
 }
 
+export function getQuestionsAPI(lecture_id) {
+    return axios.get(baseURL + 'professor/lectures/' + lecture_id + '/questions');
+}
+
 export function getStudentCoursesAPI() {
     return axios.get(baseURL + 'student/courses');
 }

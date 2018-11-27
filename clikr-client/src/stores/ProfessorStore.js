@@ -33,6 +33,10 @@ export default class ProfessorStore {
         return this.courses.find(x => x.id === course_id)
     }
 
+    getLectureWithId(lecture_id) {
+        return this.lectures.find(x => x.id === lecture_id)        
+    }
+
     @action
     updateAllLectures(lectures) {
         this.lectures = []

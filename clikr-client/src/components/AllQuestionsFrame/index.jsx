@@ -5,10 +5,10 @@ import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { observer } from 'mobx-react';
+import AddQuestionModalWrapped from '../AddQuestionModal';
 
 const styles = theme => ({
     card: {
@@ -28,51 +28,51 @@ class AllQuestionsFrame extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = props.apiProfService
-        this.parentCourse = this.profStore.getCourseWithId(this.profStore.course_id)
+        this.parentLecture = this.profStore.getLectureWithId(this.profStore.lecture_id)
     }
 
     componentDidMount() {
-        this.apiProfService.loadLecturesForCourse(this.parentCourse.id)
+        this.apiProfService.loadQuestionsForLecture(this.parentLecture.id)
     }
 
-    handleNewLectureClick = () => {
+    handleNewQuestionClick = () => {
         this.setState(() => ({
-            toNewLecture: true
+            toNewQuestion: true
         }))
     }
 
-    handleLectureClick = index => () => {
+    handleQuestionClick = index => () => {
         this.setState(() => ({
-            referrerLectureIndex: index
+            referrerQuestionIndex: index
         }))
     }
 
     render() {
         // Handle routes
-        if (this.state.toNewLecture === true) {
-            return <Redirect to='/professor/add-lecture' />
+        if (this.state.toNewQuestion === true) {
+            return <Redirect to='/professor/TODO' />
         }
 
         return (
             <div>
                 <Typography variant="subtitle1" color="textPrimary">
-                    Here are your lectures:
+                    Here are your questions:
                 </Typography>
                 <Card className={this.styles.card}>
                     <CardContent>
                         <Typography variant="h6" color="inherit">
-                            Lectures for {this.parentCourse.title}
+                            Questions for {this.parentLecture.title}
                         </Typography>
                         <List component="nav">
-                            {this.profStore.lectures.map((lectureObj, index) => {
+                            {this.profStore.questions.map((questionObj, index) => {
                                 return (
-                                    <ListItem divider button key={index} onClick={this.handleLectureClick(lectureObj.id)} >
-                                        <ListItemText primary={lectureObj.title + " Lecture on " + lectureObj.date} />
+                                    <ListItem divider button key={index} onClick={this.handleQuestionClick(questionObj.id)} >
+                                        <ListItemText primary={questionObj.title + " Lecture"} />
                                     </ListItem>
                                 )
                             })}
                         </List>
-                        <Button onClick={this.handleNewLectureClick} variant="outlined" color="primary">Add Lecture</Button>
+                        <AddQuestionModalWrapped profStore={this.profStore} />
                     </CardContent>
                 </Card>
             </div>
