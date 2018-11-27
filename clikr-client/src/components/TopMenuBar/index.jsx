@@ -7,6 +7,8 @@ import DropDownMenu from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import SvgIcon from '@material-ui/core/SvgIcon';
+import { Link } from 'react-router-dom';
+
 
 const drawerWidth = 240;
 
@@ -27,13 +29,15 @@ class TopMenuBar extends React.Component {
         return (
             <AppBar position="static" color="white" className={this.styles.appBar}>
                 <Toolbar>
-                    <ToolbarGroup firstChild={true} float="left">
-                        <IconButton color="primary">
-                            <SvgIcon>
-                                <path fill="#FFEA00"
+                    <ToolbarGroup firstChild={true}>
+                        <Link to={'/professor'}>
+                            <IconButton color="primary">
+                                <SvgIcon>
+                                    <path fill="#FFEA00"
                                     d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
-                            </SvgIcon>
-                        </IconButton>
+                                </SvgIcon>
+                            </IconButton>
+                        </Link>
                     </ToolbarGroup>
 
                     <ToolbarGroup style={{
@@ -46,6 +50,7 @@ class TopMenuBar extends React.Component {
 
                     <ToolbarGroup lastChild={true} float="right">
                         <DropDownMenu>
+                            
                         </DropDownMenu>
                     </ToolbarGroup>
                 </Toolbar>
