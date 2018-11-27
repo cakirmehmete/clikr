@@ -4,9 +4,10 @@ import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
 import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
 import ListItem from '@material-ui/core/ListItem';
 import { observer } from 'mobx-react';
-
+import logo from '../../assets/clikrlogo.png';
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -29,7 +30,7 @@ class SideMenuBar extends React.Component {
     }
 
     render() {
-        return (
+        return ( 
             <Drawer
                 className={this.styles.drawer}
                 variant="permanent"
@@ -38,7 +39,10 @@ class SideMenuBar extends React.Component {
                 }}
                 anchor="left"
             >
-                <div className={this.styles.toolbar} />
+            <Grid container direction="column" alignItems="center" justify="space-around">
+                <img src = {logo} alt = "logo" width="50%"></img>
+            </Grid>
+
                 <Divider />
                 <List>
                     {this.profStore.courses.map(function (courseObj, index) {
@@ -48,6 +52,7 @@ class SideMenuBar extends React.Component {
                     })}
                 </List>
             </Drawer>
+
         );
     }
 }
