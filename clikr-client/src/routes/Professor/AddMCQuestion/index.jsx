@@ -1,7 +1,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { observer, inject } from 'mobx-react';
-import Grid from '@material-ui/core/Grid';
 import APIProfService from '../../../services/APIProfService';
 
 const styles = theme => ({

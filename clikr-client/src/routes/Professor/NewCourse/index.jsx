@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import APIProfService from '../../../services/APIProfService';
 import { observer, inject } from 'mobx-react';
-import Grid from '@material-ui/core/Grid';
 import CourseObj from '../../../models/CourseObj';
 
 const styles = theme => ({
