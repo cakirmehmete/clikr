@@ -61,13 +61,13 @@ class AllQuestionsFrame extends React.Component {
                 <Card className={this.styles.card}>
                     <CardContent>
                         <Typography variant="h6" color="inherit">
-                            Questions for {this.parentLecture.title}
+                            Questions for {this.parentLecture.title + " Lecture"}
                         </Typography>
                         <List component="nav">
                             {this.profStore.questions.map((questionObj, index) => {
                                 return (
                                     <ListItem divider button key={index} onClick={this.handleQuestionClick(questionObj.id)} >
-                                        <ListItemText primary={questionObj.title + " Lecture"} />
+                                        <ListItemText primary={questionObj.question_title} />
                                     </ListItem>
                                 )
                             })}
