@@ -5,7 +5,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 
 const drawerWidth = 240;
 
@@ -20,6 +20,7 @@ const styles = theme => ({
     toolbar: theme.mixins.toolbar,
 });
 
+@inject('profStore')
 @observer
 class SideMenuBar extends React.Component {
     constructor(props) {

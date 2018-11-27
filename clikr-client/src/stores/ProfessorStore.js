@@ -29,11 +29,18 @@ export default class ProfessorStore {
         })
     }
 
+    getCourseWithId(course_id) {
+        console.log(course_id)
+        console.log(this.courses.find(x => x.id === course_id))
+        return this.courses.find(x => x.id === course_id)
+    }
+
     @action
     updateAllLectures(lectures) {
         this.lectures = []
 
         lectures.forEach(element => {
+            // course_id: any, date: any, description: any, id: any, title: any
             this.lectures.push(new LectureObj(element.title, null))
         })
     }

@@ -7,6 +7,10 @@ export function getCoursesAPI() {
     return axios.get(baseURL + 'professor/courses');
 }
 
+export function getLecturesAPI(course_id) {
+    return axios.get(baseURL + 'professor/courses/' + course_id + '/lectures');
+}
+
 export function getStudentCoursesAPI() {
     return axios.get(baseURL + 'student/courses');
 }
