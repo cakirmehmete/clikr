@@ -15,8 +15,11 @@ export function getStudentCoursesAPI() {
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {
         coursenum: course.num,
-        title: course.name,
-        dept: course.dept
+        title: course.title,
+        dept: course.dept,
+        description: course.description,
+        term: course.term,
+        year: course.year
     });
 }
 

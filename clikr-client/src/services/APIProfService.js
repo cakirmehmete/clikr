@@ -40,7 +40,9 @@ export default class APIProfService {
     }
 
     _checkAuth(error) {
-        if (error.response.status === 401)
-            window.location.replace('/login-prof')
+        if (error.response !== undefined) {
+            if (error.response.status === 401)
+                window.location.replace('/login-prof')
+        }
     }
 }

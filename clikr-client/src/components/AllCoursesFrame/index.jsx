@@ -8,7 +8,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItem from '@material-ui/core/ListItem';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { observer } from 'mobx-react';
+import AddStudentsModalWrapped from '../AddStudentsModal';
 
 const styles = theme => ({
     card: {
@@ -51,10 +53,15 @@ class AllCoursesFrame extends React.Component {
                             Courses
                         </Typography>
                         <List component="nav">
-                            {this.profStore.courses.map(function (courseObj, index) {
-                                return (<ListItem button key={index} >
-                                    <ListItemText primary={courseObj.title} />
-                                </ListItem>)
+                            {this.profStore.courses.map((courseObj, index) => {
+                                return (
+                                    <ListItem divider button key={index} >
+                                        <ListItemText primary={courseObj.title} />
+                                        <ListItemSecondaryAction>
+                                            <AddStudentsModalWrapped profStore={this.profStore} courseIndex={index} />
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                )
                             })}
                         </List>
                         <Button onClick={this.handleNewCourseClick} variant="outlined" color="primary">Add Class</Button>

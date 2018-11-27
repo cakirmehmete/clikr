@@ -32,7 +32,10 @@ class ProfessorNewCourse extends React.Component {
         toHome: false,
         name: '',
         coursenum: '',
-        dept: ''
+        dept: '',
+        description: '',
+        term: '',
+        year: ''
     };
 
     constructor(props) {
@@ -45,17 +48,21 @@ class ProfessorNewCourse extends React.Component {
     handleChange = name => event => {
         this.setState({
             [name]: event.target.value,
-            toHome: true
         });
     };
 
     handleSubmit = () => {
         // Send course to API
-        this.apiProfService.addCourse(new CourseObj(this.state.name, this.state.coursenum, this.state.dept, null))
+        this.apiProfService.addCourse(
+            // id: any, title: any, num: any, dept: any, description: any, term: any, joinCode: any, year: any
+            new CourseObj(null, this.state.name, this.state.coursenum, this.state.dept,
+                this.state.description, this.state.term, this.state.year)
+        )
         // Close modal 
-        this.setState({ open: false });
+        this.setState({ toHome: true });
     }
 
+    // TODO: Make the year and term and Dept a drop down
     render() {
         if (this.state.toHome === true) {
             return <Redirect to='/professor' />
@@ -85,10 +92,34 @@ class ProfessorNewCourse extends React.Component {
                     />
                     <TextField
                         id="standard-name"
-                        label="Course Dept"
+                        label="Course Department"
                         className={this.styles.textField}
                         value={this.state.dept}
                         onChange={this.handleChange('dept')}
+                        margin="normal"
+                    />
+                    <TextField
+                        id="standard-name"
+                        label="Course Description"
+                        className={this.styles.textField}
+                        value={this.state.description}
+                        onChange={this.handleChange('description')}
+                        margin="normal"
+                    />
+                    <TextField
+                        id="standard-name"
+                        label="Course Term"
+                        className={this.styles.textField}
+                        value={this.state.term}
+                        onChange={this.handleChange('term')}
+                        margin="normal"
+                    />
+                    <TextField
+                        id="standard-name"
+                        label="Course Year"
+                        className={this.styles.textField}
+                        value={this.state.year}
+                        onChange={this.handleChange('year')}
                         margin="normal"
                     />
                     <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Submit</Button>
