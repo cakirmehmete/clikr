@@ -12,7 +12,7 @@ export default class APIProfService {
             })
             .catch(error => {
                 console.log(error);
-                this._checkAuth();
+                this._checkAuth(error);
             })
     }
 
@@ -23,7 +23,7 @@ export default class APIProfService {
             })
             .catch(error => {
                 console.log(error);
-                this._checkAuth();
+                this._checkAuth(error);
             })
     }
 
@@ -35,11 +35,12 @@ export default class APIProfService {
             })
             .catch(error => {
                 console.log(error);
-                this._checkAuth();
+                this._checkAuth(error);
             })
     }
 
-    _checkAuth() {
-        window.location.replace('/login-prof')
+    _checkAuth(error) {
+        if (error.response.status === 401)
+            window.location.replace('/login-prof')
     }
 }

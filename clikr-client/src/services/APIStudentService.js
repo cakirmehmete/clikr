@@ -12,7 +12,7 @@ export default class APIStudentService {
             })
             .catch(error => {
                 console.log(error);
-                this._checkAuth();
+                this._checkAuth(error);
             })
     }
 
@@ -23,11 +23,12 @@ export default class APIStudentService {
             })
             .catch(error => {
                 console.log(error);
-                this._checkAuth();
+                this._checkAuth(error);
             })
     }
 
-    _checkAuth() {
-        window.location.replace('/login-student')
+    _checkAuth(error) {
+        if (error.response.status === 401)
+            window.location.replace('/login-student')
     }
 }
