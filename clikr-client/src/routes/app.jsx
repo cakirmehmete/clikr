@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import ProfessorRoutes from './Professor'
+import StudentRoutes from './Student'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import StudentHome from './StudentHome'
-import StudentEnroll from './StudentEnrollment'
 import { Provider } from 'mobx-react';
 import ProfessorStore from './../stores/ProfessorStore';
 import StudentStore from './../stores/StudentStore';
@@ -41,12 +40,11 @@ class App extends Component {
                             <div>
                                 <Route exact path='/' component={Home} />
                                 <Route exact path='/login-(prof|student)' component={Login} />
-                                <Route exact path="/student/enroll" component={StudentEnroll} />
                                 <Provider profStore={this.professorStore}>
                                     <Route path="/professor" component={ProfessorRoutes} />
                                 </Provider>
                                 <Provider store={this.studentStore}>
-                                    <Route exact path="/student" component={StudentHome} />
+                                    <Route path="/student" component={StudentRoutes} />
                                 </Provider>
                             </div>
                         </Router>
