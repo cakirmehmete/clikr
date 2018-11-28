@@ -8,14 +8,26 @@ import { Link } from 'react-router-dom'
 import { observer, inject } from 'mobx-react';
 import APIStudentService from '../../../services/APIStudentService';
 import PropTypes from 'prop-types';
+import { isNullOrUndefined } from 'util';
+//import { observer, inject } from 'mobx-react';
 
-const ClassCard = inject("classStore")(observer(class ClassCard extends React.Component {
+@inject("store")
+@observer
+class ClassCard extends React.Component {
 
     constructor(props) {
         super(props)
-        this.apiStudentService = new APIStudentService()
+        this.store = props.store
+        this.apiStudentService = new APIStudentService(this.store)
+        
+        
+    }
+    state = {
+        link:'student/questions',
+        course_id: ''
     }
 
+    
     render() {
         return (
             <Card style={{ width: '98%', margin: '2%', background: "#E76F51" }}>
@@ -28,14 +40,21 @@ const ClassCard = inject("classStore")(observer(class ClassCard extends React.Co
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button size="small">
-                        <Link to='/student/question' style={{ "color": "black", "text-decoration": "none" }}> Join </Link>
-                    </Button>
+                    <Link to={{
+                        pathname: '/student/checkquestions',
+                        state : {
+                            course_id: this.props.id,
+                        }
+                    }} style={{ "color": "black", "text-decoration": "none" }}>
+                        <Button size="small" >
+                            Join 
+                        </Button>
+                    </Link>
                 </CardActions>
             </Card>
         );
     }
-}))
+}
 
 ClassCard.propTypes = {
     name: PropTypes.string,

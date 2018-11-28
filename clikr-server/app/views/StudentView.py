@@ -4,7 +4,7 @@ from flask import request, Response, Blueprint, session, redirect, render_templa
 import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
-from ..models.QuestionModel import QuestionModel, QuestionSchema
+from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceSchema, FreeTextSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db, cas
 from ..shared.Authentication import Auth
@@ -18,6 +18,8 @@ student_api = Blueprint('students', __name__)
 student_schema = StudentSchema()
 course_schema = CourseSchema()
 question_schema = QuestionSchema()
+multiple_choice_schema = MultipleChoiceSchema()
+free_text_schema = FreeTextSchema()
 answer_schema = AnswerSchema()
 
 @socketio.on('subscribe')
@@ -109,10 +111,24 @@ def get_open_questions(current_user, course_id):
     if not current_user in course.students:
         return custom_response({'error': 'permission denied'}, 400)
 
-    # query database and return result
-    open_questions = QuestionModel.query.filter_by(is_open=True) # FIXME: returns open questions for ALL courses!
-    question_data = question_schema.dump(open_questions, many=True).data
-    return custom_response(question_data, 200)
+    # query database to get ALL open questions
+    open_questions = QuestionModel.query.filter_by(is_open=True).all()
+
+    # filter for the specified course
+    questions_data = []
+    for question in open_questions:
+        if question.lecture.course_id == course_id:
+            # use the appropriate question schema
+            if question.question_type == 'multiple_choice':
+                question_data = multiple_choice_schema.dump(question).data
+            elif question.question_type == 'free_text':
+                question_data = free_text_schema.dump(question).data
+            else:
+                raise Exception('invalid question type')
+    
+            questions_data.append(question_data)
+
+    return custom_response(questions_data, 200)
 
 @student_api.route('/questions/<question_id>', methods=['GET'])
 @Auth.student_auth_required
