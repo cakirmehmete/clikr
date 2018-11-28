@@ -9,7 +9,6 @@ import { observer, inject } from 'mobx-react';
 import APIStudentService from '../../../services/APIStudentService';
 import PropTypes from 'prop-types';
 import { isNullOrUndefined } from 'util';
-//import { observer, inject } from 'mobx-react';
 
 @inject("store")
 @observer

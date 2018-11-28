@@ -1,5 +1,5 @@
 export default class CourseObj {
-    constructor(course_id, date, description, id, title) {
+    constructor(title, description, date, id, course_id) {
         this.course_id = course_id;
         this.date = date;
         this.description = description;

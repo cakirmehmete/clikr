@@ -7,6 +7,14 @@ export function getCoursesAPI() {
     return axios.get(baseURL + 'professor/courses');
 }
 
+export function getLecturesAPI(course_id) {
+    return axios.get(baseURL + 'professor/courses/' + course_id + '/lectures');
+}
+
+export function getQuestionsAPI(lecture_id) {
+    return axios.get(baseURL + 'professor/lectures/' + lecture_id + '/questions');
+}
+
 export function getStudentCoursesAPI() {
     return axios.get(baseURL + 'student/courses');
 }
@@ -14,8 +22,21 @@ export function getStudentCoursesAPI() {
 export function hasStudentQuestions(course_id) {
     return Promise.all(axios.get(baseURL + 'student/courses/' + course_id + '/questions'));
 }
+
 export function getStudentQuestionsByCourseAPI(course_id) {
     return axios.get(baseURL + 'student/courses/' + course_id + '/questions');
+}
+
+export function postOpenQuestionAPI(question_id) {
+    return axios.post(baseURL + 'professor/questions/' + question_id, {
+        action: "open"
+    });
+}
+
+export function postCloseQuestionAPI(question_id) {
+    return axios.post(baseURL + 'professor/questions/' + question_id, {
+        action: "close"
+    });
 }
 
 // course: CourseObj
@@ -27,6 +48,15 @@ export function postNewCourseAPI(course) {
         description: course.description,
         term: course.term,
         year: course.year
+    });
+}
+
+// lecture: LectureObj
+export function postNewLectureAPI(lecture) {
+    return axios.post(baseURL + 'professor/courses/' + lecture.course_id + '/lectures', {
+        title: lecture.title,
+        description: lecture.description,
+        date: lecture.date,
     });
 }
 

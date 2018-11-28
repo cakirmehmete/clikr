@@ -21,6 +21,7 @@ const styles = theme => ({
     toolbar: theme.mixins.toolbar,
 });
 
+@inject('profStore')
 @observer
 class SideMenuBar extends React.Component {
     constructor(props) {

@@ -12,7 +12,7 @@ const styles = theme => ({
 });
 
 @observer
-class TopCoursesFrame extends React.Component {
+class TopLecturesFrame extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
@@ -24,12 +24,12 @@ class TopCoursesFrame extends React.Component {
         return (
             <div>
                 <Typography variant="subtitle1" color="textPrimary">
-                    What are your top courses?
+                    What are your top lectures?
                 </Typography>
                 <Card className={this.styles.card}>
                     <CardContent>
                         <Typography variant="h6" color="inherit">
-                            Your Top Courses
+                            Your Top Lectures
                         </Typography>
                         Todo
                     </CardContent>
@@ -39,4 +39,4 @@ class TopCoursesFrame extends React.Component {
     }
 }
 
-export default withStyles(styles)(TopCoursesFrame);
+export default withStyles(styles)(TopLecturesFrame);
