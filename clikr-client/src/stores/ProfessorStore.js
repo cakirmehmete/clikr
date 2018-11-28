@@ -29,12 +29,29 @@ export default class ProfessorStore {
         })
     }
 
+    getCourseWithId(course_id) {
+        return this.courses.find(x => x.id === course_id)
+    }
+
+    getLectureWithId(lecture_id) {
+        return this.lectures.find(x => x.id === lecture_id)        
+    }
+
+    getQuestionWithIndex(question_index) {
+        if (question_index < this.questions.length) {
+            return this.questions[question_index];
+        }
+        return new QuestionObj()
+    }
+
     @action
     updateAllLectures(lectures) {
         this.lectures = []
 
         lectures.forEach(element => {
-            this.lectures.push(new LectureObj(element.title, null))
+            // course_id: any, date: any, description: any, id: any, title: any
+            this.lectures.push(new LectureObj(element.title, element.description, 
+                element.date, element.id, element.course_id))
         })
     }
 

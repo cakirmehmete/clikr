@@ -21,7 +21,7 @@ export class MultipleChoiceQuestionObj extends QuestionObj {
 
     constructor(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at, option1, option2, option3, option4, option5, number_of_options) {
         
-        super(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at);
+        super(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at);
         
         this.option1 = option1;
         this.option2 = option2;

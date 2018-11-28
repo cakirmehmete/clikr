@@ -9,7 +9,7 @@ import { observer, inject } from 'mobx-react';
 import APIStudentService from '../../../services/APIStudentService';
 import PropTypes from 'prop-types';
 
-const ClassCard = inject("classStore")(observer(class ClassCard extends React.Component {
+const ClassCard = inject("store")(observer(class ClassCard extends React.Component {
 
     constructor(props) {
         super(props)

@@ -2,15 +2,11 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItem from '@material-ui/core/ListItem';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { observer } from 'mobx-react';
-import AddStudentsModalWrapped from '../AddStudentsModal';
+import ListOfAllCourses from '../ListOfAllCourses';
 
 const styles = theme => ({
     card: {
@@ -38,6 +34,7 @@ class AllCoursesFrame extends React.Component {
     }
 
     render() {
+        // Handle routes
         if (this.state.toNewCourse === true) {
             return <Redirect to='/professor/new-course' />
         }
@@ -52,18 +49,7 @@ class AllCoursesFrame extends React.Component {
                         <Typography variant="h6" color="inherit">
                             Courses
                         </Typography>
-                        <List component="nav">
-                            {this.profStore.courses.map((courseObj, index) => {
-                                return (
-                                    <ListItem divider button key={index} >
-                                        <ListItemText primary={courseObj.title} />
-                                        <ListItemSecondaryAction>
-                                            <AddStudentsModalWrapped profStore={this.profStore} courseIndex={index} />
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                )
-                            })}
-                        </List>
+                        <ListOfAllCourses profStore={this.profStore} />
                         <Button onClick={this.handleNewCourseClick} variant="outlined" color="primary">Add Class</Button>
                     </CardContent>
                 </Card>
