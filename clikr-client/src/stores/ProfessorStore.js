@@ -37,6 +37,13 @@ export default class ProfessorStore {
         return this.lectures.find(x => x.id === lecture_id)        
     }
 
+    getQuestionWithIndex(question_index) {
+        if (question_index < this.questions.length) {
+            return this.questions[question_index];
+        }
+        return new QuestionObj()
+    }
+
     @action
     updateAllLectures(lectures) {
         this.lectures = []

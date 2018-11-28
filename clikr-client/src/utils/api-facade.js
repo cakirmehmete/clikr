@@ -19,6 +19,18 @@ export function getStudentCoursesAPI() {
     return axios.get(baseURL + 'student/courses');
 }
 
+export function postOpenQuestionAPI(question_id) {
+    return axios.post(baseURL + 'professor/questions/' + question_id, {
+        action: "open"
+    });
+}
+
+export function postCloseQuestionAPI(question_id) {
+    return axios.post(baseURL + 'professor/questions/' + question_id, {
+        action: "close"
+    });
+}
+
 // course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {
