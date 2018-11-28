@@ -3,7 +3,8 @@ import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import ToolbarGroup from '@material-ui/core/Toolbar';
-import DropDownMenu from '@material-ui/core/Toolbar';
+import Grid from '@material-ui/core/Grid';
+import TopMenuBarDropdown from '../TopMenuBarDropdown';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import SvgIcon from '@material-ui/core/SvgIcon';
@@ -29,7 +30,7 @@ class TopMenuBar extends React.Component {
         return (
             <AppBar position="static" color="white" className={this.styles.appBar}>
                 <Toolbar>
-                    <ToolbarGroup firstChild={true}>
+                    <Grid container direction="row" justify="space-between" alignItems='marginLeft'>
                         <Link to={'/professor'}>
                             <IconButton color="primary">
                                 <SvgIcon>
@@ -38,21 +39,22 @@ class TopMenuBar extends React.Component {
                                 </SvgIcon>
                             </IconButton>
                         </Link>
+                    </Grid>
+                    <TopMenuBarDropdown />
+                    {/*<ToolbarGroup firstChild={true}>
+
                     </ToolbarGroup>
 
                     <ToolbarGroup style={{
                         float       : 'none',
-                        width       : '200px',
                         marginLeft  : 'auto',
                         marginRight : 'auto'
                     }}>
                     </ToolbarGroup>
 
                     <ToolbarGroup lastChild={true} float="right">
-                        <DropDownMenu>
-                            
-                        </DropDownMenu>
-                    </ToolbarGroup>
+                        <TopMenuBarDropdown />
+                    </ToolbarGroup>*/}
                 </Toolbar>
             </AppBar>
 
