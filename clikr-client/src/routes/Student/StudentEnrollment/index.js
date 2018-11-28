@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import Header from '../../components/Student/LoggedinHeader';
+import Header from '../../../components/Student/LoggedinHeader';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import CourseEnrollmentForm from '../../components/Student/CourseEnrollmentForm';
+import CourseEnrollmentForm from '../../../components/Student/CourseEnrollmentForm';
 
 class StudentEnroll extends Component {
 

@@ -19,6 +19,14 @@ export function getStudentCoursesAPI() {
     return axios.get(baseURL + 'student/courses');
 }
 
+export function hasStudentQuestions(course_id) {
+    return Promise.all(axios.get(baseURL + 'student/courses/' + course_id + '/questions'));
+}
+
+export function getStudentQuestionsByCourseAPI(course_id) {
+    return axios.get(baseURL + 'student/courses/' + course_id + '/questions');
+}
+
 export function postOpenQuestionAPI(question_id) {
     return axios.post(baseURL + 'professor/questions/' + question_id, {
         action: "open"
@@ -55,6 +63,12 @@ export function postNewLectureAPI(lecture) {
 export function postEnrollStudentAPI(code) {
     return axios.post(baseURL + 'student/courses', {
         enroll_code: code
+    });
+}
+
+export function postAnswerQuestionAPI(answer, question_id) {
+    return axios.post(baseURL + 'student/questions/' + question_id, {
+        answer: answer
     });
 }
 
