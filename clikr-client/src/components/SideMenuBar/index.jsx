@@ -6,7 +6,7 @@ import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import ListItem from '@material-ui/core/ListItem';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import logo from '../../assets/clikrlogo.png';
 const drawerWidth = 240;
 
