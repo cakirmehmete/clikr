@@ -273,7 +273,15 @@ def get_lectures(current_user, course_id):
 
     # retrieve and return lectures
     lectures = course.lectures
-    lecture_data = lecture_schema.dump(lectures, many=True).data
+
+    lecture_data = []
+    for lecture in lectures:
+        one_lecture_data = lecture_schema.dump(lecture).data
+        
+        # add number of questions to each lecture
+        one_lecture_data['num_questions'] = len(lecture.questions)
+        lecture_data.append(one_lecture_data)
+
     return custom_response(lecture_data, 200)
 
 @professor_api.route('/courses/<course_id>/lectures', methods=['POST'])
@@ -325,7 +333,9 @@ def get_lecture_info(current_user, lecture_id):
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
+    # return lecture data and number of questions
     lecture_data = lecture_schema.dump(lecture).data
+    lecture_data['num_questions'] = len(lecture.questions)
     return custom_response(lecture_data, 200)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['PATCH'])
