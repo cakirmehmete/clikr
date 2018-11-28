@@ -32,22 +32,6 @@ export default class APIStudentService {
         
     }
 
-    // hasQuestions(course_id) {
-    //      getStudentQuestionsByCourseAPI(course_id)
-    //         .then(res => {
-    //             console.log(res.data['length'] === 0)
-    //             if (res.data['length'] === 0) {
-    //                  return false;
-    //             }
-    //             return true;
-    //         })
-    //         .catch(error => {
-    //             console.log(error);
-    //             this._checkAuth(error);
-    //         })
-    //     console.log(hasQ)
-
-    // }
     async postAnswer(answer, question_id) {
         postAnswerQuestionAPI(answer, question_id)
             .then(res => {
