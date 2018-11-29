@@ -26,6 +26,35 @@ multiple_choice_schema = MultipleChoiceSchema()
 free_text_schema = FreeTextSchema()
 answer_schema = AnswerSchema()
 
+@professor_api.route('/data', methods=['GET'])
+@Auth.professor_auth_required
+def get_all_data(current_user):
+    """
+    returns all courses, lectures, and questions of the current prof
+    """
+    result = []
+    courses = current_user.courses
+
+    for course in courses:
+        course_data = course_schema.dump(course).data
+        
+        lectures_data = []
+        lectures = course.lectures
+
+        for lecture in lectures:
+            lecture_data = lecture_schema.dump(lecture).data
+
+            questions = lecture.questions
+            questions_data = question_schema.dump(questions, many=True).data
+            lecture_data['questions'] = questions_data
+
+            lectures_data.append(lecture_data)
+
+        course_data['lectures'] = lectures_data
+        result.append(course_data)
+
+    return custom_response(result, 200)
+
 @professor_api.route('/courses', methods=['GET'])
 @Auth.professor_auth_required
 def get_courses(current_user):
