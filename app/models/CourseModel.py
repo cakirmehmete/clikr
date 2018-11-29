@@ -15,8 +15,8 @@ class CourseModel(db.Model):
 
     # columns
     id = db.Column(db.String(36), primary_key=True) # uuid
-    dept = db.Column(db.String(128), nullable=False)    # TODO: courses can be listed in multiple deptartments
-    coursenum = db.Column(db.Integer, nullable=False)   # TODO: same
+    dept = db.Column(db.String(128), nullable=True)    # TODO: remove entirely?
+    coursenum = db.Column(db.Integer, nullable=True)   # TODO: same
     title = db.Column(db.String(256), nullable=False)
     description = db.Column(db.String(1024), nullable=True)
     year = db.Column(db.Integer, nullable=True)
@@ -81,8 +81,8 @@ class CourseSchema(Schema):
     Course Schema
     """
     id = fields.Str(dump_only=True)
-    dept = fields.Str(required=True)
-    coursenum = fields.Str(required=True)
+    dept = fields.Str()
+    coursenum = fields.Str()
     title = fields.Str(required=True)
     description = fields.Str()
     year = fields.Integer()
