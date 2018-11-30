@@ -45,7 +45,20 @@ def on_join(course_id):
         return
 
     join_room(course_id)
-    emit('server message', 'you joined the room (course) ' + course_id)
+
+    # return list of all open questions for this course
+    # query database to get ALL open questions
+    open_questions = QuestionModel.query.filter_by(is_open=True).all()
+
+    # filter for the specified course
+    questions_data = []
+    for question in open_questions:
+        if question.lecture.course_id == course_id:
+            # use the appropriate question schema
+            question_data = _dump_one_question(question)
+            questions_data.append(question_data)
+
+    emit('all open questions', {'questions': questions_data, 'message': 'you joined the room (course) ' + course_id})
 
 @student_api.route('/courses', methods=['GET'])
 @Auth.student_auth_required
