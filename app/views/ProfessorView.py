@@ -14,6 +14,7 @@ from .. import db
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response
 
+from flask_socketio import emit, join_room
 from .. import socketio
 
 professor_api = Blueprint('professors', __name__)
@@ -24,6 +25,30 @@ lecture_schema = LectureSchema()
 multiple_choice_schema = MultipleChoiceSchema()
 free_text_schema = FreeTextSchema()
 answer_schema = AnswerSchema()
+
+@socketio.on('subscribe professor')
+def on_join(question_id):
+    # authenticate the user
+    current_user = Auth.authenticate_professor()
+    if not current_user:
+        print('here')
+        emit('server message', 'permission denied')
+        return
+
+    # retrieve question and check if valid
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        emit('server message', 'invalid question_id')
+        return
+
+    # check permission
+    if not question.lecture.course in current_user.courses:
+        print('there')
+        emit('server message', 'permission denied')
+        return
+
+    join_room(question_id)
+    emit('server message', 'you joined the room (question) ' + question_id)
 
 @professor_api.route('/data', methods=['GET'])
 @Auth.professor_auth_required
@@ -723,3 +748,9 @@ def logout():
         return redirect(service_url)
     else:
         return custom_response({'message': 'logged out'}, 200)
+
+
+# test endpoints
+@professor_api.route('/socketio', methods=['GET'])
+def socketIO_test():
+    return render_template('socketIO_professor.html')

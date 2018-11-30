@@ -2,6 +2,7 @@
 
 from flask import request, Response, Blueprint, session, redirect, render_template
 import uuid
+import json
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceSchema, FreeTextSchema
@@ -10,6 +11,8 @@ from .. import db, cas
 from ..shared.Authentication import Auth
 # from ..shared.CASClient import CASClient
 from ..shared.Util import custom_response
+
+from sqlalchemy import func
 
 from flask_socketio import send, emit, join_room
 from .. import socketio
@@ -21,7 +24,7 @@ multiple_choice_schema = MultipleChoiceSchema(exclude=['correct_answer'])
 free_text_schema = FreeTextSchema(exclude=['correct_answer'])
 answer_schema = AnswerSchema()
 
-@socketio.on('subscribe')
+@socketio.on('subscribe student')
 def on_join(course_id):
 
     # authenticate the user
@@ -42,7 +45,7 @@ def on_join(course_id):
         return
 
     join_room(course_id)
-    emit('server message', 'you joined the room ' + course_id)
+    emit('server message', 'you joined the room (course) ' + course_id)
 
 @student_api.route('/courses', methods=['GET'])
 @Auth.student_auth_required
@@ -210,6 +213,16 @@ def submit_answer(current_user, question_id):
         current_user.answers.append(answer)
         db.session.commit()
         message = 'answer created'
+
+    # push updated results to professor using socketio
+    results_raw = AnswerModel.query.filter_by(question_id=answer.question_id).with_entities(AnswerModel.answer, func.count(AnswerModel.answer)).group_by(AnswerModel.answer).all()
+    print(str(results_raw))
+
+    results = {}
+    for one_answer in results_raw:
+        results[one_answer[0]] = one_answer[1]
+
+    socketio.emit('new results', results, room=answer.question_id)
 
     # prepare response
     answer_data = answer_schema.dump(answer).data

@@ -20,27 +20,21 @@ $(document).ready(function() {
 		console.log('Received message');
 	});
 
-	socket.on('question opened', function(msg) {
+	socket.on('new results', function(msg) {
 		var data = JSON.stringify(msg);
-		$("#messages").append('<li>question opened: <br>'+data+'</li>');
-		console.log('received new open question')
-	});
-
-	socket.on('question closed', function(msg) {
-		var data = JSON.stringify(msg);
-		$("#messages").append('<li>question closed: <br>'+data+'</li>');
-		console.log('received closed question')
+		$("#messages").append('<li>current results: <br>'+data+'</li>');
+		console.log('received new results')
 	});
 
 	$('#joinbutton').on('click', function() {
-		socket.emit('subscribe student', $('#courseId').val());
-		$('#courseId').val('');
+		socket.emit('subscribe professor', $('#questionId').val());
+		$('#questionId').val('');
 	});
 
 });
 </script>
 <ul id="messages"></ul>
-<input type="text" id="courseId">
+<input type="text" id="questionId">
 <button id="joinbutton">Join Room</button>
 </body>
 </html>
