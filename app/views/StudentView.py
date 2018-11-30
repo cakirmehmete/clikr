@@ -23,6 +23,24 @@ answer_schema = AnswerSchema()
 
 @socketio.on('subscribe')
 def on_join(course_id):
+
+    # authenticate the user
+    current_user = Auth.authenticate_student()
+    if not current_user:
+        emit('server message', 'permission denied')
+        return
+
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        emit('server message', 'invalid course_id')
+        return
+
+    # check permission
+    if not course in current_user.courses:
+        emit('server message', 'permission denied')
+        return
+
     join_room(course_id)
     emit('server message', 'you joined the room ' + course_id)
 
@@ -291,7 +309,7 @@ def logout():
     else:
         return custom_response({'message': 'logged out'}, 200)
             
-
+# various test endpoints
 
 @student_api.route('/logincas', methods=['GET'])
 def login_cas():
@@ -306,3 +324,7 @@ def login_cas():
 @cas.cas_required
 def secure():
     return render_template('login_test.html', username=session['username'])
+
+@student_api.route('/socketio', methods=['GET'])
+def socketIO_test():
+    return render_template('socketIO_student.html')
