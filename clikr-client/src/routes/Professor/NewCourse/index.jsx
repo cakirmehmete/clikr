@@ -64,7 +64,7 @@ class ProfessorNewCourse extends React.Component {
     // TODO: Make the year and term and Dept a drop down
     render() {
         if (this.state.toHome === true) {
-            return <Redirect to='/professor' />
+            return <Redirect to='/professor' push />
         }
 
         return (

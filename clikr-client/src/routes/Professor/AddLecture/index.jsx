@@ -58,7 +58,7 @@ class ProfessorAddLecture extends React.Component {
 
     render() {
         if (this.state.toLecture === true) {
-            return <Redirect to='/professor/view-lectures' />
+            return <Redirect to='/professor/view-lectures' push />
         }
 
         return (

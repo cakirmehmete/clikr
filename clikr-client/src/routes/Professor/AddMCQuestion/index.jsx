@@ -64,7 +64,7 @@ class ProfessorAddMCQuestion extends React.Component {
 
     render() {
         if (this.state.toQuestions === true) {
-            return <Redirect to='/professor/view-questions' />
+            return <Redirect to='/professor/view-questions' push />
         }
 
         return (

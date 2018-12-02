@@ -50,10 +50,10 @@ class AllLecturesFrame extends React.Component {
     render() {
         // Handle routes
         if (this.state.toNewLecture === true) {
-            return <Redirect to='/professor/add-lecture' />
+            return <Redirect to='/professor/add-lecture' push />
         } else if (this.state.referrerLectureIndex !== -1) {
             this.profStore.lecture_id = this.state.referrerLectureIndex
-            return <Redirect to='/professor/view-questions' />
+            return <Redirect to='/professor/view-questions' push />
         }
 
         return (

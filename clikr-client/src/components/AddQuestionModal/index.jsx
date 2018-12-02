@@ -78,7 +78,7 @@ class AddQuestionModal extends React.Component {
     render() {
         const { classes } = this.props;
         if (this.state.toNewMCQuestion === true) {
-            return <Redirect to='/professor/view-questions/add-mc-question' />
+            return <Redirect to='/professor/view-questions/add-mc-question' push />
         }
 
         return (
