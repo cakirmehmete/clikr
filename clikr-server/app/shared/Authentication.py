@@ -1,4 +1,3 @@
-import jwt
 import os
 import datetime
 from flask import json, jsonify, Response, request, session
@@ -10,79 +9,8 @@ from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 class Auth():
     """
     Does not provide authentication at the moment! Right now, its only purpose is to identify the current user.
-    Export environment variable JWT_SECRET_KEY to make it work.
+    Export environment variable SECRET_KEY to make it work.
     """
-    @staticmethod
-    def generate_token(user_id, role):
-        """
-        Generate Token Method
-        """
-        try:
-            payload = {
-                'id': user_id,
-                'role': role,
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8) # arbitrarily chosen
-            }
-            token = jwt.encode(payload, os.getenv('JWT_SECRET_KEY'),'HS256').decode('UTF-8')
-            return token
-
-        except Exception as e:
-            print(str(e))
-            return None
-
-    @staticmethod
-    def student_token_required(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            token = None
-
-            if 'x-access-token' in request.headers:
-                token = request.headers['x-access-token']
-
-            if not token:
-                return jsonify({'message' : 'Token is missing!'}), 401
-
-            try: 
-                data = jwt.decode(token, os.getenv('JWT_SECRET_KEY'))
-                if data['role'] != 'student':
-                    return jsonify({'error': 'Permission denied'})
-
-                current_user = StudentModel.get_student_by_netId(data['id'])
-            except Exception as e:
-                print(str(e))
-                return jsonify({'message' : 'Token is invalid!'}), 401
-
-            print('current user: ' + str(current_user))
-            return f(current_user, *args, **kwargs)
-
-        return decorated
-
-    @staticmethod
-    def professor_token_required(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            token = None
-
-            if 'x-access-token' in request.headers:
-                token = request.headers['x-access-token']
-
-            if not token:
-                return jsonify({'message' : 'Token is missing!'}), 401
-
-            try: 
-                data = jwt.decode(token, os.getenv('JWT_SECRET_KEY'))
-                if data['role'] != 'professor':
-                    return jsonify({'error': 'Permission denied'})
-
-                current_user = ProfessorModel.get_professor_by_netId(data['id'])
-            except Exception as e:
-                print(str(e))
-                return jsonify({'message' : 'Token is invalid!'}), 401
-
-            print('current user: ' + str(current_user))
-            return f(current_user, *args, **kwargs)
-
-        return decorated
 
     @staticmethod
     def professor_auth_required(f):
@@ -100,7 +28,6 @@ class Auth():
             
             current_user = ProfessorModel.get_professor_by_netId(username)
             
-            print('current user: ' + str(current_user))
             return f(current_user, *args, **kwargs)
 
         return decorated
@@ -121,7 +48,42 @@ class Auth():
             
             current_user = StudentModel.get_student_by_netId(username)
             
-            print('current user: ' + str(current_user))
             return f(current_user, *args, **kwargs)
 
         return decorated
+
+    @staticmethod
+    def authenticate_professor():
+        """
+        this method can be used in socketIO event handlers to authenticate a professor
+        (the professor_auth_required decorator is not applicable to socketIO event handlers)
+        """
+        if (not 'username' in session) or (not 'role' in session):
+            return None
+        
+        username = session['username']
+        role = session['role']
+
+        if role != 'professor':
+            return None
+
+        current_user = ProfessorModel.get_professor_by_netId(username)  # note that this could be None
+        return current_user
+
+    @staticmethod
+    def authenticate_student():
+        """
+        this method can be used in socketIO event handlers to authenticate a student
+        (the student_auth_required decorator is not applicable to socketIO event handlers)
+        """
+        if (not 'username' in session) or (not 'role' in session):
+            return None
+        
+        username = session['username']
+        role = session['role']
+
+        if role != 'student':
+            return None
+
+        current_user = StudentModel.get_student_by_netId(username) # note that this could be none
+        return current_user

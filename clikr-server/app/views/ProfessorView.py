@@ -14,6 +14,7 @@ from .. import db
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response
 
+from flask_socketio import emit, join_room
 from .. import socketio
 
 professor_api = Blueprint('professors', __name__)
@@ -24,6 +25,30 @@ lecture_schema = LectureSchema()
 multiple_choice_schema = MultipleChoiceSchema()
 free_text_schema = FreeTextSchema()
 answer_schema = AnswerSchema()
+
+@socketio.on('subscribe professor')
+def on_join(question_id):
+    # authenticate the user
+    current_user = Auth.authenticate_professor()
+    if not current_user:
+        print('here')
+        emit('server message', 'permission denied')
+        return
+
+    # retrieve question and check if valid
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        emit('server message', 'invalid question_id')
+        return
+
+    # check permission
+    if not question.lecture.course in current_user.courses:
+        print('there')
+        emit('server message', 'permission denied')
+        return
+
+    join_room(question_id)
+    emit('server message', 'you joined the room (question) ' + question_id)
 
 @professor_api.route('/data', methods=['GET'])
 @Auth.professor_auth_required
@@ -583,15 +608,15 @@ def _open_question(current_user, question, course):
     question.update(updated_data)
 
     # push question to students using socketIO
-    socketio.emit('server message', 'question ' + question.id + ' has been opened!', room=course.id)
-
     if question.question_type == 'multiple_choice':
         detailed_schema = MultipleChoiceSchema(exclude=['correct_answer'])  # TODO: maybe separate schemas to send questions to students vs. to profs?
     elif question.question_type == 'free_text':
         detailed_schema = FreeTextSchema(exclude=['correct_answer'])
     
-    detailed_data = detailed_schema.dump(question).data
-    socketio.emit('question opened', detailed_data, room=course.id)
+    response_data = {}
+    response_data['question'] = detailed_schema.dump(question).data
+    response_data['message'] = 'question opened'
+    socketio.emit('question opened', response_data, room=course.id)
     
     return custom_response({'message': 'question opened'}, 200)
 
@@ -607,7 +632,12 @@ def _close_question(current_user, question, course):
     }
     question.update(updated_data)
 
-    socketio.emit('server message', 'question ' + question.id + ' has been closed!', room=course.id)
+    # push question data (incl. correct answer) to students
+    response_data = {}
+    response_data['question'] = _dump_one_question(question)
+    response_data['message'] = 'question closed'
+
+    socketio.emit('question closed', response_data, room=course.id)
 
     return custom_response({'message': 'question closed'}, 200)
 
@@ -718,3 +748,9 @@ def logout():
         return redirect(service_url)
     else:
         return custom_response({'message': 'logged out'}, 200)
+
+
+# test endpoints
+@professor_api.route('/socketio', methods=['GET'])
+def socketIO_test():
+    return render_template('socketIO_professor.html')
