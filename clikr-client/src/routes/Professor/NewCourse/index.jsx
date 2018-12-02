@@ -45,7 +45,7 @@ class ProfessorNewCourse extends React.Component {
     }
 
     handleChange = name => event => {
-        this.setState({
+            this.setState({
             [name]: event.target.value,
         });
     };

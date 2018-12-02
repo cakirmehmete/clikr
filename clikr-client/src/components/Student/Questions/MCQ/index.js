@@ -9,18 +9,18 @@ import APIStudentService from '../../../../services/APIStudentService'
 import { observer, inject } from 'mobx-react';
 
 @inject("store")
-@observer    
+@observer
 class MCQ extends Component {
-    
+
     constructor(props) {
         super(props)
         this.store = this.props.store
         this.apiStudentService = new APIStudentService(this.store)
     }
-    componentDidMount () {
-        
+    componentDidMount() {
+
         var answers = []
-        
+
         var mcq = this.props.question.question
         for (var i = 1; i <= mcq['number_of_options']; i++) {
             var qstring = mcq["option" + i.toString()];
@@ -32,7 +32,7 @@ class MCQ extends Component {
     }
 
     state = {
-        question:"What is the meaning of life?",
+        question: "What is the meaning of life?",
         answerchoices: [],
         answer: "",
         disabled: false
@@ -48,24 +48,23 @@ class MCQ extends Component {
             disabled: true
         })
     }
-   
 
     render() {
         return (
             <Grid item>
-                <Grid container direction="column" justify="center" style={{padding:"1%"}}>
+                <Grid container direction="column" justify="center" style={{ padding: "1%" }}>
                     <FormControl component="fieldset">
                         <RadioGroup
                             name="answers"
                             value={this.state.answer}
                             onChange={this.handleChange}
                         >
-                        {this.state.answerchoices.map(a => (
-                            <FormControlLabel value={a} control={<Radio />} label={a}/>
-                        ))}
+                            {this.state.answerchoices.map(a => (
+                                <FormControlLabel value={a} control={<Radio />} label={a} />
+                            ))}
                         </RadioGroup>
                     </FormControl>
-                    <Grid container justify="flex-end" style={{"paddingRight":"1%"}}>
+                    <Grid container justify="flex-end" style={{ "paddingRight": "1%" }}>
                         <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
                             submit
                         </Button>

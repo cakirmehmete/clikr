@@ -23,7 +23,6 @@ export default class StudentStore {
     })
   }
 
-
   @action
   updateAllQuestions(questions) {
       this.questions = []

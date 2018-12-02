@@ -4,9 +4,12 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { observer, inject } from 'mobx-react';
+import { socketioURL } from '../../../constants/api';
+import socketIOClient from 'socket.io-client'
 import APIProfService from '../../../services/APIProfService';
 import Typography from '@material-ui/core/Typography';
 import AllQuestionsFrame from '../../../components/AllQuestionsFrame';
+const socket = socketIOClient(socketioURL)
 
 const styles = theme => ({
     root: {
@@ -48,16 +51,30 @@ class ProfessorViewQuestions extends React.Component {
         this.apiProfService = new APIProfService(this.profStore)
     }
 
-    handleStartLecture = () => {
+    send = () => {
         if (this.state.firstTime === false) {
             this.setState({ firstTime: 'true' });
             this.apiProfService.openQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).id)
+            socket.emit('subscribe professor', this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).id)
         } else {
             this.apiProfService.closeQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).id)
             this.apiProfService.openQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex + 1).id)
+            socket.emit('subscribe professor', this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex + 1).id)
             this.setState({ currentQuestionIndex: this.state.currentQuestionIndex + 1 });
         }
-    };
+    }
+
+    componentDidMount() {
+        socket.on('new results', (msg) => {
+            var data = JSON.stringify(msg);
+            // setting the color of our button
+            console.log(data)
+        })
+
+        socket.on('server message', (msg) => {
+            console.log('Received message:' + msg);
+        });
+    }
 
     render() {
         return (
@@ -69,7 +86,7 @@ class ProfessorViewQuestions extends React.Component {
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
                         Q{this.state.currentQuestionIndex + 1}: {this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).question_text}
                     </Typography>
-                    <Button variant="outlined" color="primary" onClick={this.handleStartLecture} className={this.styles.startLectureBtn}>
+                    <Button variant="outlined" color="primary" onClick={() => this.send()} className={this.styles.startLectureBtn}>
                         {this.state.firstTime === false ? "Start Lecture" : "Next Question"}
                     </Button>
                 </Paper>
