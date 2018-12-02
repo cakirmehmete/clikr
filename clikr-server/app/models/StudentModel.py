@@ -2,6 +2,7 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
+from ..shared.Util import CustomStringField, CustomDateTimeField
 import uuid
 
 # helper table for the many-to-many relationship courses-students
@@ -76,9 +77,9 @@ class StudentSchema(Schema):
     """
     Student Schema
     """
-    id = fields.Str(dump_only=True)
-    netId = fields.Str(required=True)
-    firstName = fields.Str()
-    lastName = fields.Str()
-    created_at = fields.DateTime(dump_only=True)
-    modified_at = fields.DateTime(dump_only=True)
+    id = CustomStringField(dump_only=True)
+    netId = CustomStringField(required=True)
+    firstName = CustomStringField()
+    lastName = CustomStringField()
+    created_at = CustomDateTimeField(dump_only=True)
+    modified_at = CustomDateTimeField(dump_only=True)
