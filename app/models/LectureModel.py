@@ -3,6 +3,7 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
+from ..shared.Util import CustomStringField, CustomIntegerField, CustomDateTimeField, CustomDateField
 import uuid
 
 class LectureModel(db.Model):
@@ -70,11 +71,11 @@ class LectureSchema(Schema):
     """
     Lecture Schema
     """
-    id = fields.Str(dump_only=True)
-    course_id = fields.Str(required=True)
-    date = fields.Date()
-    title = fields.Str()
-    description = fields.Str()
-    creator_id = fields.Str()
-    created_at = fields.DateTime(dump_only=True)
-    modified_at = fields.DateTime(dump_only=True)
+    id = CustomStringField(dump_only=True)
+    course_id = CustomStringField(required=True)
+    date = CustomDateField()
+    title = CustomStringField()
+    description = CustomStringField()
+    creator_id = CustomStringField()
+    created_at = CustomDateTimeField(dump_only=True)
+    modified_at = CustomDateTimeField(dump_only=True)

@@ -4,6 +4,7 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
+from ..shared.Util import CustomStringField, CustomIntegerField, CustomDateTimeField, CustomBoolField
 import uuid
 
 class QuestionModel(db.Model):
@@ -120,26 +121,26 @@ class QuestionSchema(Schema):
     """
     Question Schema
     """
-    id = fields.Str(dump_only=True)
-    lecture_id = fields.Str(required=True)
-    question_type = fields.Str(required=True)
-    question_title = fields.Str()
-    question_text = fields.Str()
-    correct_answer = fields.Str()
-    creator_id = fields.Str()
-    is_open = fields.Bool(dump_only=True)
-    opened_at = fields.DateTime(dump_only=True)
-    closed_at = fields.DateTime(dump_only=True)
-    created_at = fields.DateTime(dump_only=True)
-    modified_at = fields.DateTime(dump_only=True)
+    id = CustomStringField(dump_only=True)
+    lecture_id = CustomStringField(required=True)
+    question_type = CustomStringField(required=True)
+    question_title = CustomStringField()
+    question_text = CustomStringField()
+    correct_answer = CustomStringField()
+    creator_id = CustomStringField()
+    is_open = CustomBoolField(dump_only=True)
+    opened_at = CustomDateTimeField(dump_only=True)
+    closed_at = CustomDateTimeField(dump_only=True)
+    created_at = CustomDateTimeField(dump_only=True)
+    modified_at = CustomDateTimeField(dump_only=True)
 
 class MultipleChoiceSchema(QuestionSchema):
-    option1 = fields.Str()
-    option2 = fields.Str()
-    option3 = fields.Str()
-    option4 = fields.Str()
-    option5 = fields.Str()
-    number_of_options = fields.Integer(required=True)
+    option1 = CustomStringField()
+    option2 = CustomStringField()
+    option3 = CustomStringField()
+    option4 = CustomStringField()
+    option5 = CustomStringField()
+    number_of_options = CustomIntegerField(required=True)
 
 class FreeTextSchema(QuestionSchema):
-    word_limit = fields.Integer()
+    word_limit = CustomIntegerField()
