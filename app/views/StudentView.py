@@ -2,6 +2,7 @@
 
 from flask import request, Response, Blueprint, session, redirect, render_template
 import uuid
+import json
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceSchema, FreeTextSchema
@@ -10,6 +11,8 @@ from .. import db, cas
 from ..shared.Authentication import Auth
 # from ..shared.CASClient import CASClient
 from ..shared.Util import custom_response
+
+from sqlalchemy import func
 
 from flask_socketio import send, emit, join_room
 from .. import socketio
@@ -21,10 +24,41 @@ multiple_choice_schema = MultipleChoiceSchema(exclude=['correct_answer'])
 free_text_schema = FreeTextSchema(exclude=['correct_answer'])
 answer_schema = AnswerSchema()
 
-@socketio.on('subscribe')
+@socketio.on('subscribe student')
 def on_join(course_id):
+
+    # authenticate the user
+    current_user = Auth.authenticate_student()
+    if not current_user:
+        emit('server message', 'permission denied')
+        return
+
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        emit('server message', 'invalid course_id')
+        return
+
+    # check permission
+    if not course in current_user.courses:
+        emit('server message', 'permission denied')
+        return
+
     join_room(course_id)
-    emit('server message', 'you joined the room ' + course_id)
+
+    # return list of all open questions for this course
+    # query database to get ALL open questions
+    open_questions = QuestionModel.query.filter_by(is_open=True).all()
+
+    # filter for the specified course
+    questions_data = []
+    for question in open_questions:
+        if question.lecture.course_id == course_id:
+            # use the appropriate question schema
+            question_data = _dump_one_question(question)
+            questions_data.append(question_data)
+
+    emit('all open questions', {'questions': questions_data, 'message': 'you joined the room (course) ' + course_id})
 
 @student_api.route('/courses', methods=['GET'])
 @Auth.student_auth_required
@@ -193,6 +227,16 @@ def submit_answer(current_user, question_id):
         db.session.commit()
         message = 'answer created'
 
+    # push updated results to professor using socketio
+    results_raw = AnswerModel.query.filter_by(question_id=answer.question_id).with_entities(AnswerModel.answer, func.count(AnswerModel.answer)).group_by(AnswerModel.answer).all()
+    print(str(results_raw))
+
+    results = {}
+    for one_answer in results_raw:
+        results[one_answer[0]] = one_answer[1]
+
+    socketio.emit('new results', results, room=answer.question_id)
+
     # prepare response
     answer_data = answer_schema.dump(answer).data
     return custom_response({'message': message, 'id': answer_data['id'], 'question_id': answer_data['question_id']}, 200)
@@ -291,7 +335,7 @@ def logout():
     else:
         return custom_response({'message': 'logged out'}, 200)
             
-
+# various test endpoints
 
 @student_api.route('/logincas', methods=['GET'])
 def login_cas():
@@ -306,3 +350,7 @@ def login_cas():
 @cas.cas_required
 def secure():
     return render_template('login_test.html', username=session['username'])
+
+@student_api.route('/socketio', methods=['GET'])
+def socketIO_test():
+    return render_template('socketIO_student.html')
