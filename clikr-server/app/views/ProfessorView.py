@@ -62,7 +62,7 @@ def get_all_data(current_user):
     # process each course
     for course in courses:
         course_data = course_schema.dump(course).data
-        
+
         lectures_data = []
         lectures = course.lectures
 
@@ -181,7 +181,7 @@ def update_course(current_user, course_id):
     course.update(updated_data)
 
     return custom_response({'message': 'course updated'}, 201)
-    
+
 @professor_api.route('/courses/<course_id>', methods=['DELETE'])
 @Auth.professor_auth_required
 def delete_course(current_user, course_id):
@@ -200,7 +200,7 @@ def delete_course(current_user, course_id):
     course.delete()
     return custom_response({'message': 'course deleted'}, 200)
 
-@professor_api.route('/courses/<course_id>/code', methods=['GET'])
+@professor_api.route('/courses/<course_id>/code', methods=['POST'])
 @Auth.professor_auth_required
 def get_enrollment_code(current_user, course_id):
     """
@@ -233,7 +233,7 @@ def get_students(current_user, course_id):
     course = CourseModel.get_course_by_uuid(course_id)
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
-    
+
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
@@ -260,15 +260,15 @@ def enroll_student(current_user, course_id):
     course = CourseModel.get_course_by_uuid(course_id)
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
-    
+
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
-    
+
     # check if student is already enrolled
     if course in student.courses:
         return custom_response({'error': 'already enrolled in this course'}, 400)
-    
+
     # add the course to the student's list of courses
     student.courses.append(course)
     db.session.commit()
@@ -291,7 +291,7 @@ def remove_student(current_user, course_id, student_id):
     course = CourseModel.get_course_by_uuid(course_id)
     if not course:
         return custom_response({'error': 'course_id does not exist'}, 400)
-    
+
     # check permissions
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
@@ -301,7 +301,7 @@ def remove_student(current_user, course_id, student_id):
         return custom_response({'error': 'student not enrolled in this course'}, 400)
 
     # remove the course from the student's list of courses
-    student.courses.remove(course) 
+    student.courses.remove(course)
     db.session.commit()
 
     # prepare response
@@ -332,7 +332,7 @@ def get_lectures(current_user, course_id):
     lecture_data = []
     for lecture in lectures:
         one_lecture_data = lecture_schema.dump(lecture).data
-        
+
         # add number of questions to each lecture
         one_lecture_data['num_questions'] = len(lecture.questions)
         lecture_data.append(one_lecture_data)
@@ -612,12 +612,12 @@ def _open_question(current_user, question, course):
         detailed_schema = MultipleChoiceSchema(exclude=['correct_answer'])  # TODO: maybe separate schemas to send questions to students vs. to profs?
     elif question.question_type == 'free_text':
         detailed_schema = FreeTextSchema(exclude=['correct_answer'])
-    
+
     response_data = {}
     response_data['question'] = detailed_schema.dump(question).data
     response_data['message'] = 'question opened'
     socketio.emit('question opened', response_data, room=course.id)
-    
+
     return custom_response({'message': 'question opened'}, 200)
 
 def _close_question(current_user, question, course):
@@ -661,11 +661,11 @@ def _dump_one_question(question):
     if question.question_type == 'multiple_choice':
         question_data = multiple_choice_schema.dump(question).data
     elif question.question_type == 'free_text':
-        question_data = free_text_schema.dump(question).data   
+        question_data = free_text_schema.dump(question).data
     else:
         raise Exception('invalid question type')
 
-    return question_data 
+    return question_data
 
 def _load_one_question(input_data):
     """
@@ -677,7 +677,7 @@ def _load_one_question(input_data):
         question_type = input_data['question_type']
     except:
         raise Exception('question_type missing')
-    
+
     # load the appropriate schema and create object
     if question_type == 'multiple_choice':
         data, error = multiple_choice_schema.load(input_data)
@@ -697,13 +697,13 @@ def _load_one_question(input_data):
 @professor_api.route('/login', methods=['GET', 'POST'])
 def login():
     """
-    Does not provide authentication at the moment! 
+    Does not provide authentication at the moment!
     Its only purpose is to create a session (cookie) for a professor, which is used to identify the user in subsequent API calls.
     """
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        
+
         if 'username' in session:
             netId = session['username']
         else:
@@ -722,7 +722,7 @@ def login():
         professor = ProfessorModel.get_professor_by_netId(netId)
         if not professor:
             return render_template('login_professor.html', error='Invalid netId')
-        
+
         # create a session for the user
         session['username'] = netId
         session['role'] = 'professor'
