@@ -50,7 +50,7 @@ class AllQuestionsFrame extends React.Component {
     render() {
         // Handle routes
         if (this.state.toNewQuestion === true) {
-            return <Redirect to='/professor/TODO' />
+            return <Redirect to='/professor/TODO' push />
         }
 
         return (
