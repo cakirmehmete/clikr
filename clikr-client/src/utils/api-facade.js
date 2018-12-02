@@ -90,3 +90,7 @@ export function postNewQuestionAPI(question) {
     });
 }
 
+export function getLogoutStudent() {
+    return axios.get(baseURL + 'student/logout');
+}
+
