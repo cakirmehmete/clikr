@@ -21,10 +21,40 @@ professor_schema = ProfessorSchema()
 student_schema = StudentSchema()
 course_schema = CourseSchema()
 lecture_schema = LectureSchema()
-question_schema = QuestionSchema()
 multiple_choice_schema = MultipleChoiceSchema()
 free_text_schema = FreeTextSchema()
 answer_schema = AnswerSchema()
+
+@professor_api.route('/data', methods=['GET'])
+@Auth.professor_auth_required
+def get_all_data(current_user):
+    """
+    returns all courses, lectures, and questions of the current prof
+    """
+    result = []
+    courses = current_user.courses
+
+    # process each course
+    for course in courses:
+        course_data = course_schema.dump(course).data
+        
+        lectures_data = []
+        lectures = course.lectures
+
+        # process each lecture within the course
+        for lecture in lectures:
+            lecture_data = lecture_schema.dump(lecture).data
+
+            questions = lecture.questions
+            questions_data = _dump_questions(questions)
+            lecture_data['questions'] = questions_data
+
+            lectures_data.append(lecture_data)
+
+        course_data['lectures'] = lectures_data
+        result.append(course_data)
+
+    return custom_response(result, 200)
 
 @professor_api.route('/courses', methods=['GET'])
 @Auth.professor_auth_required
@@ -273,7 +303,15 @@ def get_lectures(current_user, course_id):
 
     # retrieve and return lectures
     lectures = course.lectures
-    lecture_data = lecture_schema.dump(lectures, many=True).data
+
+    lecture_data = []
+    for lecture in lectures:
+        one_lecture_data = lecture_schema.dump(lecture).data
+        
+        # add number of questions to each lecture
+        one_lecture_data['num_questions'] = len(lecture.questions)
+        lecture_data.append(one_lecture_data)
+
     return custom_response(lecture_data, 200)
 
 @professor_api.route('/courses/<course_id>/lectures', methods=['POST'])
@@ -325,7 +363,9 @@ def get_lecture_info(current_user, lecture_id):
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
+    # return lecture data and number of questions
     lecture_data = lecture_schema.dump(lecture).data
+    lecture_data['num_questions'] = len(lecture.questions)
     return custom_response(lecture_data, 200)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['PATCH'])
@@ -384,7 +424,7 @@ def get_questions(current_user, lecture_id):
 
     # retrieve questions and return
     questions = lecture.questions
-    question_data = question_schema.dump(questions, many=True).data
+    question_data = _dump_questions(questions)
     return custom_response(question_data, 200)
 
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['POST'])
@@ -408,23 +448,11 @@ def create_question(current_user, lecture_id):
     req_data['creator_id'] = current_user.id
     req_data['lecture_id'] = lecture_id
 
-    # load the appropriate schema and create new question
+    # try to load the appropriate schema and create new question
     try:
-        question_type = req_data['question_type']
-    except:
-        return custom_response({'error': 'question type required'}, 400)
-    if question_type == 'multiple_choice':
-        data, error = multiple_choice_schema.load(req_data)
-        if error:
-            return custom_response(error, 400)
-        question = MultipleChoiceModel(data)
-    elif question_type == 'free_text':
-        data, error = free_text_schema.load(req_data)
-        if error:
-            return custom_response(error, 400)
-        question = FreeTextModel(data)
-    else:
-        return custom_response({'error': 'invalid question type'}, 400)
+        question = _load_one_question(req_data)
+    except Exception as e:
+        return custom_response({'error': str(e)}, 400)
 
     question.save()
 
@@ -433,7 +461,7 @@ def create_question(current_user, lecture_id):
     db.session.commit()
 
     all_questions = lecture.questions
-    all_questions_data = question_schema.dump(all_questions, many=True).data
+    all_questions_data = _dump_questions(all_questions)
     return custom_response({'message': 'question created', 'id': question.id, 'questions': all_questions_data}, 201)
 
 @professor_api.route('/questions/<question_id>', methods=['GET'])
@@ -449,13 +477,8 @@ def get_question_info(current_user, question_id):
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
-    question_type = question.question_type
-    if question_type == 'multiple_choice':
-        question_data = multiple_choice_schema.dump(question).data
-    elif question_type == 'free_text':
-        question_data = free_text_schema.dump(question).data
-    else:
-        return custom_response({'error': 'question_type not found'}, 400)
+    # dump using appropriate schema and return
+    question_data = _dump_one_question(question)
     return custom_response(question_data, 200)
 
 @professor_api.route('/questions/<question_id>', methods=['DELETE'])
@@ -588,6 +611,59 @@ def _close_question(current_user, question, course):
 
     return custom_response({'message': 'question closed'}, 200)
 
+def _dump_questions(questions):
+    """
+    dumps a list of questions, using the appropriate schema for each question
+    """
+    questions_data = []
+
+    # process each question
+    for question in questions:
+        question_data = _dump_one_question(question)
+        questions_data.append(question_data)
+
+    return questions_data
+
+def _dump_one_question(question):
+    """
+    checks the question type and uses the appropriate schema to dump the question
+    """
+    if question.question_type == 'multiple_choice':
+        question_data = multiple_choice_schema.dump(question).data
+    elif question.question_type == 'free_text':
+        question_data = free_text_schema.dump(question).data   
+    else:
+        raise Exception('invalid question type')
+
+    return question_data 
+
+def _load_one_question(input_data):
+    """
+    tries to create a question object of the appropriate question subclass
+    raises an exception if the question type is missing or invalid
+    """
+    # check if question_type is present
+    try:
+        question_type = input_data['question_type']
+    except:
+        raise Exception('question_type missing')
+    
+    # load the appropriate schema and create object
+    if question_type == 'multiple_choice':
+        data, error = multiple_choice_schema.load(input_data)
+        if error:
+            raise Exception(error)
+        question = MultipleChoiceModel(data)
+    elif question_type == 'free_text':
+        data, error = free_text_schema.load(input_data)
+        if error:
+            raise Exception(error)
+        question = FreeTextModel(data)
+    else:
+        raise Exception('invalid question_type')
+
+    return question
+
 @professor_api.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -597,14 +673,25 @@ def login():
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        return render_template('login_professor.html')
+        
+        if 'username' in session:
+            netId = session['username']
+        else:
+            netId = None
+
+        if 'role' in session:
+            role = session['role']
+        else:
+            role = ''
+
+        return render_template('login_professor.html', role=role, netId=netId)
     else:
         netId = request.form.get('netId')
 
         # check if student exists in DB
         professor = ProfessorModel.get_professor_by_netId(netId)
         if not professor:
-            return render_template('logged_in.html', error='Invalid netId')
+            return render_template('login_professor.html', error='Invalid netId')
         
         # create a session for the user
         session['username'] = netId
@@ -616,4 +703,18 @@ def login():
             print('redirecting to' + service_url)
             return redirect(service_url)
         else:
-            return render_template('logged_in.html', role=session['role'], netId=session['username'])
+            return render_template('login_professor.html', role=session['role'], netId=session['username'])
+
+@professor_api.route('/logout', methods=['GET'])
+def logout():
+    """
+    deletes the session cookie
+    """
+    session.pop('username', None)
+
+    service_url = request.args.get('service')
+
+    if service_url:
+        return redirect(service_url)
+    else:
+        return custom_response({'message': 'logged out'}, 200)

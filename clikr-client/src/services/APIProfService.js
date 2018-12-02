@@ -1,4 +1,4 @@
-import { getCoursesAPI, postNewCourseAPI, postNewQuestionAPI } from '../utils/api-facade';
+import { getCoursesAPI, postNewCourseAPI, postNewQuestionAPI, getLecturesAPI, postNewLectureAPI, getQuestionsAPI, postOpenQuestionAPI, postCloseQuestionAPI } from '../utils/api-facade';
 
 export default class APIProfService {
     constructor(professorStore) {
@@ -12,7 +12,62 @@ export default class APIProfService {
             })
             .catch(error => {
                 console.log(error);
-                this._checkAuth();
+                this._checkAuth(error);
+            })
+    }
+
+    loadLecturesForCourse(course_id) {
+        getLecturesAPI(course_id)
+            .then(res => {
+                this.professorStore.updateAllLectures(res.data)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
+    openQuestion(question_id) {
+        postOpenQuestionAPI(question_id)
+            .then(res => {
+                console.log(res)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
+    closeQuestion(question_id) {
+        postCloseQuestionAPI(question_id)
+            .then(res => {
+                console.log(res)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
+    loadQuestionsForLecture(lecture_id) {
+        getQuestionsAPI(lecture_id)
+            .then(res => {
+                this.professorStore.updateAllQuestions(res.data)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+    
+    addLecture(lecture) {
+        postNewLectureAPI(lecture)
+            .then(res => {
+                this.professorStore.updateAllLectures(res.data.lectures)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
             })
     }
 
@@ -23,7 +78,7 @@ export default class APIProfService {
             })
             .catch(error => {
                 console.log(error);
-                this._checkAuth();
+                this._checkAuth(error);
             })
     }
 
@@ -35,11 +90,14 @@ export default class APIProfService {
             })
             .catch(error => {
                 console.log(error);
-                this._checkAuth();
+                this._checkAuth(error);
             })
     }
 
-    _checkAuth() {
-        window.location.replace('/login-prof')
+    _checkAuth(error) {
+        if (error.response !== undefined) {
+            if (error.response.status === 401)
+                window.location.replace('/login-prof')
+        }
     }
 }

@@ -4,7 +4,7 @@ from flask import request, Response, Blueprint, session, redirect, render_templa
 import uuid
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
-from ..models.QuestionModel import QuestionModel, QuestionSchema
+from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceSchema, FreeTextSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db, cas
 from ..shared.Authentication import Auth
@@ -17,7 +17,8 @@ from .. import socketio
 student_api = Blueprint('students', __name__)
 student_schema = StudentSchema()
 course_schema = CourseSchema()
-question_schema = QuestionSchema()
+multiple_choice_schema = MultipleChoiceSchema(exclude=['correct_answer'])
+free_text_schema = FreeTextSchema(exclude=['correct_answer'])
 answer_schema = AnswerSchema()
 
 @socketio.on('subscribe')
@@ -109,10 +110,18 @@ def get_open_questions(current_user, course_id):
     if not current_user in course.students:
         return custom_response({'error': 'permission denied'}, 400)
 
-    # query database and return result
-    open_questions = QuestionModel.query.filter_by(is_open=True) # FIXME: returns open questions for ALL courses!
-    question_data = question_schema.dump(open_questions, many=True).data
-    return custom_response(question_data, 200)
+    # query database to get ALL open questions
+    open_questions = QuestionModel.query.filter_by(is_open=True).all()
+
+    # filter for the specified course
+    questions_data = []
+    for question in open_questions:
+        if question.lecture.course_id == course_id:
+            # use the appropriate question schema
+            question_data = _dump_one_question(question)
+            questions_data.append(question_data)
+
+    return custom_response(questions_data, 200)
 
 @student_api.route('/questions/<question_id>', methods=['GET'])
 @Auth.student_auth_required
@@ -215,6 +224,19 @@ def delete_answer(current_user, question_id):
 
     return custom_response({'message': 'answer deleted'}, 200)
 
+def _dump_one_question(question):
+    """
+    checks the question type and uses the appropriate schema to dump the question
+    """
+    if question.question_type == 'multiple_choice':
+        question_data = multiple_choice_schema.dump(question).data
+    elif question.question_type == 'free_text':
+        question_data = free_text_schema.dump(question).data   
+    else:
+        raise Exception('invalid question type')
+
+    return question_data 
+
 @student_api.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -224,14 +246,24 @@ def login():
 
     # for testing purposes, the user only needs to supply his netId (no password required)
     if request.method == 'GET':
-        return render_template('login_student.html')
+        if 'username' in session:
+            netId = session['username']
+        else:
+            netId = None
+
+        if 'role' in session:
+            role = session['role']
+        else:
+            role = ''
+
+        return render_template('login_student.html', role=role, netId=netId)
     else:
         netId = request.form.get('netId')
 
         # check if student exists in DB
         student = StudentModel.get_student_by_netId(netId)
         if not student:
-            return render_template('logged_in.html', error='Invalid netId')
+            return render_template('login_student.html', error='Invalid netId')
         
         # create a session for the user
         session['username'] = netId
@@ -243,7 +275,21 @@ def login():
             print('redirecting to' + service_url)
             return redirect(service_url)
         else:
-            return render_template('logged_in.html', role=session['role'], netId=session['username'])
+            return render_template('login_student.html', role=session['role'], netId=session['username'])
+
+@student_api.route('/logout', methods=['GET'])
+def logout():
+    """
+    deletes the session cookie
+    """
+    session.pop('username', None)
+
+    service_url = request.args.get('service')
+
+    if service_url:
+        return redirect(service_url)
+    else:
+        return custom_response({'message': 'logged out'}, 200)
             
 
 

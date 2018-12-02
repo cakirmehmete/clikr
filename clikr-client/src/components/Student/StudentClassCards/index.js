@@ -1,45 +1,59 @@
 import React from 'react';
-import { MuiThemeProvider } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import typeographytheme from '../../../constants/themes/typographytheme'
 import { Link } from 'react-router-dom'
 import { observer, inject } from 'mobx-react';
 import APIStudentService from '../../../services/APIStudentService';
 import PropTypes from 'prop-types';
+import { isNullOrUndefined } from 'util';
 
-const ClassCard = inject("classStore")(observer(class ClassCard extends React.Component {
+@inject("store")
+@observer
+class ClassCard extends React.Component {
 
     constructor(props) {
         super(props)
-        this.apiStudentService = new APIStudentService()
+        this.store = props.store
+        this.apiStudentService = new APIStudentService(this.store)
+        
+        
+    }
+    state = {
+        link:'student/questions',
+        course_id: ''
     }
 
+    
     render() {
         return (
-            <MuiThemeProvider theme={typeographytheme}>
-                <Card style={{ width: '98%', margin: '2%', background: "#E76F51" }}>
-                    <CardContent>
-                        <Typography variant="h4">
-                            {this.props.name}
-                        </Typography>
-                        <Typography marginbottom="12" color="textSecondary">
-                            {this.props.number}
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                        <Button size="small">
-                            <Link to='/student/question' style={{ "color": "black", "text-decoration": "none" }}> Join </Link>
+            <Card style={{ width: '98%', margin: '2%', background: "#E76F51" }}>
+                <CardContent>
+                    <Typography variant="h4">
+                        {this.props.name}
+                    </Typography>
+                    <Typography marginbottom="12" color="textSecondary">
+                        {this.props.number}
+                    </Typography>
+                </CardContent>
+                <CardActions>
+                    <Link to={{
+                        pathname: '/student/checkquestions',
+                        state : {
+                            course_id: this.props.id,
+                        }
+                    }} style={{ "color": "black", "text-decoration": "none" }}>
+                        <Button size="small" >
+                            Join 
                         </Button>
-                    </CardActions>
-                </Card>
-            </MuiThemeProvider>
+                    </Link>
+                </CardActions>
+            </Card>
         );
     }
-}))
+}
 
 ClassCard.propTypes = {
     name: PropTypes.string,

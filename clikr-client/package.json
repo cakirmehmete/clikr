@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.4.0",
+    "@material-ui/icons": "^3.0.1",
     "@svgr/webpack": "2.4.1",
     "axios": "^0.18.0",
     "bfj": "6.1.1",
@@ -103,15 +104,15 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "7.1.0",
+    "@babel/plugin-proposal-decorators": "^7.1.6",
+    "@babel/plugin-syntax-json-strings": "^7.0.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "9.0.0",
     "babel-jest": "23.6.0",
     "babel-loader": "8.0.4",
     "babel-plugin-named-asset-import": "^0.2.2",
     "babel-preset-react-app": "^5.0.4",
-    "@babel/core": "7.1.0",
-    "@babel/plugin-proposal-decorators": "^7.1.6",
-    "@babel/plugin-syntax-json-strings": "^7.0.0",
     "eslint": "5.6.0",
     "eslint-config-react-app": "^3.0.4",
     "eslint-loader": "2.1.1",
