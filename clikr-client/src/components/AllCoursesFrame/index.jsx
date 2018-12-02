@@ -36,7 +36,7 @@ class AllCoursesFrame extends React.Component {
     render() {
         // Handle routes
         if (this.state.toNewCourse === true) {
-            return <Redirect to='/professor/new-course' />
+            return <Redirect to='/professor/new-course' push />
         }
 
         return (

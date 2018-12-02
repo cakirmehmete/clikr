@@ -36,7 +36,7 @@ class ListOfAllCoures extends React.Component {
         // Handle routes
         if (this.state.referrerCourseIndex !== -1) {
             this.profStore.course_id = this.profStore.courses[this.state.referrerCourseIndex].id
-            return <Redirect to='/professor/view-lectures'/>
+            return <Redirect to='/professor/view-lectures' push />
         }
         
         return (
