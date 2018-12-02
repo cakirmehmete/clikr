@@ -3,6 +3,7 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
+from ..shared.Util import CustomStringField, CustomIntegerField, CustomDateTimeField
 import uuid
 
 class CourseModel(db.Model):
@@ -24,7 +25,7 @@ class CourseModel(db.Model):
     creator_id = db.Column(db.String(36), db.ForeignKey('professors.id', onupdate='CASCADE', ondelete='SET NULL'))  # TODO: should delete the course when the last prof for that course is deleted
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
-    enroll_code = db.Column(db.String(8), nullable=True)
+    enroll_code = db.Column(db.String(8), nullable=True)    # TODO: should not be nullable
 
     # relationships
     lectures = db.relationship('LectureModel', backref='course', lazy=True, passive_deletes=True)
@@ -80,14 +81,14 @@ class CourseSchema(Schema):
     """
     Course Schema
     """
-    id = fields.Str(dump_only=True)
-    dept = fields.Str()
-    coursenum = fields.Str()
-    title = fields.Str(required=True)
-    description = fields.Str()
-    year = fields.Integer()
-    term = fields.Str()
-    creator_id = fields.Str()
-    created_at = fields.DateTime(dump_only=True)
-    modified_at = fields.DateTime(dump_only=True)
-    enroll_code = fields.Str(dump_only=True)
+    id = CustomStringField(dump_only=True)
+    dept = CustomStringField()
+    coursenum = CustomIntegerField()
+    title = CustomStringField(required=True)
+    description = CustomStringField()
+    year = CustomIntegerField()
+    term = CustomStringField()
+    creator_id = CustomStringField()
+    created_at = CustomDateTimeField(dump_only=True)
+    modified_at = CustomDateTimeField(dump_only=True)
+    enroll_code = CustomStringField(dump_only=True)

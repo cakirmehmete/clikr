@@ -3,6 +3,7 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
+from ..shared.Util import CustomStringField, CustomDateTimeField
 import uuid
 
 class AnswerModel(db.Model):
@@ -63,9 +64,9 @@ class AnswerSchema(Schema):
     """
     Answer Schema
     """
-    id = fields.Str(dump_only=True)
-    student_id = fields.Str(required=True)
-    question_id = fields.Str(required=True)
-    answer = fields.Str(required=True)
-    created_at = fields.DateTime(dump_only=True)
-    modified_at = fields.DateTime(dump_only=True)
+    id = CustomStringField(dump_only=True)
+    student_id = CustomStringField(required=True)
+    question_id = CustomStringField(required=True)
+    answer = CustomStringField(required=True)
+    created_at = CustomDateTimeField(dump_only=True)
+    modified_at = CustomDateTimeField(dump_only=True)
