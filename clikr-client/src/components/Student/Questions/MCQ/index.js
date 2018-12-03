@@ -7,6 +7,17 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import APIStudentService from '../../../../services/APIStudentService'
 import { observer, inject } from 'mobx-react';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
+
+// for sliding up motion
+function Transition(props) {
+    return <Slide direction="up" {...props} />;
+  }
 
 @inject("store")
 @observer
@@ -38,18 +49,21 @@ class MCQ extends Component {
         question: "What is the meaning of life?",
         answerchoices: [],
         answer: "",
-        disabled: false
+        sent: "",
+        dialogue: false
     }
 
     handleChange = (e) => {
         this.setState({
             answer: e.target.value
         });
-    }
-    handleClick = (e) => {
-        this.apiStudentService.postAnswer(this.state.answer, this.props.question.question.id)
+    };
+
+    handleSubmit = () => {
+        this.apiStudentService.postAnswer(this.state.answerchoices.indexOf(this.state.answer) + 1, this.props.question.question.id)
+        console.log(this.state.answerchoices.indexOf(this.state.answer) + 1)
         this.setState({
-            disabled: true
+            sent: this.state.answer
         })
     }
 
@@ -72,6 +86,31 @@ class MCQ extends Component {
                         <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
                             submit
                         </Button>
+                        <Dialog
+                            open={this.state.dialogue}
+                            TransitionComponent={Transition}
+                            keepMounted
+                            onClose={this.handleClose}
+                            aria-labelledby="alert-dialog-slide-title"
+                            aria-describedby="alert-dialog-slide-description"
+                            >
+                            <DialogTitle id="alert-dialog-slide-title">
+                                {"Answer changed- "}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-slide-description">
+                                "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.handleClose} color="primary">
+                                no
+                                </Button>
+                                <Button onClick={this.handleCloseSubmit} color="primary">
+                                yes
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </Grid>
                 </Grid>
             </Grid>
