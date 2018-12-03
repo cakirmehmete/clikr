@@ -9,7 +9,7 @@ export default class AddCourseButton extends React.Component {
 
   render() {
     return (
-      <Link to={this.state.link} style={{color:"white", "text-decoration": "none"}}>
+      <Link to={this.state.link} style={{color:"white", "textDecoration": "none"}}>
         <Button variant="fab" color="secondary" aria-label="Add" style={{"font-size":"xx-large"}}>+</Button>
       </Link>
       
