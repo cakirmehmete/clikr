@@ -47,7 +47,8 @@ class MCQ extends Component {
         answerchoices: [],
         answer: "",
         sent: "",
-        dialogue: false
+        dialogue: false, 
+        disabled: false
     }
 
 
@@ -55,13 +56,23 @@ class MCQ extends Component {
         this.setState({
             answer: e.target.value
         });
+        if (e.target.value === this.state.sent) {
+            this.setState({
+                disabled: true
+            })
+        }
+        else{
+            this.setState({
+                disabled: false
+            }) 
+        }
     };
 
     handleSubmit = () => {
-        this.apiStudentService.postAnswer(this.state.answerchoices.indexOf(this.state.answer) + 1, this.props.question.question.id)
-        console.log(this.state.answerchoices.indexOf(this.state.answer) + 1)
+        this.apiStudentService.postAnswer((this.state.answerchoices.indexOf(this.state.answer) + 1).toString(), this.props.question.question.id)
         this.setState({
-            sent: this.state.answer
+            sent: this.state.answer,
+            disabled: true
         })
     };
 
@@ -99,12 +110,12 @@ class MCQ extends Component {
                             onChange={this.handleChange}
                         >
                         {this.state.answerchoices.map(a => (
-                            <FormControlLabel value={a} control={<Radio />} label={a}/>
+                            <FormControlLabel key={a} value={a} control={<Radio />} label={a}/>
                         ))}
                         </RadioGroup>
                     </FormControl>
                     <Grid container justify="flex-end" style={{"paddingRight":"1%"}}>
-                        <Button onClick={this.handleClick} value={this.state.answer} variant="contained" color="secondary">
+                        <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
                             submit
                         </Button>
                         <Dialog
