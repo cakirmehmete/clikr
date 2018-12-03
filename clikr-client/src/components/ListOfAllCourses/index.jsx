@@ -17,7 +17,7 @@ const styles = theme => ({
 @observer
 class ListOfAllCoures extends React.Component {
     state = {
-        referrerCourseIndex: -1
+        referrerCourseId: null
     }
 
     constructor(props) {
@@ -26,27 +26,26 @@ class ListOfAllCoures extends React.Component {
         this.profStore = props.profStore
     }
 
-    handleCourseClick = index => () => {
+    handleCourseClick = id => () => {
         this.setState(() => ({
-            referrerCourseIndex: index
+            referrerCourseId: id
         }))
     }
 
     render() {
         // Handle routes
-        if (this.state.referrerCourseIndex !== -1) {
-            this.profStore.course_id = this.profStore.courses[this.state.referrerCourseIndex].id
-            return <Redirect to='/professor/view-lectures' push />
+        if (this.state.referrerCourseId !== null) {
+            return <Redirect to={'/professor/' + this.state.referrerCourseId + '/lectures'} push />
         }
         
         return (
             <List component="nav">
                 {this.profStore.courses.map((courseObj, index) => {
                     return (
-                        <ListItem divider button key={index} onClick={this.handleCourseClick(index)} >
+                        <ListItem divider button key={index} onClick={this.handleCourseClick(courseObj.id)} >
                             <ListItemText primary={courseObj.title} />
                             <ListItemSecondaryAction>
-                                <AddStudentsModalWrapped profStore={this.profStore} courseIndex={index} />
+                                <AddStudentsModalWrapped joinCode={courseObj.enroll_code}/>
                             </ListItemSecondaryAction>
                         </ListItem>
                     )

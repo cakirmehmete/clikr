@@ -7,7 +7,6 @@ import TopMenuBar from '../../components/TopMenuBar';
 import APIProfService from '../../services/APIProfService';
 import ProfessorHome from './Home';
 import ProfessorNewCourse from './NewCourse';
-import ProfessorAddStudent from './AddStudents';
 import ProfessorViewLectures from './ViewLectures';
 import ProfessorViewQuestions from './ViewQuestions';
 import ProfessorAddMCQuestion from './AddMCQuestion';
@@ -37,7 +36,7 @@ class ProfessorRoutes extends React.Component {
     }
 
     componentDidMount() {
-        this.apiProfService.loadAllCourses()
+        this.apiProfService.loadData()
     }
 
     render() {
@@ -49,12 +48,11 @@ class ProfessorRoutes extends React.Component {
                     <Router>
                         <Switch>
                             <Route exact path='/professor' component={ProfessorHome} />
-                            <Route path='/professor/new-course' component={ProfessorNewCourse} />
-                            <Route path='/professor/add-students' component={ProfessorAddStudent} />
-                            <Route path='/professor/view-lectures' component={ProfessorViewLectures} />
-                            <Route path='/professor/add-lecture' component={ProfessorAddLecture} />
-                            <Route exact path='/professor/view-questions' component={ProfessorViewQuestions} />
-                            <Route path='/professor/view-questions/add-mc-question' component={ProfessorAddMCQuestion} />
+                            <Route path='/professor/new' component={ProfessorNewCourse} />
+                            <Route path='/professor/:courseId/lectures' component={ProfessorViewLectures} />
+                            <Route path='/professor/:courseId/new' component={ProfessorAddLecture} />
+                            <Route exact path='/professor/:lectureId/questions' component={ProfessorViewQuestions} />
+                            <Route path='/professor/:lectureId/questions/new-mc' component={ProfessorAddMCQuestion} />
                         </Switch>
                     </Router>
                 </main>

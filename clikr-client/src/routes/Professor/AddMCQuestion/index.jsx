@@ -25,6 +25,7 @@ const styles = theme => ({
 });
 
 @inject("profStore")
+@inject("apiService")
 @observer
 class ProfessorAddMCQuestion extends React.Component {
     state = {
@@ -43,8 +44,6 @@ class ProfessorAddMCQuestion extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.profStore = props.profStore
-        this.apiProfService = new APIProfService(this.profStore)
     }
 
     handleChange = name => event => {
@@ -54,17 +53,21 @@ class ProfessorAddMCQuestion extends React.Component {
     };
 
     handleSubmit = () => {
+        const { lectureId } = this.props.match.params
+
         // Send course to API
-        this.apiProfService.addQuestion(
-            new MultipleChoiceQuestionObj(null, this.profStore.lecture_id, "multiple_choice", this.state.title, this.state.text, this.state.correct_answer, null, null, null, null, null, null, this.state.option1, this.state.option2, this.state.option3, this.state.option4, this.state.option5, this.state.number_of_options)
+        this.props.apiService.addQuestion(
+            new MultipleChoiceQuestionObj(null, lectureId, "multiple_choice", this.state.title, this.state.text, this.state.correct_answer, null, null, null, null, null, null, this.state.option1, this.state.option2, this.state.option3, this.state.option4, this.state.option5, this.state.number_of_options)
         )
 
         this.setState({ toQuestions: true });
     }
 
     render() {
+        const { lectureId } = this.props.match.params
+
         if (this.state.toQuestions === true) {
-            return <Redirect to='/professor/view-questions' push />
+            return <Redirect to={'/professor/' + lectureId + '/questions'} push />
         }
 
         return (
