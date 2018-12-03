@@ -23,6 +23,10 @@ export default class StudentStore {
     })
   }
 
+  getQuestionWithId(question_id) {
+    return this.questions.find(x => x.id === question_id);
+  }
+
   @action
   updateAllQuestions(questions) {
       this.questions = []

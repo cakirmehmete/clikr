@@ -22,14 +22,16 @@ class MCQ extends Component {
 
         var answers = []
 
-        var mcq = this.props.question.question
+        var mcq = this.store.getQuestionWithId(this.props.questionId);
         for (var i = 1; i <= mcq['number_of_options']; i++) {
             var qstring = mcq["option" + i.toString()];
             answers.push(qstring)
         }
+
         this.setState({
             answerchoices: answers
         })
+        
     }
 
     state = {
@@ -38,6 +40,7 @@ class MCQ extends Component {
         answer: "",
         disabled: false
     }
+
     handleChange = (e) => {
         this.setState({
             answer: e.target.value
