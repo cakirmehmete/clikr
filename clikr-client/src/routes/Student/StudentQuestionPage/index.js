@@ -38,18 +38,20 @@ class QuestionPage extends Component {
         // This method is looking for the event 'change color'
         // socket.on takes a callback function for the first argument
         socket.on('question opened', (data) => {
-            this.store.updateAllQuestions([data.question])
+            this.store.addOneQuestion(data.question)
             this.setState({
                 has_question: true
             })
         })
 
         socket.on('question closed', (msg) => {
-            var data = JSON.stringify(msg);
-            // setting the color of our button
-            this.setState({
-                has_question: false
-            })
+            this.store.removeQuestionById(msg.question.id)
+
+            if (this.store.questions.length == 0) {
+                this.setState({
+                    has_question: false
+                })
+            }
         })
 
         socket.on('all open questions', (data) => {
