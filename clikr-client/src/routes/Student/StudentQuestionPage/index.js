@@ -54,7 +54,12 @@ class QuestionPage extends Component {
 
         socket.on('all open questions', (data) => {
             console.log(data.questions)
-            this.store.updateAllQuestions(data.questions)
+            if (data.questions.length > 0) {
+                this.store.updateAllQuestions(data.questions)
+                this.setState({
+                    has_question: true
+                })
+            }
         })
 
         socket.on('server message', (msg) => {
