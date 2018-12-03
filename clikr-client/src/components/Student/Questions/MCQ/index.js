@@ -17,6 +17,7 @@ class MCQ extends Component {
         this.store = this.props.store
         this.apiStudentService = new APIStudentService(this.store)
     }
+    
     componentDidMount() {
 
         var answers = []

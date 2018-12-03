@@ -46,7 +46,7 @@ class ProfessorViewQuestions extends React.Component {
         this.state = {
             currentQuestionIndex: 0,
             currentQuestionId: 0,
-            firstTime: false,
+            btnStatus: 0,
             parentLecture: { questions: [] }
         }
     }
@@ -58,11 +58,13 @@ class ProfessorViewQuestions extends React.Component {
             this.setState({
                 parentLecture: this.props.profStore.getLectureWithId(lectureId)
             })
+            this.setState({
+                currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+            })
         })
 
         socket.on('new results', (msg) => {
             var data = JSON.stringify(msg);
-            // setting the color of our button
             console.log(data)
         })
 
@@ -71,16 +73,41 @@ class ProfessorViewQuestions extends React.Component {
         });
     }
 
-    send = () => {
-        if (this.state.firstTime === false) {
-            this.setState({ firstTime: 'true' });
-            this.props.apiService.openQuestion(this.state.currentQuestionId)
-            socket.emit('subscribe professor', this.state.currentQuestionId)
-        } else {
-            this.props.apiService.closeQuestion(this.state.currentQuestionId)
-            this.props.apiService.openQuestion(this.state.currentQuestionId) // Should be the next question though!!
-            socket.emit('subscribe professor', this.state.currentQuestionId) // Next Q here
-            this.setState({ currentQuestionIndex: this.state.currentQuestionIndex + 1 });
+    handleBtnClick = () => {
+        switch (this.state.btnStatus) {
+            case 0:
+                // Handle the "Open Question"
+                this.props.apiService.openQuestion(this.state.currentQuestionId)
+                socket.emit('subscribe professor', this.state.currentQuestionId)
+                this.setState({ btnStatus: 1 })
+                break;
+
+            case 1:
+                // Handle the "Close Question"
+                this.props.apiService.closeQuestion(this.state.currentQuestionId)
+                // Check if this is last question
+                if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length)
+                    this.setState({ btnStatus: 3 })
+                else
+                    this.setState({ btnStatus: 2 })
+                break;
+
+            case 2:
+                // Handle the "Open Next Question"
+                this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1))
+                socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1))
+
+                // Update the index to the next question
+                this.setState({
+                    btnStatus: 1,
+                    currentQuestionIndex: this.state.currentQuestionIndex + 1,
+                    currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1)
+                })
+
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -94,8 +121,11 @@ class ProfessorViewQuestions extends React.Component {
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
                         Q{this.state.currentQuestionIndex + 1}: {this.props.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_text}
                     </Typography>
-                    <Button variant="outlined" color="primary" onClick={() => this.send()} className={this.styles.startLectureBtn}>
-                        {this.state.firstTime === false ? "Start Lecture" : "Next Question"}
+                    <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3}>
+                        {this.state.btnStatus === 0 ? "Open Question" :
+                            this.state.btnStatus === 1 ? "Close Question" : 
+                            this.state.btnStatus === 2 ? "Open Next Question" : 
+                            "No More Questions"}
                     </Button>
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
@@ -108,7 +138,10 @@ class ProfessorViewQuestions extends React.Component {
     }
 
     convertQuestionIndexToId(index) {
-        return this.state.parentLecture.questions[index].id
+        if (index < this.state.parentLecture.questions.length)
+            return this.state.parentLecture.questions[index].id
+        else
+            return 0
     }
 }
 
