@@ -20,7 +20,7 @@ const styles = theme => ({
 class AllQuestionsFrame extends React.Component {
     state = {
         toNewQuestion: false,
-        referrerQuestionIndex: -1
+        questionId: ""
     }
 
     constructor(props) {
@@ -28,7 +28,7 @@ class AllQuestionsFrame extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = props.apiProfService
-        this.parentLecture = this.profStore.getLectureWithId(this.profStore.lecture_id)
+        this.parentLecture = props.parentLecture
     }
 
     componentDidMount() {
@@ -41,9 +41,9 @@ class AllQuestionsFrame extends React.Component {
         }))
     }
 
-    handleQuestionClick = index => () => {
+    handleQuestionClick = QuestionObj => () => {
         this.setState(() => ({
-            referrerQuestionIndex: index
+            questionId: QuestionObj.id
         }))
     }
 
@@ -61,18 +61,18 @@ class AllQuestionsFrame extends React.Component {
                 <Card className={this.styles.card}>
                     <CardContent>
                         <Typography variant="h6" color="inherit">
-                            Questions for {this.parentLecture.title + " Lecture"}
+                            Questions for "{this.parentLecture.title}" Lecture
                         </Typography>
                         <List component="nav">
                             {this.profStore.questions.map((questionObj, index) => {
                                 return (
-                                    <ListItem divider button key={index} onClick={this.handleQuestionClick(questionObj.id)} >
+                                    <ListItem divider button key={index} onClick={this.handleQuestionClick(questionObj)} >
                                         <ListItemText primary={questionObj.question_title} />
                                     </ListItem>
                                 )
                             })}
                         </List>
-                        <AddQuestionModalWrapped profStore={this.profStore} />
+                        <AddQuestionModalWrapped profStore={this.profStore} parentLecture={this.parentLecture}/>
                     </CardContent>
                 </Card>
             </div>

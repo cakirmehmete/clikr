@@ -60,6 +60,7 @@ class AddQuestionModal extends React.Component {
     constructor(props) {
         super(props)
         this.profStore = props.profStore
+        this.parentLecture = props.parentLecture
     }
 
     handleOpen = () => {
@@ -78,7 +79,7 @@ class AddQuestionModal extends React.Component {
     render() {
         const { classes } = this.props;
         if (this.state.toNewMCQuestion === true) {
-            return <Redirect to='/professor/view-questions/add-mc-question' push />
+            return <Redirect from='/professor/view-questions' to={{pathname:'/professor/add-mc-question', state:{LectureObj:this.parentLecture}}} push />
         }
 
         return (

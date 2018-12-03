@@ -56,7 +56,7 @@ class ProfessorAddMCQuestion extends React.Component {
     handleSubmit = () => {
         // Send course to API
         this.apiProfService.addQuestion(
-            new MultipleChoiceQuestionObj(null, this.profStore.lecture_id, "multiple_choice", this.state.title, this.state.text, this.state.correct_answer, null, null, null, null, null, null, this.state.option1, this.state.option2, this.state.option3, this.state.option4, this.state.option5, this.state.number_of_options)
+            new MultipleChoiceQuestionObj(null, this.props.location.state.LectureObj.id, "multiple_choice", this.state.title, this.state.text, this.state.correct_answer, null, null, null, null, null, null, this.state.option1, this.state.option2, this.state.option3, this.state.option4, this.state.option5, this.state.number_of_options)
         )
 
         this.setState({ toQuestions: true });
@@ -64,7 +64,7 @@ class ProfessorAddMCQuestion extends React.Component {
 
     render() {
         if (this.state.toQuestions === true) {
-            return <Redirect to='/professor/view-questions' push />
+            return <Redirect from='/professor/add-mc-question' to={{pathname:"/professor/view-questions/" + this.props.location.state.LectureObj.title, state:{lectureObj: this.props.location.state.LectureObj}}} push />
         }
 
         return (

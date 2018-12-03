@@ -51,10 +51,22 @@ class ProfessorRoutes extends React.Component {
                             <Route exact path='/professor' component={ProfessorHome} />
                             <Route path='/professor/new-course' component={ProfessorNewCourse} />
                             <Route path='/professor/add-students' component={ProfessorAddStudent} />
-                            <Route path='/professor/view-lectures' component={ProfessorViewLectures} />
-                            <Route path='/professor/add-lecture' component={ProfessorAddLecture} />
-                            <Route exact path='/professor/view-questions' component={ProfessorViewQuestions} />
-                            <Route path='/professor/view-questions/add-mc-question' component={ProfessorAddMCQuestion} />
+                            <Route
+                                path='/professor/view-lectures/:id?'
+                                render={(props) => <ProfessorViewLectures {...props} />}
+                            />
+                            <Route
+                                exact path='/professor/view-questions/:id?'
+                                render={(props) => <ProfessorViewQuestions {...props} />}
+                            />
+                            <Route
+                                exact path='/professor/add-lecture'
+                                render={(props) => <ProfessorAddLecture {...props} />}
+                            />
+                            <Route
+                                exact path='/professor/add-mc-question'
+                                render={(props) => <ProfessorAddMCQuestion {...props} />}
+                            />
                         </Switch>
                     </Router>
                 </main>

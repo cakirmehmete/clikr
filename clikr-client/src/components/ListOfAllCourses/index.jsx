@@ -7,6 +7,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { observer } from 'mobx-react';
 import AddStudentsModalWrapped from '../AddStudentsModal';
+import TopCoursesStatFrame from '../TopCoursesStatFrame';
 
 const styles = theme => ({
     card: {
@@ -17,7 +18,10 @@ const styles = theme => ({
 @observer
 class ListOfAllCoures extends React.Component {
     state = {
-        referrerCourseIndex: -1
+        courseId: "",
+        title: "",
+        redirect: false
+
     }
 
     constructor(props) {
@@ -26,27 +30,28 @@ class ListOfAllCoures extends React.Component {
         this.profStore = props.profStore
     }
 
-    handleCourseClick = index => () => {
+    handleCourseClick = courseObj => () => {
         this.setState(() => ({
-            referrerCourseIndex: index
+            courseId: courseObj.id,
+            courseObj: courseObj,
+            redirect: TopCoursesStatFrame
         }))
     }
 
     render() {
         // Handle routes
-        if (this.state.referrerCourseIndex !== -1) {
-            this.profStore.course_id = this.profStore.courses[this.state.referrerCourseIndex].id
-            return <Redirect to='/professor/view-lectures' push />
+        if (this.state.redirect) {
+            return <Redirect from="/professor" to={{pathname:"/professor/view-lectures/" + this.state.courseId, state:{courseObj: this.state.courseObj}}} push />
         }
         
         return (
             <List component="nav">
                 {this.profStore.courses.map((courseObj, index) => {
                     return (
-                        <ListItem divider button key={index} onClick={this.handleCourseClick(index)} >
+                        <ListItem divider button key={index} onClick={this.handleCourseClick(courseObj)} >
                             <ListItemText primary={courseObj.title} />
                             <ListItemSecondaryAction>
-                                <AddStudentsModalWrapped profStore={this.profStore} courseIndex={index} />
+                                <AddStudentsModalWrapped profStore={this.profStore} joinCode={courseObj.joinCode} />
                             </ListItemSecondaryAction>
                         </ListItem>
                     )

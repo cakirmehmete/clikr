@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { observer } from 'mobx-react';
+import ListOfAllLectures from '../ListOfAllLectures'
 
 const styles = theme => ({
     card: {
@@ -19,8 +20,7 @@ const styles = theme => ({
 @observer
 class AllLecturesFrame extends React.Component {
     state = {
-        toNewLecture: false,
-        referrerLectureIndex: -1
+        newLecture: false
     }
 
     constructor(props) {
@@ -28,34 +28,20 @@ class AllLecturesFrame extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = props.apiProfService
-        this.parentCourse = this.profStore.getCourseWithId(this.profStore.course_id)
-    }
-
-    componentDidMount() {
-        this.apiProfService.loadLecturesForCourse(this.parentCourse.id)
+        this.parentCourse = props.parentCourse
     }
 
     handleNewLectureClick = () => {
         this.setState(() => ({
-            toNewLecture: true
+            newLecture: true
         }))
     }
-
-    handleLectureClick = index => () => {
-        this.setState(() => ({
-            referrerLectureIndex: index
-        }))
-    }
-
     render() {
         // Handle routes
-        if (this.state.toNewLecture === true) {
-            return <Redirect to='/professor/add-lecture' push />
-        } else if (this.state.referrerLectureIndex !== -1) {
-            this.profStore.lecture_id = this.state.referrerLectureIndex
-            return <Redirect to='/professor/view-questions' push />
+        if (this.state.newLecture) {
+            return <Redirect from="/professor/view-lectures" to={{pathname:"/professor/add-lecture", state:{courseObj: this.parentCourse}}} push />
         }
-
+        
         return (
             <div>
                 <Typography variant="subtitle1" color="textPrimary">
@@ -66,15 +52,7 @@ class AllLecturesFrame extends React.Component {
                         <Typography variant="h6" color="inherit">
                             Lectures for {this.parentCourse.title}
                         </Typography>
-                        <List component="nav">
-                            {this.profStore.lectures.map((lectureObj, index) => {
-                                return (
-                                    <ListItem divider button key={index} onClick={this.handleLectureClick(lectureObj.id)} >
-                                        <ListItemText primary={lectureObj.title + " Lecture on " + lectureObj.date} />
-                                    </ListItem>
-                                )
-                            })}
-                        </List>
+                        <ListOfAllLectures profStore={this.profStore} courseObj={this.courseObj}/>
                         <Button onClick={this.handleNewLectureClick} variant="outlined" color="primary">Add Lecture</Button>
                     </CardContent>
                 </Card>

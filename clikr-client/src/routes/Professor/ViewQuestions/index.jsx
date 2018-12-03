@@ -7,6 +7,7 @@ import { observer, inject } from 'mobx-react';
 import APIProfService from '../../../services/APIProfService';
 import Typography from '@material-ui/core/Typography';
 import AllQuestionsFrame from '../../../components/AllQuestionsFrame';
+import queryString from 'query-string'
 
 const styles = theme => ({
     root: {
@@ -36,16 +37,19 @@ const styles = theme => ({
 @inject("profStore")
 @observer
 class ProfessorViewQuestions extends React.Component {
-    state = {
-        currentQuestionIndex: 0,
-        firstTime: false
-    }
 
     constructor(props) {
         super(props)
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = new APIProfService(this.profStore)
+    
+    }
+
+    state = {
+        currentQuestionIndex: 0,
+        parentLecture: this.props.location.state.lectureObj,
+        firstTime: false
     }
 
     handleStartLecture = () => {
@@ -54,7 +58,7 @@ class ProfessorViewQuestions extends React.Component {
             this.apiProfService.openQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).id)
         } else {
             this.apiProfService.closeQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).id)
-            this.apiProfService.openQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex + 1).id)
+            // this.apiProfService.openQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex + 1).id)
             this.setState({ currentQuestionIndex: this.state.currentQuestionIndex + 1 });
         }
     };
@@ -64,7 +68,7 @@ class ProfessorViewQuestions extends React.Component {
             <div>
                 <Paper className={this.styles.root} elevation={1}>
                     <Typography variant="h6" component="h5" className={this.styles.text}>
-                        {this.profStore.getLectureWithId(this.profStore.lecture_id).title} Lecture on {this.profStore.getLectureWithId(this.profStore.lecture_id).date}
+                        {this.state.parentLecture.title} Lecture on {this.state.parentLecture.date}
                     </Typography>
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
                         Q{this.state.currentQuestionIndex + 1}: {this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).question_text}
@@ -75,7 +79,7 @@ class ProfessorViewQuestions extends React.Component {
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={8}>
-                        <AllQuestionsFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+                        <AllQuestionsFrame profStore={this.profStore} apiProfService={this.apiProfService} parentLecture={this.state.parentLecture} />
                     </Grid>
                 </Grid>
             </div>

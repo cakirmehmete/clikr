@@ -50,7 +50,7 @@ class ProfessorAddLecture extends React.Component {
     handleSubmit = () => {
         // Send course to API
         this.apiProfService.addLecture(
-            new LectureObj(this.state.title, this.state.description, this.state.date, null, this.profStore.course_id)
+            new LectureObj(this.state.title, this.state.description, this.state.date, null, this.props.location.state.courseObj.courseObj.id)
         )
 
         this.setState({ toLecture: true });
@@ -58,7 +58,7 @@ class ProfessorAddLecture extends React.Component {
 
     render() {
         if (this.state.toLecture === true) {
-            return <Redirect to='/professor/view-lectures' push />
+            return <Redirect from="/professor/add-lecture" to={{pathname:"/professor/view-lectures/" + this.props.location.state.courseObj.courseObj.id, state:{courseObj: this.props.location.state.courseObj.courseObj}}} push />
         }
 
         return (

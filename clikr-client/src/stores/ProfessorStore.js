@@ -36,7 +36,9 @@ export default class ProfessorStore {
     getLectureWithId(lecture_id) {
         return this.lectures.find(x => x.id === lecture_id)        
     }
-
+    getQuestionWithId(question_id) {
+        return this.questions.find(x => x.id === question_id)
+    }
     getQuestionWithIndex(question_index) {
         if (question_index < this.questions.length) {
             return this.questions[question_index];
