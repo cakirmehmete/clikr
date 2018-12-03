@@ -30,11 +30,6 @@ class ProfessorNewCourse extends React.Component {
     state = {
         toHome: false,
         name: '',
-        coursenum: '',
-        dept: '',
-        description: '',
-        term: '',
-        year: ''
     };
 
     constructor(props) {
@@ -53,10 +48,9 @@ class ProfessorNewCourse extends React.Component {
     handleSubmit = () => {
         // Send course to API
         this.apiProfService.addCourse(
-            // id: any, title: any, num: any, dept: any, description: any, term: any, joinCode: any, year: any
-            new CourseObj(null, this.state.name, this.state.coursenum, this.state.dept,
-                this.state.description, this.state.term, this.state.year)
+            new CourseObj(this.state.name)
         )
+
         // Close modal 
         this.setState({ toHome: true });
     }
@@ -79,46 +73,6 @@ class ProfessorNewCourse extends React.Component {
                         className={this.styles.textField}
                         value={this.state.name}
                         onChange={this.handleChange('name')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Course Number"
-                        className={this.styles.textField}
-                        value={this.state.coursenum}
-                        onChange={this.handleChange('coursenum')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Course Department"
-                        className={this.styles.textField}
-                        value={this.state.dept}
-                        onChange={this.handleChange('dept')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Course Description"
-                        className={this.styles.textField}
-                        value={this.state.description}
-                        onChange={this.handleChange('description')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Course Term"
-                        className={this.styles.textField}
-                        value={this.state.term}
-                        onChange={this.handleChange('term')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Course Year"
-                        className={this.styles.textField}
-                        value={this.state.year}
-                        onChange={this.handleChange('year')}
                         margin="normal"
                     />
                     <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Submit</Button>

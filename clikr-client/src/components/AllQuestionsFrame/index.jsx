@@ -7,8 +7,9 @@ import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import AddQuestionModalWrapped from '../AddQuestionModal';
+import PropTypes from 'prop-types';
 
 const styles = theme => ({
     card: {
@@ -16,23 +17,17 @@ const styles = theme => ({
     },
 });
 
+@inject('profStore')
 @observer
 class AllQuestionsFrame extends React.Component {
     state = {
         toNewQuestion: false,
-        referrerQuestionIndex: -1
+        referrerQuestionId: -1,
     }
 
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.profStore = props.profStore
-        this.apiProfService = props.apiProfService
-        this.parentLecture = this.profStore.getLectureWithId(this.profStore.lecture_id)
-    }
-
-    componentDidMount() {
-        this.apiProfService.loadQuestionsForLecture(this.parentLecture.id)
     }
 
     handleNewQuestionClick = () => {
@@ -41,9 +36,9 @@ class AllQuestionsFrame extends React.Component {
         }))
     }
 
-    handleQuestionClick = index => () => {
+    handleQuestionClick = id => () => {
         this.setState(() => ({
-            referrerQuestionIndex: index
+            referrerQuestionId: id
         }))
     }
 
@@ -61,10 +56,10 @@ class AllQuestionsFrame extends React.Component {
                 <Card className={this.styles.card}>
                     <CardContent>
                         <Typography variant="h6" color="inherit">
-                            Questions for {this.parentLecture.title + " Lecture"}
+                            Questions for {this.props.parentLecture.title + " Lecture"}
                         </Typography>
                         <List component="nav">
-                            {this.profStore.questions.map((questionObj, index) => {
+                            {this.props.parentLecture.questions.map((questionObj, index) => {
                                 return (
                                     <ListItem divider button key={index} onClick={this.handleQuestionClick(questionObj.id)} >
                                         <ListItemText primary={questionObj.question_title} />
@@ -72,12 +67,16 @@ class AllQuestionsFrame extends React.Component {
                                 )
                             })}
                         </List>
-                        <AddQuestionModalWrapped profStore={this.profStore} />
+                        <AddQuestionModalWrapped lectureId={this.props.parentLecture.id} />
                     </CardContent>
                 </Card>
             </div>
         );
     }
 }
+
+AllQuestionsFrame.propTypes = {
+    parentLecture: PropTypes.object
+};
 
 export default withStyles(styles)(AllQuestionsFrame);

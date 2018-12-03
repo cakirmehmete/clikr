@@ -6,7 +6,7 @@ import { List } from '@material-ui/icons';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import { observer } from 'mobx-react';
+import PropTypes from 'prop-types';
 
 function getModalStyle() {
     const top = 50;
@@ -50,16 +50,16 @@ const styles = theme => ({
     }
 });
 
-@observer
 class AddQuestionModal extends React.Component {
     state = {
         open: false,
-        toNewMCQuestion: false
+        toNewMCQuestion: false,
+        lectureId: null
     };
 
     constructor(props) {
         super(props)
-        this.profStore = props.profStore
+
     }
 
     handleOpen = () => {
@@ -78,7 +78,8 @@ class AddQuestionModal extends React.Component {
     render() {
         const { classes } = this.props;
         if (this.state.toNewMCQuestion === true) {
-            return <Redirect to='/professor/view-questions/add-mc-question' push />
+            // Lecture Id
+            return <Redirect to={'/professor/' + this.props.lectureId + '/questions/new-mc'} push />
         }
 
         return (
@@ -105,6 +106,10 @@ class AddQuestionModal extends React.Component {
         );
     }
 }
+
+AddQuestionModal.propTypes = {
+    lectureId: PropTypes.string
+};
 
 // We need an intermediary variable for handling the recursive nesting.
 const AddQuestionModalWrapped = withStyles(styles)(AddQuestionModal);

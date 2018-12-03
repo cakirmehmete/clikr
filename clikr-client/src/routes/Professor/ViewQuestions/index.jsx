@@ -6,7 +6,6 @@ import Paper from '@material-ui/core/Paper';
 import { observer, inject } from 'mobx-react';
 import { socketioURL } from '../../../constants/api';
 import socketIOClient from 'socket.io-client'
-import APIProfService from '../../../services/APIProfService';
 import Typography from '@material-ui/core/Typography';
 import AllQuestionsFrame from '../../../components/AllQuestionsFrame';
 const socket = socketIOClient(socketioURL)
@@ -37,34 +36,30 @@ const styles = theme => ({
 });
 
 @inject("profStore")
+@inject("apiService")
 @observer
 class ProfessorViewQuestions extends React.Component {
-    state = {
-        currentQuestionIndex: 0,
-        firstTime: false
-    }
-
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.profStore = props.profStore
-        this.apiProfService = new APIProfService(this.profStore)
-    }
 
-    send = () => {
-        if (this.state.firstTime === false) {
-            this.setState({ firstTime: 'true' });
-            this.apiProfService.openQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).id)
-            socket.emit('subscribe professor', this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).id)
-        } else {
-            this.apiProfService.closeQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).id)
-            this.apiProfService.openQuestion(this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex + 1).id)
-            socket.emit('subscribe professor', this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex + 1).id)
-            this.setState({ currentQuestionIndex: this.state.currentQuestionIndex + 1 });
+        this.state = {
+            currentQuestionIndex: 0,
+            currentQuestionId: 0,
+            firstTime: false,
+            parentLecture: { questions: [] }
         }
     }
 
     componentDidMount() {
+        // Get the lecture
+        this.props.apiService.loadData().then(() => {
+            const { lectureId } = this.props.match.params
+            this.setState({
+                parentLecture: this.props.profStore.getLectureWithId(lectureId)
+            })
+        })
+
         socket.on('new results', (msg) => {
             var data = JSON.stringify(msg);
             // setting the color of our button
@@ -76,15 +71,28 @@ class ProfessorViewQuestions extends React.Component {
         });
     }
 
+    send = () => {
+        if (this.state.firstTime === false) {
+            this.setState({ firstTime: 'true' });
+            this.props.apiService.openQuestion(this.state.currentQuestionId)
+            socket.emit('subscribe professor', this.state.currentQuestionId)
+        } else {
+            this.props.apiService.closeQuestion(this.state.currentQuestionId)
+            this.props.apiService.openQuestion(this.state.currentQuestionId) // Should be the next question though!!
+            socket.emit('subscribe professor', this.state.currentQuestionId) // Next Q here
+            this.setState({ currentQuestionIndex: this.state.currentQuestionIndex + 1 });
+        }
+    }
+
     render() {
         return (
             <div>
                 <Paper className={this.styles.root} elevation={1}>
                     <Typography variant="h6" component="h5" className={this.styles.text}>
-                        {this.profStore.getLectureWithId(this.profStore.lecture_id).title} Lecture on {this.profStore.getLectureWithId(this.profStore.lecture_id).date}
+                        {this.state.parentLecture.title} Lecture on {this.state.parentLecture.date}
                     </Typography>
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
-                        Q{this.state.currentQuestionIndex + 1}: {this.profStore.getQuestionWithIndex(this.state.currentQuestionIndex).question_text}
+                        Q{this.state.currentQuestionIndex + 1}: {this.props.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_text}
                     </Typography>
                     <Button variant="outlined" color="primary" onClick={() => this.send()} className={this.styles.startLectureBtn}>
                         {this.state.firstTime === false ? "Start Lecture" : "Next Question"}
@@ -92,11 +100,15 @@ class ProfessorViewQuestions extends React.Component {
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={8}>
-                        <AllQuestionsFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+                        <AllQuestionsFrame parentLecture={this.state.parentLecture} />
                     </Grid>
                 </Grid>
             </div>
         );
+    }
+
+    convertQuestionIndexToId(index) {
+        return this.state.parentLecture.questions[index].id
     }
 }
 

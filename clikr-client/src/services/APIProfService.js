@@ -1,25 +1,14 @@
-import { getCoursesAPI, postNewCourseAPI, postNewQuestionAPI, getLecturesAPI, postNewLectureAPI, getQuestionsAPI, postOpenQuestionAPI, postCloseQuestionAPI } from '../utils/api-facade';
+import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI } from '../utils/api-facade';
 
 export default class APIProfService {
     constructor(professorStore) {
         this.professorStore = professorStore;
     }
 
-    loadAllCourses() {
-        getCoursesAPI()
+    loadData() {
+        return getProfDataAPI()
             .then(res => {
-                this.professorStore.updateAllCourses(res.data)
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
-    }
-
-    loadLecturesForCourse(course_id) {
-        getLecturesAPI(course_id)
-            .then(res => {
-                this.professorStore.updateAllLectures(res.data)
+                this.professorStore.updateData(res.data)
             })
             .catch(error => {
                 console.log(error);
@@ -48,22 +37,12 @@ export default class APIProfService {
                 this._checkAuth(error);
             })
     }
-
-    loadQuestionsForLecture(lecture_id) {
-        getQuestionsAPI(lecture_id)
-            .then(res => {
-                this.professorStore.updateAllQuestions(res.data)
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
-    }
     
     addLecture(lecture) {
         postNewLectureAPI(lecture)
             .then(res => {
-                this.professorStore.updateAllLectures(res.data.lectures)
+                lecture.id = res.data.id
+                this.professorStore.addLecture(lecture)
             })
             .catch(error => {
                 console.log(error);
@@ -74,7 +53,8 @@ export default class APIProfService {
     addCourse(course) {
         postNewCourseAPI(course)
             .then(res => {
-                this.professorStore.updateAllCourses(res.data.courses)
+                course.id = res.data.id
+                this.professorStore.addCourse(course)
             })
             .catch(error => {
                 console.log(error);
@@ -86,7 +66,8 @@ export default class APIProfService {
         // post new question
         postNewQuestionAPI(question)
             .then(res => {
-                this.professorStore.updateAllQuestions(res.data.questions)
+                question.id = res.data.id
+                this.professorStore.addQuestion(question)
             })
             .catch(error => {
                 console.log(error);

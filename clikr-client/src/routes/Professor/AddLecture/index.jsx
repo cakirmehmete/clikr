@@ -4,8 +4,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { Redirect } from "react-router-dom";
-import { observer, inject } from 'mobx-react';
-import APIProfService from '../../../services/APIProfService';
+import { inject } from 'mobx-react';
 import LectureObj from '../../../models/LectureObj';
 
 const styles = theme => ({
@@ -24,21 +23,20 @@ const styles = theme => ({
     },
 });
 
-@inject("profStore")
-@observer
+@inject("apiService")
 class ProfessorAddLecture extends React.Component {
-    state = {
-        toLecture: false,
-        title: '',
-        date: '',
-        description: '',
-    };
-
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.profStore = props.profStore
-        this.apiProfService = new APIProfService(this.profStore)
+
+        const { courseId } = this.props.match.params
+        this.state = {
+            toLecture: false,
+            title: '',
+            date: '',
+            description: '',
+            courseId: courseId
+        }
     }
 
     handleChange = name => event => {
@@ -49,8 +47,8 @@ class ProfessorAddLecture extends React.Component {
 
     handleSubmit = () => {
         // Send course to API
-        this.apiProfService.addLecture(
-            new LectureObj(this.state.title, this.state.description, this.state.date, null, this.profStore.course_id)
+        this.props.apiService.addLecture(
+            new LectureObj(this.state.title, this.state.description, this.state.date, null, this.state.courseId)
         )
 
         this.setState({ toLecture: true });
@@ -58,7 +56,7 @@ class ProfessorAddLecture extends React.Component {
 
     render() {
         if (this.state.toLecture === true) {
-            return <Redirect to='/professor/view-lectures' push />
+            return <Redirect to={'/professor/' + this.state.courseId + '/lectures'} push />
         }
 
         return (

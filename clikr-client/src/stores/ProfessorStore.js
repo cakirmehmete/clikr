@@ -1,69 +1,46 @@
 import { observable, action } from "mobx";
-import CourseObj from '../models/CourseObj';
-import LectureObj from '../models/LectureObj';
-import { QuestionObj } from "../models/QuestionObj";
 
 export default class ProfessorStore {
-    constructor(course_id, lecture_id) {
-        this.course_id = course_id;
-        this.lecture_id = lecture_id;
-    }
-
     @observable
-    courses = []; // CourseObj[]
-
-    @observable
-    lectures = []; // LectureObj[]
-
-    @observable
-    questions = []; // QuestionObj[]
-
-    @action
-    updateAllCourses(courses) {
-        this.courses = []
-
-        courses.forEach(element => {
-            // id: any, title: any, num: any, dept: any, description: any, term: any, joinCode: any, year: any
-            this.courses.push(new CourseObj(element.id, element.title, element.coursenum,
-                element.dept, element.description, element.term, element.enroll_code, element.year))
-        })
-    }
+    courses = [];
 
     getCourseWithId(course_id) {
         return this.courses.find(x => x.id === course_id)
     }
 
     getLectureWithId(lecture_id) {
-        return this.lectures.find(x => x.id === lecture_id)        
+        const lectures = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+        return lectures.find(lecture => lecture.id === lecture_id)
     }
 
-    getQuestionWithIndex(question_index) {
-        if (question_index < this.questions.length) {
-            return this.questions[question_index];
-        }
-        return new QuestionObj()
-    }
+    getQuestionWithId(lecture, question_id) {
+        if (lecture.questions === undefined)
+            return { questions: [] };
 
-    @action
-    updateAllLectures(lectures) {
-        this.lectures = []
+        if (lecture.questions.find(x => x.id === question_id) === undefined)
+            return { questions: [] };
 
-        lectures.forEach(element => {
-            // course_id: any, date: any, description: any, id: any, title: any
-            this.lectures.push(new LectureObj(element.title, element.description, 
-                element.date, element.id, element.course_id))
-        })
+        return lecture.questions.find(x => x.id === question_id)
     }
 
     @action
-    updateAllQuestions(questions) {
-        this.questions = []
+    updateData(data) {
+        this.courses = data;
+    }
 
-        questions.forEach(element => {
-            this.questions.push(new QuestionObj(element.id, element.lecture_id,
-                element.question_type, element.question_title, element.question_text,
-                element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-                element.closed_at, element.created_at, element.modified_at))
-        });
+    @action
+    addCourse(course) {
+        this.courses.push(course);
+    }
+
+    @action
+    addLecture(lecture) {
+        this.courses.find(x => x.id === lecture.course_id).lectures.push(lecture)
+    }
+
+    @action
+    addQuestion(question) {
+        this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
+            .find(lecture => lecture.id === question.lecture_id).questions.push(question);
     }
 }
