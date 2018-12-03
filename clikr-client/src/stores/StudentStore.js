@@ -18,11 +18,14 @@ export default class StudentStore {
 
     courses.forEach(element => {
       // id: any, title: any, num: any, dept: any, description: any, term: any, joinCode: any, year: any
-      this.courses.push(new CourseObj(element.id, element.title, element.coursenum,
+      this.courses.push(new CourseObj(element.title, element.id, element.coursenum,
         element.dept, element.description, element.term, element.enroll_code, element.year))
     })
   }
 
+  getQuestionWithId(question_id) {
+    return this.questions.find(x => x.id === question_id);
+  }
 
   @action
   updateAllQuestions(questions) {

@@ -3,16 +3,8 @@ import { baseURL } from '../constants/api'
 
 axios.defaults.withCredentials = true;
 
-export function getCoursesAPI() {
-    return axios.get(baseURL + 'professor/courses');
-}
-
-export function getLecturesAPI(course_id) {
-    return axios.get(baseURL + 'professor/courses/' + course_id + '/lectures');
-}
-
-export function getQuestionsAPI(lecture_id) {
-    return axios.get(baseURL + 'professor/lectures/' + lecture_id + '/questions');
+export function getProfDataAPI() {
+    return axios.get(baseURL + 'professor/data');
 }
 
 export function getStudentCoursesAPI() {
@@ -42,12 +34,7 @@ export function postCloseQuestionAPI(question_id) {
 // course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {
-        coursenum: course.num,
-        title: course.title,
-        dept: course.dept,
-        description: course.description,
-        term: course.term,
-        year: course.year
+        title: course.title
     });
 }
 

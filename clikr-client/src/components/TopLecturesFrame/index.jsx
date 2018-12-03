@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 
 const styles = theme => ({
     card: {
@@ -11,13 +11,13 @@ const styles = theme => ({
     },
 });
 
+@inject("profStore") // props.profStore
+@inject("apiService") // props.apiService
 @observer
 class TopLecturesFrame extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.profStore = props.profStore
-        this.apiProfService = props.apiProfService
     }
 
     render() {

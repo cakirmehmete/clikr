@@ -20,37 +20,39 @@ function Transition(props) {
   }
 
 @inject("store")
-@observer    
+@observer
 class MCQ extends Component {
-    
+
     constructor(props) {
         super(props)
         this.store = this.props.store
         this.apiStudentService = new APIStudentService(this.store)
     }
-    componentDidMount () {
-        
+    
+    componentDidMount() {
+
         var answers = []
-        
-        var mcq = this.props.question.question
+
+        var mcq = this.store.getQuestionWithId(this.props.questionId);
         for (var i = 1; i <= mcq['number_of_options']; i++) {
             var qstring = mcq["option" + i.toString()];
             answers.push(qstring)
         }
+
         this.setState({
             answerchoices: answers
         })
+        
     }
 
     state = {
-        question:"What is the meaning of life?",
+        question: "What is the meaning of life?",
         answerchoices: [],
         answer: "",
         sent: "",
         dialogue: false, 
         disabled: false
     }
-
 
     handleChange = (e) => {
         this.setState({
@@ -74,35 +76,12 @@ class MCQ extends Component {
             sent: this.state.answer,
             disabled: true
         })
-    };
-
-    handleClick = () => {
-        if (this.state.sent === ""){
-            this.handleSubmit()
-        }
-        else {
-            this.setState({
-                dialogue: true
-            });
-        }
-    };
-
-    // close dialogue box
-    handleClose = () => {
-        this.setState({ dialogue: false });
-      };
-
-    // close dialogue box and resubmit
-    handleCloseSubmit = () => {
-        this.setState({ dialogue: false });
-        this.handleSubmit()
-      };
-   
+    }
 
     render() {
         return (
             <Grid item>
-                <Grid container direction="column" justify="center" style={{padding:"1%"}}>
+                <Grid container direction="column" justify="center" style={{ padding: "1%" }}>
                     <FormControl component="fieldset">
                         <RadioGroup
                             name="answers"
@@ -115,6 +94,7 @@ class MCQ extends Component {
                         </RadioGroup>
                     </FormControl>
                     <Grid container justify="flex-end" style={{"paddingRight":"1%"}}>
+
                         <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
                             submit
                         </Button>

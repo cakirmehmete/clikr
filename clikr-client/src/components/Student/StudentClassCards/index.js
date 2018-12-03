@@ -40,7 +40,7 @@ class ClassCard extends React.Component {
                 </CardContent>
                 <CardActions>
                     <Link to={{
-                        pathname: '/student/checkquestions',
+                        pathname: '/student/questions',
                         state : {
                             course_id: this.props.id,
                         }

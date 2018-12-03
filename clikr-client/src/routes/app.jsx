@@ -6,6 +6,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { Provider } from 'mobx-react';
 import ProfessorStore from './../stores/ProfessorStore';
 import StudentStore from './../stores/StudentStore';
+import APIProfService from './../services/APIProfService';
 import Home from './Home';
 import Login from './Login'
 
@@ -29,27 +30,25 @@ const theme = createMuiTheme({
 
 class App extends Component {
     professorStore = new ProfessorStore()
+    profApiService = new APIProfService(this.professorStore)
+
     studentStore = new StudentStore()
 
     render() {
         return (
             <MuiThemeProvider theme={theme}>
-                <div>
-                    <header>
-                        <Router>
-                            <div>
-                                <Route exact path='/' component={Home} />
-                                <Route exact path='/login-(prof|student)' component={Login} />
-                                <Provider profStore={this.professorStore}>
-                                    <Route path="/professor" component={ProfessorRoutes} />
-                                </Provider>
-                                <Provider store={this.studentStore}>
-                                    <Route path="/student" component={StudentRoutes} />
-                                </Provider>
-                            </div>
-                        </Router>
-                    </header>
-                </div>
+                <Router>
+                    <div>
+                        <Route exact path='/' component={Home} />
+                        <Route exact path='/login-(prof|student)' component={Login} />
+                        <Provider profStore={this.professorStore} apiService={this.profApiService}>
+                            <Route path="/professor" component={ProfessorRoutes} />
+                        </Provider>
+                        <Provider store={this.studentStore}>
+                            <Route path="/student" component={StudentRoutes} />
+                        </Provider>
+                    </div>
+                </Router>
             </MuiThemeProvider>
         );
     }

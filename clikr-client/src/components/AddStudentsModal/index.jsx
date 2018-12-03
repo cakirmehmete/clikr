@@ -49,8 +49,7 @@ class AddStudentsModal extends React.Component {
 
     constructor(props) {
         super(props)
-        this.profStore = props.profStore
-        this.courseIndex = props.courseIndex
+        this.joinCode = props.joinCode
     }
 
     handleOpen = () => {
@@ -80,7 +79,7 @@ class AddStudentsModal extends React.Component {
                 >
                     <div style={getModalStyle()} className={classes.paper}>
                         <Typography variant="h6">
-                            {this.profStore.courses[this.courseIndex].joinCode}
+                            {this.joinCode}
                         </Typography>
                         <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Done</Button>
                     </div>
