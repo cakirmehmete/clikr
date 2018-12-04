@@ -44,7 +44,7 @@ class CheckQuestions extends Component {
                             state : {
                                 course_id: this.state.course_id
                             }
-                        }} style={{ "color": "white", "text-decoration": "none" }}> Open Questions </Link>
+                        }} style={{ "color": "white", "textDecoration": "none" }}> Open Questions </Link>
 
                     </Button>
                     </Paper>
