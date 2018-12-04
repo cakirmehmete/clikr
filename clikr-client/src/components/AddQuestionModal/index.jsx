@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { List } from '@material-ui/icons';
+import { List, ChatBubbleOutline } from '@material-ui/icons';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
@@ -54,6 +54,7 @@ class AddQuestionModal extends React.Component {
     state = {
         open: false,
         toNewMCQuestion: false,
+        toNewFreeTextQuestion: false,
         lectureId: null
     };
 
@@ -75,11 +76,18 @@ class AddQuestionModal extends React.Component {
         this.setState({ open: false, toNewMCQuestion: true });
     }
 
+    handleFreeText = () => {
+        // Close modal
+        this.setState({ open: false, toNewFreeTextQuestion: true});
+    }
+
     render() {
         const { classes } = this.props;
         if (this.state.toNewMCQuestion === true) {
             // Lecture Id
             return <Redirect to={'/professor/' + this.props.lectureId + '/questions/new-mc'} push />
+        } else if (this.state.toNewFreeTextQuestion === true) {
+            return <Redirect to={'/professor/' + this.props.lectureId + '/questions/new-free-text'} push />
         }
 
         return (
@@ -97,6 +105,14 @@ class AddQuestionModal extends React.Component {
                                 <List color="primary" fontSize="large" />
                                 <Typography>
                                     Multiple Choice
+                                </Typography>
+                            </div>
+                        </IconButton>
+                        <IconButton className={classes.button} aria-label="Delete" onClick={this.handleFreeText}>
+                            <div className={classes.vert}>
+                                <ChatBubbleOutline color="primary" fontSize="large" />
+                                <Typography>
+                                    Free Text
                                 </Typography>
                             </div>
                         </IconButton>
