@@ -1,4 +1,4 @@
-import { getStudentCoursesAPI, postEnrollStudentAPI, getStudentQuestionsByCourseAPI, postAnswerQuestionAPI } from '../utils/api-facade';
+import { getStudentCoursesAPI, postEnrollStudentAPI, getStudentQuestionsByCourseAPI, postAnswerQuestionAPI, getLogoutStudentAPI } from '../utils/api-facade';
 
 export default class APIStudentService {
     constructor(studentStore) {
@@ -52,6 +52,14 @@ export default class APIStudentService {
                 console.log(error);
                 this._checkAuth(error);
             })
+    }
+
+    async getLogoutStudent() {
+        getLogoutStudentAPI()
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+        })
     }
 
     _checkAuth(error) {

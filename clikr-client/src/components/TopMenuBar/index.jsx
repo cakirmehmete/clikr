@@ -3,12 +3,12 @@ import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import ToolbarGroup from '@material-ui/core/Toolbar';
-import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import SvgIcon from '@material-ui/core/SvgIcon';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import APIProfService from '../../services/APIProfService'
 
 const drawerWidth = 240;
 
@@ -23,11 +23,14 @@ class TopMenuBar extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
+        this.store  = props.store
+        this.apiProfService = new APIProfService(this.store)
     }
 
     state = {
       anchorEl: null,
-      goHome: false
+      goHome: false,
+      logout: false
     };
 
     handleMenu = event => {
@@ -35,7 +38,10 @@ class TopMenuBar extends React.Component {
     };
 
     handleClose = () => {
-      this.setState({ anchorEl: null });
+      this.setState({ 
+          anchorEl: null,
+          logout: true
+        });
     };
 
     // force reload of page
@@ -57,6 +63,10 @@ class TopMenuBar extends React.Component {
         if (this.state.goHome) {
             window.location.reload();
             this.handleReset();
+        }
+        if (this.state.logout) {
+            this.apiProfService.getLogoutProf()
+            return <Redirect to='/login-prof'/>
         }
         return (
             <AppBar position="static" color="white" className={this.styles.appBar}>
@@ -100,9 +110,7 @@ class TopMenuBar extends React.Component {
                         onClose={this.handleClose}
                     >
                         <MenuItem onClick={this.handleClose}>
-                            <Link to='/' style={{"color":"black", "text-decoration": "none"}}>
-                                 LOGOUT
-                            </Link>
+                            LOGOUT
                         </MenuItem>
                     </Menu>
                 </Toolbar>
