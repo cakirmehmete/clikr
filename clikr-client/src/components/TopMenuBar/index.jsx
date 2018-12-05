@@ -27,6 +27,7 @@ class TopMenuBar extends React.Component {
 
     state = {
       anchorEl: null,
+      goHome: false
     };
 
     handleMenu = event => {
@@ -37,16 +38,31 @@ class TopMenuBar extends React.Component {
       this.setState({ anchorEl: null });
     };
 
+    // force reload of page
+    handleHome = () => {
+        this.setState({
+            goHome: true
+        })
+    }
+    // reset state
+    handleReset = () => {
+        this.setState({
+            goHome: false
+        })
+    }
     render() {
         const { classes } = this.props;
         const { anchorEl } = this.state;
         const open = Boolean(anchorEl);
-
+        if (this.state.goHome) {
+            window.location.reload();
+            this.handleReset();
+        }
         return (
             <AppBar position="static" color="white" className={this.styles.appBar}>
                 <Toolbar>
                     <Link to={'/professor'} marginLeft="0%">
-                        <IconButton className={classes.homeButton} color="primary">
+                        <IconButton className={classes.homeButton} onClick={this.handleHome} color="primary">
                             <SvgIcon>
                                 <path fill="secondary"
                                 d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
