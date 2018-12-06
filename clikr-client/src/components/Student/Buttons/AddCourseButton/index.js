@@ -6,7 +6,7 @@ import AddIcon from '@material-ui/icons/Add';
 export default class AddCourseButton extends React.Component {
   state = {
     link: '/student/enroll'
-  };
+  }; 
 
   render() {
     return (
