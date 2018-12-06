@@ -53,6 +53,7 @@ class QuestionPage extends Component {
         })
 
         socket.on('all open questions', (data) => {
+            console.log(data.questions)
             if (data.questions.length > 0) {
                 this.store.updateAllQuestions(data.questions)
                 this.setState({
@@ -68,19 +69,19 @@ class QuestionPage extends Component {
 
     render() {
         return (
-            <Grid container direction='column' spacing={Number("24")}>
+            <Grid container direction='column' spacing={Number("16")}>
                 <Header />
                 {this.state.has_question == false ? (
-                    <Paper style={{ padding:"1em" }}>
-                        <Typography variant="h5" color="secondary"> There are no questions for this course at the moment... </Typography>
+                    <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
+                        <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> There are no questions for this course at the moment... </Typography>
                     </Paper>
                 ) : (
-                        this.store.questions.map(function(q, index) {
+                        this.store.questions.map(q => {
                             if (q.question_type === 'free_text') {
                                 return (
-                                    <Grid item key={index}>
-                                        <Paper style={{padding:"1em"}}>
-                                            <Typography variant="h5" color="secondary"> {q.question_text} </Typography>
+                                    <Grid item>
+                                        <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
+                                            <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
                                             <FRQ question={{ question: q }} />
                                         </Paper>
                                     </Grid>
@@ -89,9 +90,9 @@ class QuestionPage extends Component {
                             }
                             else {
                                 return (
-                                    <Grid item key={index}> 
-                                        <Paper style={{padding:"1em"}}>
-                                            <Typography variant="h5" color="secondary"> {q.question_text} </Typography>
+                                    <Grid item>
+                                        <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
+                                            <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
                                             <MCQ questionId={q.id} />
                                         </Paper>
                                     </Grid>

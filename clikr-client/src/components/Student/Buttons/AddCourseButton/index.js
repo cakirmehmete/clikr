@@ -1,7 +1,6 @@
 import React from 'react'
+import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom'
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
 
 export default class AddCourseButton extends React.Component {
   state = {
@@ -10,10 +9,8 @@ export default class AddCourseButton extends React.Component {
 
   render() {
     return (
-      <Link to={this.state.link} style={{color:"white", "textDecoration": "none"}}>
-        <Fab color="secondary" aria-label="Add">
-          <AddIcon />
-        </Fab>
+      <Link to={this.state.link} style={{color:"white", "text-decoration": "none"}}>
+        <Button variant="fab" color="secondary" aria-label="Add" style={{"font-size":"xx-large"}}>+</Button>
       </Link>
       
     )

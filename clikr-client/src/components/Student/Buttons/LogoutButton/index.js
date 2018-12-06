@@ -6,7 +6,7 @@ export default class LogoutButton extends React.Component {
 
     render() {
         return (
-            <Link to='/' style={{"color":"black", "textDecoration": "none"}}>
+            <Link to='/' style={{"color":"black", "text-decoration": "none"}}>
                 <Button>logout</Button>
             </Link>
            
