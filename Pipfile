@@ -18,6 +18,7 @@ flask-socketio = "*"
 gevent = "*"
 gevent-websocket = "*"
 gevent-socketio = "*"
+eventlet = "*"
 
 [dev-packages]
 
