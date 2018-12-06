@@ -15,6 +15,9 @@ pyjwt = "*"
 gunicorn = "*"
 flask-cors = "*"
 flask-socketio = "*"
+gevent = "*"
+gevent-websocket = "*"
+gevent-socketio = "*"
 
 [dev-packages]
 
