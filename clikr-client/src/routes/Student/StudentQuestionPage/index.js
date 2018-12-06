@@ -45,7 +45,7 @@ class QuestionPage extends Component {
         })
 
         socket.on('question closed', (msg) => {
-            var data = JSON.stringify(msg);
+            // var data = JSON.stringify(msg);
             // setting the color of our button
             this.setState({
                 has_question: false
@@ -71,7 +71,7 @@ class QuestionPage extends Component {
         return (
             <Grid container direction='column' spacing={Number("16")}>
                 <Header />
-                {this.state.has_question == false ? (
+                {this.state.has_question === false ? (
                     <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
                         <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> There are no questions for this course at the moment... </Typography>
                     </Paper>
