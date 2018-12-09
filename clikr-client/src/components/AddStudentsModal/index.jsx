@@ -75,19 +75,9 @@ class AddStudentsModal extends React.Component {
 
         return (
             <div>
-                <Tooltip title="edit course" placement="top-start">
-                    <Button variant="text" size="small">
-                        <Icon className={classes.icon} color="secondary">edit</Icon>
-                    </Button>
-                </Tooltip>
                 <Tooltip title="add students" placement="top-start">
                     <Button variant="text" size="small" onClick={this.handleOpen}>
                         <Icon className={classes.icon} color="secondary">person_add</Icon>
-                    </Button>
-                </Tooltip>
-                <Tooltip title="remove course" placement="top-start">
-                    <Button variant="text" size="small">
-                        <Icon className={classes.icon} color='secondary'>delete</Icon>
                     </Button>
                 </Tooltip>
                 <Modal
