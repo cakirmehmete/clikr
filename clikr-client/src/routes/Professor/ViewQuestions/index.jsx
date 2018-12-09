@@ -130,7 +130,7 @@ class ProfessorViewQuestions extends React.Component {
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={8}>
-                        <AllQuestionsFrame parentLecture={this.state.parentLecture} />
+                        <AllQuestionsFrame parentLecture={this.state.parentLecture} selectedQuestionId={this.state.currentQuestionId}/>
                     </Grid>
                 </Grid>
             </div>
