@@ -5,7 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import ToolbarGroup from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import SvgIcon from '@material-ui/core/SvgIcon';
-import { Link, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { withRouter } from "react-router";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';

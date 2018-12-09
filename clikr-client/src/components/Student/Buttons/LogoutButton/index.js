@@ -6,9 +6,9 @@ import APIStudentService from '../../../../services/APIStudentService'
 import { observer, inject } from 'mobx-react';
 
 @inject("store")
-@observer  
+@observer
 class LogoutButton extends React.Component {
-    
+
     constructor(props) {
         super(props)
         this.store = this.props.store
@@ -20,12 +20,14 @@ class LogoutButton extends React.Component {
 
     render() {
         return (
-            <Link to='/login-student' style={{"color":"black", "text-decoration": "none"}}>
-                <Button onClick={this.handleLogout}>logout</Button>
-            <Link to='/' style={{"color":"black", "text-decoration": "none"}}>
-                <Button>logout</Button>
-            </Link>
-           
+            <div>
+                <Link to='/login-student' style={{ "color": "black", "text-decoration": "none" }}>
+                    <Button onClick={this.handleLogout}>logout</Button>
+                </Link>
+                <Link to='/' style={{ "color": "black", "text-decoration": "none" }}>
+                    <Button>logout</Button>
+                </Link>
+            </div>
         );
     }
 }
