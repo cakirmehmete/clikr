@@ -1,2 +1,2 @@
-export const baseURL = "http://localhost:5000/api/v1/";
-export const socketioURL = "http://localhost:5000/";
+export const socketioURL = "http://clikr.herokuapp.com/";
+export const baseURL = socketioURL + "api/v1/"; 

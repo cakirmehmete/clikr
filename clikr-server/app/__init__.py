@@ -1,6 +1,6 @@
 # app/__init__.py
-
-from flask import Flask
+import os
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
@@ -28,7 +28,7 @@ def create_app(env_name):
     """
     
     # initialize flask app
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='react_app/build')
     app.config.from_object(app_config[env_name])
     
     # initialize flask extensions
@@ -46,11 +46,16 @@ def create_app(env_name):
     app.register_blueprint(admin_blueprint, url_prefix='/api/v1/admin')
 
     CORS(app, supports_credentials=True)
-    @app.route('/', methods=['GET'])
-    def index():
-        """
-        example endpoint
-        """
-        return 'Congratulations! Your first endpoint is working'
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve(path):
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, "react_app/build/", path)
+        print("======THE PATH IS", filename)
+        if path != "" and os.path.exists(filename):
+            print("GOING TO SEND A FILE!")
+            return send_from_directory('react_app/build/', path)
+        else:
+            return send_from_directory('react_app/build', 'index.html')
 
     return app

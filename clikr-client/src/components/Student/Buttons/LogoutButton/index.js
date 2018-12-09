@@ -20,8 +20,11 @@ class LogoutButton extends React.Component {
 
     render() {
         return (
+
             <Link to='/login-student' style={{"color":"black", "text-decoration": "none"}}>
                 <Button onClick={this.handleLogout}>logout</Button>
+            <Link to='/' style={{"color":"black", "text-decoration": "none"}}>
+                <Button>logout</Button>
             </Link>
            
         );
