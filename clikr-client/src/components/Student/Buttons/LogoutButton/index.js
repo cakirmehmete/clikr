@@ -1,4 +1,3 @@
-
 import React from 'react'
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
@@ -20,14 +19,9 @@ class LogoutButton extends React.Component {
 
     render() {
         return (
-            <div>
-                <Link to='/login-student' style={{ "color": "black", "textDecoration": "none" }}>
-                    <Button onClick={this.handleLogout}>logout</Button>
-                </Link>
-                <Link to='/' style={{ "color": "black", "textDecoration": "none" }}>
-                    <Button>logout</Button>
-                </Link>
-            </div>
+            <Link to='/login-student' style={{ "color": "black", "text-decoration": "none" }}>
+                <Button onClick={this.handleLogout}>logout</Button>
+            </Link>
         );
     }
 }
