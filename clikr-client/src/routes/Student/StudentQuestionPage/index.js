@@ -47,7 +47,7 @@ class QuestionPage extends Component {
         socket.on('question closed', (msg) => {
             this.store.removeQuestionById(msg.question.id)
 
-            if (this.store.questions.length == 0) {
+            if (this.store.questions.length === 0) {
                 this.setState({
                     has_question: false
                 })
