@@ -15,12 +15,10 @@ class ProfessorViewLectures extends React.Component {
     }
 
     render() {
-        const { courseId } = this.props.match.params
-
         return (
             <Grid container spacing={24}>
                 <Grid item xs={8}>
-                    <AllLecturesFrame courseId={courseId} />
+                    <AllLecturesFrame courseId={this.props.match.params.courseId} />
                 </Grid>
                 <Grid item xs={4}>
                     <TopLecturesFrame />
