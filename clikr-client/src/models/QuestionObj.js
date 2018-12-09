@@ -34,9 +34,9 @@ export class MultipleChoiceQuestionObj extends QuestionObj {
 
 export class FreeTextQuestionObj extends QuestionObj {
 
-    constructor(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at, word_limit) {
+    constructor(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at, word_limit) {
 
-        super(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at);
+        super(id, lecture_id, question_type, question_title, question_text, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at,);
 
         this.word_limit = word_limit;
     }

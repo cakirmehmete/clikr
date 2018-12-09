@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 export default class AddCourseButton extends React.Component {
   state = {
     link: '/student/enroll'
-  };
+  }; 
 
   render() {
     return (

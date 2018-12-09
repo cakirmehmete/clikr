@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { observer, inject } from 'mobx-react';
-import { MultipleChoiceQuestionObj } from '../../../models/QuestionObj';
+import { FreeTextQuestionObj } from '../../../models/QuestionObj';
 
 const styles = theme => ({
     paper: {
@@ -26,18 +26,13 @@ const styles = theme => ({
 @inject("profStore")
 @inject("apiService")
 @observer
-class ProfessorAddMCQuestion extends React.Component {
+class ProfessorAddFreeTextQuestion extends React.Component {
     state = {
         toQuestions: false,
         title: '',
         text: '',
         correct_answer: '',
-        option1: '',
-        option2: '',
-        option3: '',
-        option4: '',
-        option5: '',
-        number_of_options: ''
+        word_limit: ''
     };
 
     constructor(props) {
@@ -56,7 +51,7 @@ class ProfessorAddMCQuestion extends React.Component {
 
         // Send course to API
         this.props.apiService.addQuestion(
-            new MultipleChoiceQuestionObj(null, lectureId, "multiple_choice", this.state.title, this.state.text, this.state.correct_answer, null, null, null, null, null, null, this.state.option1, this.state.option2, this.state.option3, this.state.option4, this.state.option5, this.state.number_of_options)
+            new FreeTextQuestionObj(null, lectureId, "free_text", this.state.title, this.state.text, this.state.correct_answer, null, null, null, null, null, null, this.state.word_limit)
         )
 
         this.setState({ toQuestions: true });
@@ -101,50 +96,10 @@ class ProfessorAddMCQuestion extends React.Component {
                     />
                     <TextField
                         id="standard-name"
-                        label="Question Option 1"
+                        label="Answer Word Limit"
                         className={this.styles.textField}
-                        value={this.state.option1}
-                        onChange={this.handleChange('option1')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Question Option 2"
-                        className={this.styles.textField}
-                        value={this.state.option2}
-                        onChange={this.handleChange('option2')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Question Option 3"
-                        className={this.styles.textField}
-                        value={this.state.option3}
-                        onChange={this.handleChange('option3')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Question Option 4"
-                        className={this.styles.textField}
-                        value={this.state.option4}
-                        onChange={this.handleChange('option4')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Question Option 5"
-                        className={this.styles.textField}
-                        value={this.state.option5}
-                        onChange={this.handleChange('option5')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Question # of Options"
-                        className={this.styles.textField}
-                        value={this.state.number_of_options}
-                        onChange={this.handleChange('number_of_options')}
+                        value={this.state.word_limit}
+                        onChange={this.handleChange('word_limit')}
                         margin="normal"
                     />
                     <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Submit</Button>
@@ -154,4 +109,4 @@ class ProfessorAddMCQuestion extends React.Component {
     }
 }
 
-export default withStyles(styles)(ProfessorAddMCQuestion);
+export default withStyles(styles)(ProfessorAddFreeTextQuestion);
