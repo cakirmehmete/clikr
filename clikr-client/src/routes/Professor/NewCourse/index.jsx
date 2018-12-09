@@ -30,6 +30,7 @@ class ProfessorNewCourse extends React.Component {
     state = {
         toHome: false,
         name: '',
+        nameValid: false,
     };
 
     constructor(props) {
@@ -39,10 +40,28 @@ class ProfessorNewCourse extends React.Component {
         this.apiProfService = new APIProfService(this.profStore)
     }
 
+    handleValidation(value) {
+        let nameValid = this.state.nameValid;
+
+        if (value === '') {
+            nameValid = false
+        }
+        else {
+            nameValid = true
+        }
+
+        this.setState({ nameValid: nameValid }, this.validateForm);
+    }
+
+    validateForm() {
+        this.setState({formValid: this.state.nameValid });
+    }
+
     handleChange = name => event => {
-            this.setState({
-            [name]: event.target.value,
-        });
+        let value = event.target.value;
+        this.setState({
+            [name]: value,
+        }, () => { this.handleValidation(value) });
     };
 
     handleSubmit = () => {
@@ -51,7 +70,7 @@ class ProfessorNewCourse extends React.Component {
             new CourseObj(this.state.name)
         )
 
-        // Close modal 
+        // Close modal
         this.setState({ toHome: true });
     }
 
@@ -75,7 +94,13 @@ class ProfessorNewCourse extends React.Component {
                         onChange={this.handleChange('name')}
                         margin="normal"
                     />
-                    <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Submit</Button>
+                    <Button
+                        disabled={!this.state.nameValid}
+                        variant="outlined"
+                        color="primary"
+                        onClick={this.handleSubmit}>
+                            Submit
+                    </Button>
                 </form>
             </div>
         );
