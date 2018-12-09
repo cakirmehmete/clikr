@@ -51,7 +51,7 @@ class MCQ extends Component {
         answer: "",
         sent: "",
         dialogue: false, 
-        disabled: false
+        disabled: false,
     }
 
 
@@ -90,6 +90,10 @@ class MCQ extends Component {
         }
     };
 
+    handleDismiss = () => {
+        this.store.removeQuestionById(this.props.questionId);
+    }
+
     // close dialogue box
     handleClose = () => {
         this.setState({ dialogue: false });
@@ -103,6 +107,29 @@ class MCQ extends Component {
    
 
     render() {
+        var button;
+        var correct_answer_index = this.store.getQuestionWithId(this.props.questionId).correct_answer;
+        var correct_answer = this.state.answerchoices[correct_answer_index-1];
+        var answer_index = (this.state.answerchoices.indexOf(this.state.answer) + 1).toString();
+
+        console.log('correct_answer=' + correct_answer_index);
+        console.log('my answer=' + this.state.answer);
+
+        // either submit button or dismiss button
+        if (this.store.getQuestionWithId(this.props.questionId).correct_answer) {
+            button = (
+                <Button onClick={this.handleDismiss} variant="contained" color="secondary">
+                    dismiss
+                </Button>
+            );
+        } else {
+            button = (
+                <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
+                    submit
+                </Button>
+            );
+        }
+
         return (
             <Grid item>
                 <Grid container direction="column" justify="center" style={{padding:"1%"}}>
@@ -117,13 +144,11 @@ class MCQ extends Component {
                         ))}
                         </RadioGroup>
                     </FormControl>
-                    <Grid container>
-                        <Typography>{this.store.getQuestionWithId(this.props.questionId).correct_answer ? 'Correct answer: ' + this.store.getQuestionWithId(this.props.questionId).correct_answer : ''}</Typography>
+                    <Grid container style={answer_index === correct_answer_index ? {backgroundColor: 'green'} : {backgroundColor: 'red'}}>
+                        {this.store.getQuestionWithId(this.props.questionId).correct_answer && <Typography>Correct answer: {correct_answer}</Typography>}
                     </Grid>
                     <Grid container justify="flex-end" style={{"paddingRight":"1%"}}>
-                        <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
-                            submit
-                        </Button>
+                        {button}
                         <Dialog
                             open={this.state.dialogue}
                             TransitionComponent={Transition}

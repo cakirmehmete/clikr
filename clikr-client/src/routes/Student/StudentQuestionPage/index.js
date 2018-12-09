@@ -15,7 +15,8 @@ import MCQ from '../../../components/Student/Questions/MCQ';
 @observer
 class QuestionPage extends Component {
     state = {
-        has_question: false,
+        // has_question: false,
+        number_of_open_questions: 0,
     }
 
     constructor(props) {
@@ -40,28 +41,27 @@ class QuestionPage extends Component {
         socket.on('question opened', (data) => {
             this.store.addOneQuestion(data.question)
             this.setState({
-                has_question: true
-            })
+                // has_question: true,
+                number_of_open_questions: this.state.number_of_open_questions + 1
+            });
         })
 
         socket.on('question closed', (msg) => {
             this.store.updateOneQuestion(msg.question);
-            // this.store.removeQuestionById(msg.question.id);
-
-            // if (this.store.questions.length === 0) {
-            //     this.setState({
-            //         has_question: false
-            //     })
-            // }
+            this.setState({
+                number_of_open_questions: this.state.number_of_open_questions - 1
+            });
         })
 
         socket.on('all open questions', (data) => {
-            console.log(data.questions)
-            if (data.questions.length > 0) {
-                this.store.updateAllQuestions(data.questions)
+            console.log(data.questions);
+            var num_questions = data.questions.length;
+            if (num_questions > 0) {
+                this.store.updateAllQuestions(data.questions);
                 this.setState({
-                    has_question: true
-                })
+                    // has_question: true,
+                    number_of_open_questions: num_questions,
+                });
             }
         })
 
@@ -74,39 +74,43 @@ class QuestionPage extends Component {
         return (
             <Grid container direction='column' spacing={Number("16")}>
                 <Header />
-                {this.state.has_question === false ? (
-                    <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                        <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> There are no questions for this course at the moment... </Typography>
-                    </Paper>
-                ) : (
-                        this.store.questions.map(q => {
-                            if (q.question_type === 'free_text') {
-                                return (
-                                    <Grid item>
-                                        <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                                            <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
-                                            <FRQ question={{ question: q }} />
-                                        </Paper>
-                                    </Grid>
+                <Grid>
+                    {this.state.number_of_open_questions === 0 ? (
+                        <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
+                            <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> There are no questions for this course at the moment... </Typography>
+                        </Paper>
+                    ) : null} 
+                </Grid>
+                <Grid>
+                    {this.store.questions.map(q => {
+                        if (q.question_type === 'free_text') {
+                            return (
+                                <Grid item key={q.id}>
+                                    <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
+                                        <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
+                                        <FRQ question={{ question: q }} />
+                                    </Paper>
+                                </Grid>
 
-                                )
-                            }
-                            else {
-                                return (
-                                    <Grid item>
-                                        <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                                            <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
-                                            <MCQ questionId={q.id} />
-                                        </Paper>
-                                    </Grid>
-                                )
-                            }
+                            )
+                        }
+                        else {
+                            return (
+                                <Grid item key={q.id}>
+                                    <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
+                                        <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
+                                        <MCQ questionId={q.id} />
+                                    </Paper>
+                                </Grid>
+                            )
+                        }
 
-                        })
-                    )}
+                    })}
+
+                </Grid>
 
             </Grid>
-        )
+        );
 
     }
 }
