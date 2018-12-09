@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
 import Drawer from '@material-ui/core/Drawer';
+import { withRouter } from "react-router";
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import ListItem from '@material-ui/core/ListItem';
@@ -30,8 +31,12 @@ class SideMenuBar extends React.Component {
         this.profStore = props.profStore
     }
 
+    handleClick(id) {
+        this.props.history.push('/professor/' + id + '/lectures');
+    }
+
     render() {
-        return ( 
+        return (
             <Drawer
                 className={this.styles.drawer}
                 variant="permanent"
@@ -40,14 +45,14 @@ class SideMenuBar extends React.Component {
                 }}
                 anchor="left"
             >
-            <Grid container direction="column" alignItems="center" justify="space-around">
-                <img src = {logo} alt = "logo" width="50%"></img>
-            </Grid>
+                <Grid container direction="column" alignItems="center" justify="space-around">
+                    <img src={logo} alt="logo" width="50%"></img>
+                </Grid>
 
                 <Divider />
                 <List>
-                    {this.profStore.courses.map(function (courseObj, index) {
-                        return (<ListItem button key={index} >
+                    {this.profStore.courses.map((courseObj, index) => {
+                        return (<ListItem button key={index} onClick={() => this.handleClick(courseObj.id)}>
                             <ListItemText primary={courseObj.title} />
                         </ListItem>)
                     })}
@@ -58,4 +63,4 @@ class SideMenuBar extends React.Component {
     }
 }
 
-export default withStyles(styles)(SideMenuBar);
+export default withRouter(withStyles(styles)(SideMenuBar));
