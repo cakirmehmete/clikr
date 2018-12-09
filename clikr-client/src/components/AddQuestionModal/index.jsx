@@ -58,11 +58,6 @@ class AddQuestionModal extends React.Component {
         lectureId: null
     };
 
-    constructor(props) {
-        super(props)
-
-    }
-
     handleOpen = () => {
         this.setState({ open: true });
     };

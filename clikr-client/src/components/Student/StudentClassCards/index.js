@@ -43,7 +43,7 @@ class ClassCard extends React.Component {
                         state : {
                             course_id: this.props.id,
                         }
-                    }} style={{ "color": "black", "textDecoration": "none" }}>
+                    }} style={{ "color": "black", "text-decoration": "none" }}>
                         <Button size="small" >
                             Join 
                         </Button>
