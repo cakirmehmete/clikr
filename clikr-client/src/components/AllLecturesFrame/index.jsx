@@ -36,6 +36,16 @@ class AllLecturesFrame extends React.Component {
         })
     }
 
+    componentDidUpdate() {
+        if (this.state.parentCourse.id !== this.props.courseId) {
+            this.props.apiService.loadData().then(() => {
+                this.setState({
+                    parentCourse: this.props.profStore.getCourseWithId(this.props.courseId)
+                })
+            })
+        }
+    }
+
     handleNewLectureClick = () => {
         this.setState(() => ({
             toNewLecture: true

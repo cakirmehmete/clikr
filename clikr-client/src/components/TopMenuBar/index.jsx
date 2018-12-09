@@ -49,7 +49,7 @@ class TopMenuBar extends React.Component {
         const open = Boolean(anchorEl);
 
         return (
-            <AppBar position="static" color="white" className={this.styles.appBar}>
+            <AppBar position="static" color="inherit" className={this.styles.appBar}>
                 <Toolbar>
                     <IconButton className={classes.homeButton} onClick={this.handleHome} color="primary">
                         <SvgIcon>
