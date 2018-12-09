@@ -46,6 +46,7 @@ class ProfessorViewQuestions extends React.Component {
         this.state = {
             currentQuestionIndex: 0,
             currentQuestionId: 0,
+            openQuestionId: 0,
             btnStatus: 0,
             parentLecture: { questions: [] }
         }
@@ -79,7 +80,7 @@ class ProfessorViewQuestions extends React.Component {
                 // Handle the "Open Question"
                 this.props.apiService.openQuestion(this.state.currentQuestionId)
                 socket.emit('subscribe professor', this.state.currentQuestionId)
-                this.setState({ btnStatus: 1 })
+                this.setState({ btnStatus: 1, openQuestionId: this.state.currentQuestionId })
                 break;
 
             case 1:
@@ -87,9 +88,9 @@ class ProfessorViewQuestions extends React.Component {
                 this.props.apiService.closeQuestion(this.state.currentQuestionId)
                 // Check if this is last question
                 if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length)
-                    this.setState({ btnStatus: 3 })
+                    this.setState({ btnStatus: 3, openQuestionId: 0 })
                 else
-                    this.setState({ btnStatus: 2 })
+                    this.setState({ btnStatus: 2, openQuestionId: 0 })
                 break;
 
             case 2:
@@ -101,9 +102,9 @@ class ProfessorViewQuestions extends React.Component {
                 this.setState({
                     btnStatus: 1,
                     currentQuestionIndex: this.state.currentQuestionIndex + 1,
-                    currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1)
+                    currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1),
+                    openQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1)
                 })
-
                 break;
 
             default:
@@ -130,7 +131,7 @@ class ProfessorViewQuestions extends React.Component {
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={8}>
-                        <AllQuestionsFrame parentLecture={this.state.parentLecture} selectedQuestionId={this.state.currentQuestionId}/>
+                        <AllQuestionsFrame parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId}/>
                     </Grid>
                 </Grid>
             </div>

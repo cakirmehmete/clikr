@@ -13,17 +13,6 @@ export default class QuestionListItem extends React.Component {
         this.styles = props.classes
     }
 
-    componentDidUpdate() {
-        console.log(this.props.openQuestion)
-        if (this.state.selected === false) {
-            if (this.props.questionObj.id === this.props.openQuestion) {
-                this.setState({
-                    selected: true
-                })
-            }
-        }
-    }
-
     handleToUpdate = (selected) => {
         this.setState({
             selected
@@ -32,7 +21,7 @@ export default class QuestionListItem extends React.Component {
 
     render() {
         return (
-            <ListItem selected={this.state.selected} divider >
+            <ListItem selected={this.props.questionObj.id === this.props.openQuestion || this.state.selected} divider >
                 <ListItemText primary={this.props.questionObj.question_title} />
                 <OpenClosedButton questionId={this.props.questionObj.id} handleToUpdate={this.handleToUpdate} />
             </ListItem>
