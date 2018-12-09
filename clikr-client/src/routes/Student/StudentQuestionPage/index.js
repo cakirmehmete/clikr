@@ -81,7 +81,7 @@ class QuestionPage extends Component {
                         this.store.questions.map(q => {
                             if (q.question_type === 'free_text') {
                                 return (
-                                    <Grid item>
+                                    <Grid item key={q.id}>
                                         <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
                                             <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
                                             <FRQ question={{ question: q }} />
@@ -92,7 +92,7 @@ class QuestionPage extends Component {
                             }
                             else {
                                 return (
-                                    <Grid item>
+                                    <Grid item key={q.id}>
                                         <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
                                             <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
                                             <MCQ questionId={q.id} />
