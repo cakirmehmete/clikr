@@ -1,4 +1,3 @@
-
 import React from 'react'
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
@@ -6,9 +5,9 @@ import APIStudentService from '../../../../services/APIStudentService'
 import { observer, inject } from 'mobx-react';
 
 @inject("store")
-@observer  
+@observer
 class LogoutButton extends React.Component {
-    
+
     constructor(props) {
         super(props)
         this.store = this.props.store
@@ -20,14 +19,9 @@ class LogoutButton extends React.Component {
 
     render() {
         return (
-            <Link to='/login-student' style={{"color":"black", "text-decoration": "none"}}>
+            <Link to='/login-student' style={{ "color": "black", "text-decoration": "none" }}>
                 <Button onClick={this.handleLogout}>logout</Button>
-
-            <Link to='/' style={{"color":"black", "text-decoration": "none"}}>
-                <Button>logout</Button>
-
             </Link>
-           
         );
     }
 }
