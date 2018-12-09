@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom'
 import { observer, inject } from 'mobx-react';
 import APIStudentService from '../../../services/APIStudentService';
-import PropTypes from 'prop-types';
 
 @inject("store")
 @observer
@@ -43,7 +42,7 @@ class ClassCard extends React.Component {
                         state : {
                             course_id: this.props.id,
                         }
-                    }} style={{ "color": "black", "text-decoration": "none" }}>
+                    }} style={{ "color": "black", "textDecoration": "none" }}>
                         <Button size="small" >
                             Join 
                         </Button>
@@ -52,11 +51,6 @@ class ClassCard extends React.Component {
             </Card>
         );
     }
-}
-
-ClassCard.propTypes = {
-    name: PropTypes.string,
-    number: PropTypes.string
 }
 
 export default ClassCard;
