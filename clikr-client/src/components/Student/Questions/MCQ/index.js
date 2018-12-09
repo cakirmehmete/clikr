@@ -14,7 +14,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
-import Typography from '@material-ui/core/Typography';
 
 // for sliding up motion
 function Transition(props) {
@@ -110,7 +109,7 @@ class MCQ extends Component {
         var button;
         var correct_answer_index = this.store.getQuestionWithId(this.props.questionId).correct_answer;
         var correct_answer = this.state.answerchoices[correct_answer_index-1];
-        var answer_index = (this.state.answerchoices.indexOf(this.state.answer) + 1).toString();
+        // var answer_index = (this.state.answerchoices.indexOf(this.state.answer) + 1).toString();
 
         console.log('correct_answer=' + correct_answer_index);
         console.log('my answer=' + this.state.answer);
@@ -139,14 +138,21 @@ class MCQ extends Component {
                             value={this.state.answer}
                             onChange={this.handleChange}
                         >
-                        {this.state.answerchoices.map(a => (
-                            <FormControlLabel key={a} value={a} control={<Radio />} label={a}/>
-                        ))}
+                        {this.state.answerchoices.map((a) => {
+                            var background_style;
+                            if (!correct_answer_index) {
+                                background_style = {};
+                            } else if (a === correct_answer) {
+                                background_style = {backgroundColor: '#2A9D8F'};
+                            } else if (a === this.state.answer) {
+                                background_style = {backgroundColor: '#E76F51'};
+                            }
+                            return (
+                            <FormControlLabel key={a} value={a} control={<Radio />} label={a} style={background_style}/>
+                            )}
+                        )}
                         </RadioGroup>
                     </FormControl>
-                    <Grid container style={answer_index === correct_answer_index ? {backgroundColor: 'green'} : {backgroundColor: 'red'}}>
-                        {this.store.getQuestionWithId(this.props.questionId).correct_answer && <Typography>Correct answer: {correct_answer}</Typography>}
-                    </Grid>
                     <Grid container justify="flex-end" style={{"paddingRight":"1%"}}>
                         {button}
                         <Dialog
