@@ -14,6 +14,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import Typography from '@material-ui/core/Typography';
 
 // for sliding up motion
 function Transition(props) {
@@ -116,6 +117,9 @@ class MCQ extends Component {
                         ))}
                         </RadioGroup>
                     </FormControl>
+                    <Grid container>
+                        <Typography>{this.store.getQuestionWithId(this.props.questionId).correct_answer ? 'Correct answer: ' + this.store.getQuestionWithId(this.props.questionId).correct_answer : ''}</Typography>
+                    </Grid>
                     <Grid container justify="flex-end" style={{"paddingRight":"1%"}}>
                         <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
                             submit
