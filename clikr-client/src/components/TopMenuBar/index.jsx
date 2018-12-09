@@ -5,10 +5,11 @@ import Toolbar from '@material-ui/core/Toolbar';
 import ToolbarGroup from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import SvgIcon from '@material-ui/core/SvgIcon';
-import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { withRouter } from "react-router";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import APIProfService from '../../services/APIProfService'
 
 const drawerWidth = 240;
 
@@ -23,11 +24,14 @@ class TopMenuBar extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
+        this.store  = props.store
+        this.apiProfService = new APIProfService(this.store)
     }
 
     state = {
-        anchorEl: null,
-        goHome: false
+      anchorEl: null,
+      goHome: false,
+      logout: false
     };
 
     handleMenu = event => {
@@ -35,10 +39,12 @@ class TopMenuBar extends React.Component {
     };
 
     handleClose = () => {
-        this.setState({ anchorEl: null });
+      this.setState({ 
+          anchorEl: null,
+          logout: true
+        });
     };
 
-    // force reload of page
     handleHome = () => {
         this.props.history.push('/professor');
     }
@@ -47,7 +53,11 @@ class TopMenuBar extends React.Component {
         const { classes } = this.props;
         const { anchorEl } = this.state;
         const open = Boolean(anchorEl);
-
+        if (this.state.logout) {
+            this.apiProfService.getLogoutProf()
+            return <Redirect to='/login-prof'/>
+        }
+      
         return (
             <AppBar position="static" color="inherit" className={this.styles.appBar}>
                 <Toolbar>
@@ -88,9 +98,7 @@ class TopMenuBar extends React.Component {
                         onClose={this.handleClose}
                     >
                         <MenuItem onClick={this.handleClose}>
-                            <Link to='/' style={{ "color": "black", "text-decoration": "none" }}>
-                                LOGOUT
-                            </Link>
+                            LOGOUT
                         </MenuItem>
                     </Menu>
                 </Toolbar>
