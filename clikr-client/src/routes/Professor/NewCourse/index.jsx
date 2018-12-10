@@ -31,6 +31,7 @@ class ProfessorNewCourse extends React.Component {
         toHome: false,
         name: '',
         nameValid: false,
+        formValid: true
     };
 
     constructor(props) {
