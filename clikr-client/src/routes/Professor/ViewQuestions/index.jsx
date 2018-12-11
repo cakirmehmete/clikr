@@ -64,15 +64,6 @@ class ProfessorViewQuestions extends React.Component {
                 currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
             })
         })
-
-        socket.on('new results', (msg) => {
-            var data = JSON.stringify(msg);
-            console.log(data)
-        })
-
-        socket.on('server message', (msg) => {
-            console.log('Received message:' + msg);
-        });
     }
 
     handleBtnClick = () => {

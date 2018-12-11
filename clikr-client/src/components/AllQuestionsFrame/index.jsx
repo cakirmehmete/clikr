@@ -45,25 +45,20 @@ class AllQuestionsFrame extends React.Component {
         }
 
         return (
-            <div>
-                <Typography variant="subtitle1" color="textPrimary">
-                    Here are your questions:
-                </Typography>
-                <Card className={this.styles.card}>
-                    <CardContent>
-                        <Typography variant="h6" color="inherit">
-                            Questions for {this.props.parentLecture.title + " Lecture"}
-                        </Typography>
-                        <List component="nav">
-                            {this.props.parentLecture.questions.map((questionObj, index) => {
-                                return (<QuestionListItem questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId}/>
-                                )
-                            })}
-                        </List>
-                        <AddQuestionModalWrapped lectureId={this.props.parentLecture.id} />
-                    </CardContent>
-                </Card>
-            </div>
+            <Card className={this.styles.card}>
+                <CardContent>
+                    <Typography variant="h6" color="inherit">
+                        Questions for {this.props.parentLecture.title + " Lecture"}
+                    </Typography>
+                    <List component="nav">
+                        {this.props.parentLecture.questions.map((questionObj, index) => {
+                            return (<QuestionListItem questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId} />
+                            )
+                        })}
+                    </List>
+                    <AddQuestionModalWrapped lectureId={this.props.parentLecture.id} />
+                </CardContent>
+            </Card>
         );
     }
 }
