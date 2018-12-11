@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -40,6 +42,9 @@ const styles = theme => ({
     neutralAnswer: {
         marginLeft: theme.spacing.unit*0.3,
     },
+    paper: {
+        padding: theme.spacing.unit,
+    },
 
 });
 
@@ -48,19 +53,19 @@ const styles = theme => ({
 class MCQ extends Component {
     
     constructor(props) {
-        super(props)
-        this.store = this.props.store
-        this.styles = props.classes
-        this.apiStudentService = new APIStudentService(this.store)
-        this.correct_answer = this.store.getQuestionWithId(this.props.questionId).correct_answer
+        super(props);
+        this.store = this.props.store;
+        this.styles = props.classes;
+        this.apiStudentService = new APIStudentService(this.store);
+        this.question = this.store.getQuestionWithId(this.props.questionId);
+        this.correct_answer = this.question.correct_answer;
     }
     componentDidMount () {
         
         var answers = []
-        var mcq = this.store.getQuestionWithId(this.props.questionId);
 
-        for (var i = 1; i <= mcq['number_of_options']; i++) {
-            var qstring = mcq["option" + i.toString()];
+        for (var i = 1; i <= this.question['number_of_options']; i++) {
+            var qstring = this.question["option" + i.toString()];
             answers.push(qstring)
         }
 
@@ -149,66 +154,69 @@ class MCQ extends Component {
     render() {
         return (
             <div>
-                <Grid container direction="column" className={this.styles.gridContainer}>
+                <Paper className={this.styles.paper}>
+                    <Grid container direction="column" className={this.styles.gridContainer}>
                 
-                    <FormControl component="fieldset">
-                        <RadioGroup
-                            name="answers"
-                            value={this.state.answer}
-                            onChange={this.handleChange}
-                        >
-                            {this.state.answerchoices.map((a, index) => {
-                                var background_style;
-                                if (this.state.correct === undefined) {
-                                    background_style = this.styles.neutralAnswer;
-                                }
-                                else if (index === this.state.correct) {
-                                    background_style = this.styles.correctAnswer;
-                                }
-                                else if (this.state.answerchoices.indexOf(this.state.sent) === index) {
-                                    background_style = this.styles.wrongAnswer;
-                                }
-                                
-                                return (
-                                    <FormControlLabel value={a} key={a} control={<Radio />} label={a} className={background_style}/>
-                                );
-                            })}
-                        </RadioGroup>
-                    </FormControl>
+                        <Typography variant="h5" color="secondary"> {this.question.question_text} </Typography>
+                        <FormControl component="fieldset">
+                            <RadioGroup
+                                name="answers"
+                                value={this.state.answer}
+                                onChange={this.handleChange}
+                            >
+                                {this.state.answerchoices.map((a, index) => {
+                                    var background_style;
+                                    if (this.state.correct === undefined) {
+                                        background_style = this.styles.neutralAnswer;
+                                    }
+                                    else if (index === this.state.correct) {
+                                        background_style = this.styles.correctAnswer;
+                                    }
+                                    else if (this.state.answerchoices.indexOf(this.state.sent) === index) {
+                                        background_style = this.styles.wrongAnswer;
+                                    }
+                                    
+                                    return (
+                                        <FormControlLabel value={a} key={a} control={<Radio />} label={a} className={background_style}/>
+                                    );
+                                })}
+                            </RadioGroup>
+                        </FormControl>
                     </Grid>
                     
                 
                         
-                <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
-                    <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
-                        {this.state.buttonText}
-                    </Button>
-                    <Dialog
-                        open={this.state.dialogue}
-                        TransitionComponent={Transition}
-                        keepMounted
-                        onClose={this.handleClose}
-                        aria-labelledby="alert-dialog-slide-title"
-                        aria-describedby="alert-dialog-slide-description"
-                        >
-                        <DialogTitle id="alert-dialog-slide-title">
-                            {"Answer changed- "}
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-slide-description">
-                            "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={this.handleClose} color="primary">
-                            no
-                            </Button>
-                            <Button onClick={this.handleCloseSubmit} color="primary">
-                            yes
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-                </Grid>
+                    <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
+                        <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
+                            {this.state.buttonText}
+                        </Button>
+                        <Dialog
+                            open={this.state.dialogue}
+                            TransitionComponent={Transition}
+                            keepMounted
+                            onClose={this.handleClose}
+                            aria-labelledby="alert-dialog-slide-title"
+                            aria-describedby="alert-dialog-slide-description"
+                            >
+                            <DialogTitle id="alert-dialog-slide-title">
+                                {"Answer changed- "}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-slide-description">
+                                "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.handleClose} color="primary">
+                                no
+                                </Button>
+                                <Button onClick={this.handleCloseSubmit} color="primary">
+                                yes
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                    </Grid>
+                </Paper>
             </div>
             
 

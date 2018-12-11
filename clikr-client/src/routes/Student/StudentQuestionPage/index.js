@@ -100,6 +100,7 @@ class QuestionPage extends Component {
                     {this.store.questions.map(q => {
                         if (q.question_type === 'free_text') {
                             return (
+                                // TODO: move Paper and Typography into FRQ component
                                 <Grid item className={this.styles.gridItem} key={q.id}>
                                     <Paper className={this.styles.paper}>
                                         <Typography variant="h5" color="secondary"> {q.question_text} </Typography>
@@ -111,11 +112,8 @@ class QuestionPage extends Component {
                         }
                         else {
                             return (
-                                <Grid item className={this.styles.gridItem} pkey={q.id}>
-                                    <Paper className={this.styles.paper}>
-                                        <Typography variant="h5" color="secondary"> {q.question_text} </Typography>
-                                        <MCQ questionId={q.id} />
-                                    </Paper>
+                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                    <MCQ questionId={q.id} />
                                 </Grid>
                             )
                         }
