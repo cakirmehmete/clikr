@@ -14,11 +14,34 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
+
 
 // for sliding up motion
 function Transition(props) {
     return <Slide direction="up" {...props} />;
-  }
+}
+
+const styles = theme => ({
+    gridContainer: {
+        margin: theme.spacing.unit,
+    },
+    buttonContainer: {
+        padding: theme.spacing.unit*1.5,
+    },
+    correctAnswer: {
+        backgroundColor: theme.palette.primary.light,
+        marginLeft: theme.spacing.unit*0.3,
+    },
+    wrongAnswer: {
+        backgroundColor: theme.palette.primary.dark,
+        marginLeft: theme.spacing.unit*0.3,
+    },
+    neutralAnswer: {
+        marginLeft: theme.spacing.unit*0.3,
+    },
+
+});
 
 @inject("store")
 @observer    
@@ -27,7 +50,9 @@ class MCQ extends Component {
     constructor(props) {
         super(props)
         this.store = this.props.store
+        this.styles = props.classes
         this.apiStudentService = new APIStudentService(this.store)
+        this.correct_answer = this.store.getQuestionWithId(this.props.questionId).correct_answer
     }
     componentDidMount () {
         
@@ -44,13 +69,26 @@ class MCQ extends Component {
         })
     }
 
+    componentWillReceiveProps(nextProps) {
+        var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
+    
+        if (a !== undefined) {
+            this.setState({
+                correct: Number(a) - 1, 
+                buttonText: "dismiss",
+                disabled: false
+            });
+        } 
+    }
+
     state = {
-        question:"What is the meaning of life?",
         answerchoices: [],
         answer: "",
         sent: "",
+        correct: undefined,
+        buttonText: "submit",
         dialogue: false, 
-        disabled: false,
+        disabled: false
     }
 
 
@@ -79,23 +117,26 @@ class MCQ extends Component {
     };
 
     handleClick = () => {
-        if (this.state.sent === ""){
+        if (this.state.buttonText === "dismiss") {
+            this.store.removeQuestionById(this.props.questionId);
+        }
+        else if (this.state.sent === ""){
             this.handleSubmit()
         }
-        else {
+        else if (this.state.sent !== this.state.answer) {
             this.setState({
                 dialogue: true
             });
         }
     };
 
-    handleDismiss = () => {
-        this.store.removeQuestionById(this.props.questionId);
-    }
-
     // close dialogue box
     handleClose = () => {
-        this.setState({ dialogue: false });
+        this.setState({ 
+            dialogue: false,
+            answer: this.state.sent,
+            disabled: true
+         });
       };
 
     // close dialogue box and resubmit
@@ -106,84 +147,72 @@ class MCQ extends Component {
    
 
     render() {
-        var button;
-        var correct_answer_index = this.store.getQuestionWithId(this.props.questionId).correct_answer;
-        var correct_answer = this.state.answerchoices[correct_answer_index-1];
-        // var answer_index = (this.state.answerchoices.indexOf(this.state.answer) + 1).toString();
-
-        console.log('correct_answer=' + correct_answer_index);
-        console.log('my answer=' + this.state.answer);
-
-        // either submit button or dismiss button
-        if (this.store.getQuestionWithId(this.props.questionId).correct_answer) {
-            button = (
-                <Button onClick={this.handleDismiss} variant="contained" color="secondary">
-                    dismiss
-                </Button>
-            );
-        } else {
-            button = (
-                <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
-                    submit
-                </Button>
-            );
-        }
-
         return (
-            <Grid item>
-                <Grid container direction="column" justify="center" style={{padding:"1%"}}>
+            <div>
+                <Grid container direction="column" className={this.styles.gridContainer}>
+                
                     <FormControl component="fieldset">
                         <RadioGroup
                             name="answers"
                             value={this.state.answer}
                             onChange={this.handleChange}
                         >
-                        {this.state.answerchoices.map((a) => {
-                            var background_style;
-                            if (!correct_answer_index) {
-                                background_style = {};
-                            } else if (a === correct_answer) {
-                                background_style = {backgroundColor: '#2A9D8F'};
-                            } else if (a === this.state.answer) {
-                                background_style = {backgroundColor: '#E76F51'};
-                            }
-                            return (
-                            <FormControlLabel key={a} value={a} control={<Radio />} label={a} style={background_style}/>
-                            )}
-                        )}
+                            {this.state.answerchoices.map((a, index) => {
+                                var background_style;
+                                if (this.state.correct === undefined) {
+                                    background_style = this.styles.neutralAnswer;
+                                }
+                                else if (index === this.state.correct) {
+                                    background_style = this.styles.correctAnswer;
+                                }
+                                else if (this.state.answerchoices.indexOf(this.state.sent) === index) {
+                                    background_style = this.styles.wrongAnswer;
+                                }
+                                
+                                return (
+                                    <FormControlLabel value={a} key={a} control={<Radio />} label={a} className={background_style}/>
+                                );
+                            })}
                         </RadioGroup>
                     </FormControl>
-                    <Grid container justify="flex-end" style={{"paddingRight":"1%"}}>
-                        {button}
-                        <Dialog
-                            open={this.state.dialogue}
-                            TransitionComponent={Transition}
-                            keepMounted
-                            onClose={this.handleClose}
-                            aria-labelledby="alert-dialog-slide-title"
-                            aria-describedby="alert-dialog-slide-description"
-                            >
-                            <DialogTitle id="alert-dialog-slide-title">
-                                {"Answer changed- "}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-slide-description">
-                                "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={this.handleClose} color="primary">
-                                no
-                                </Button>
-                                <Button onClick={this.handleCloseSubmit} color="primary">
-                                yes
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
                     </Grid>
+                    
+                
+                        
+                <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
+                    <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
+                        {this.state.buttonText}
+                    </Button>
+                    <Dialog
+                        open={this.state.dialogue}
+                        TransitionComponent={Transition}
+                        keepMounted
+                        onClose={this.handleClose}
+                        aria-labelledby="alert-dialog-slide-title"
+                        aria-describedby="alert-dialog-slide-description"
+                        >
+                        <DialogTitle id="alert-dialog-slide-title">
+                            {"Answer changed- "}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-slide-description">
+                            "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={this.handleClose} color="primary">
+                            no
+                            </Button>
+                            <Button onClick={this.handleCloseSubmit} color="primary">
+                            yes
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </Grid>
-            </Grid>
+            </div>
+            
+
         );
     }
 }
-export default MCQ;
+export default withStyles(styles)(MCQ);
