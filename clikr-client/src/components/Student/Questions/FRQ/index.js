@@ -24,6 +24,14 @@ const styles = theme => ({
     buttonContainer: {
         padding: theme.spacing.unit*1.5,
     },
+    correctAnswer: {
+        backgroundColor: theme.palette.primary.light,
+    },
+    wrongAnswer: {
+        backgroundColor: theme.palette.primary.dark,
+    },
+    neutralAnswer: {
+    },
     paper: {
         padding: theme.spacing.unit,
     },
@@ -44,7 +52,6 @@ class FRQ extends Component {
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
         this.question = this.store.getQuestionWithId(this.props.questionId);
-        this.correct_answer = this.question.correct_answer;
     }
 
     state = {
@@ -53,6 +60,8 @@ class FRQ extends Component {
         correct: undefined,
         buttonText: "submit",
         disabled: false,
+        disabledInput: false,
+        helperText: "Enter Response",
         dialogue: false
     }
 
@@ -63,8 +72,23 @@ class FRQ extends Component {
             this.setState({
                 correct: a,
                 buttonText: "dismiss",
-                disabled: false
+                disabled: false,
+                disabledInput: true
             });
+
+            if (a === "" || a === null) {
+                this.setState({
+                    helperText: "Your Answer"
+                });
+            } else if (this.state.answer === a) {
+                this.setState({
+                    helperText: "Correct"
+                });
+            } else {
+                this.setState({
+                    helperText: "Correct Answer: " + a
+                });
+            }
         } 
     }
 
@@ -119,22 +143,33 @@ class FRQ extends Component {
     };
 
     render() {
+        var backgroundStyle;
+        if (this.state.correct && this.state.correct !== "") {
+            if (this.state.sent === this.state.correct) {
+                backgroundStyle = this.styles.correctAnswer;
+            } else {
+                backgroundStyle = this.styles.wrongAnswer;
+            }
+        } else {
+            backgroundStyle = this.styles.neutralAnswer;
+        }
+
         return (
             <div>
                 <Paper className={this.styles.paper}>
                     <Grid container direction="column" className={this.styles.gridContainer}>
                         <Typography variant="h5" color="secondary"> {this.question.question_text} </Typography>
                         <Grid item className={this.styles.gridItem}>
-                            <form noValidate autoComplete="off">
-                                <TextField
-                                    id="full-width"
-                                    helperText="Enter Response"
-                                    name = 'answer'
-                                    value={this.state.answer}
-                                    onChange={e => this.handleChange(e)}
-                                    fullWidth  
-                                />
-                            </form>
+                            <TextField
+                                id="full-width"
+                                helperText={this.state.helperText}
+                                name = 'answer'
+                                value={this.state.answer}
+                                onChange={e => this.handleChange(e)}
+                                fullWidth
+                                disabled={this.state.disabledInput}
+                                className={backgroundStyle}
+                            />
                         </Grid>
                     </Grid>
                     <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
