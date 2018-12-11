@@ -11,6 +11,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
+import CourseObj from '../../models/CourseObj';
+
 const styles = theme => ({
     button:{
         color: theme.palette.secondary.main
@@ -55,7 +57,9 @@ class EditCourseDialog extends React.Component {
         this.setState({ open: false });
     }
     handleSubmit = () => {
-        this.apiProfService.changeCourseTitle(this.props.course, this.state.title);  
+        const newCourse = new CourseObj(this.state.title, this.course.id, this.course.num, this.course.dept, this.course.description, this.course.term, this.course.joinCode, this.course.year)
+        this.apiProfService.changeCourseTitle(newCourse);  
+        this.apiProfService.loadData();
         this.handleClose();
     };
 
@@ -65,7 +69,7 @@ class EditCourseDialog extends React.Component {
 
         return (
             <Grid item>
-                <Tooltip title="delete course" placement="top-start">
+                <Tooltip title="change title" placement="top-start">
                     <Button variant="text" size="small" onClick={this.handleOpen}>
                         <Icon className={classes.icon} color="secondary">edit</Icon>
                     </Button>

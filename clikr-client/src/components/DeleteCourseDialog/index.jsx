@@ -55,7 +55,6 @@ class DeleteCourseDialog extends React.Component {
     };
 
     handleDelete = () => {
-        console.log(this.state.courseId);
         this.apiProfService.deleteCourse(this.state.courseId);
         this.handleClose()
     };

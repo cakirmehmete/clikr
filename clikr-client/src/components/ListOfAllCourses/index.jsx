@@ -45,9 +45,7 @@ class ListOfAllCoures extends React.Component {
                 {this.profStore.courses.map((courseObj, index) => {
                     return (
                         <ListItem divider button key={index} onClick={this.handleCourseClick(courseObj.id)} >
-                            <Grid container direction="row" justify="space-between" alignItems="stretch">
-                                <Grid item><ListItemText primary={courseObj.title} /></Grid>
-                                <Grid item>
+                                <ListItemText primary={courseObj.title} />
                                     <ListItemSecondaryAction>
                                         <Grid container direction="row" justify="flex-end">
                                             <EditCourseDialog course={courseObj} sendData={this.getData}/>
@@ -55,8 +53,6 @@ class ListOfAllCoures extends React.Component {
                                             <AddStudentsModalWrapped joinCode={courseObj.enroll_code}/>
                                         </Grid>
                                     </ListItemSecondaryAction>
-                                </Grid>
-                            </Grid>
                         </ListItem>
                     )
                 })}
