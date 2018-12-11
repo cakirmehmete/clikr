@@ -10,6 +10,20 @@ import APIStudentService from '../../../services/APIStudentService';
 import { observer, inject } from 'mobx-react';
 import FRQ from '../../../components/Student/Questions/FRQ';
 import MCQ from '../../../components/Student/Questions/MCQ';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = theme => ({
+    gridContainer: {
+        padding: theme.spacing.unit,
+    },
+    gridItem: {
+        padding: theme.spacing.unit,
+    },
+    paper: {
+        padding: theme.spacing.unit,
+    }
+
+});
 
 @inject("store")
 @observer
@@ -21,6 +35,7 @@ class QuestionPage extends Component {
 
     constructor(props) {
         super(props)
+        this.styles = props.classes
         this.store = this.props.store
         this.apiStudentService = new APIStudentService(this.store)
     }
@@ -72,22 +87,22 @@ class QuestionPage extends Component {
 
     render() {
         return (
-            <Grid container direction='column' spacing={Number("16")}>
+            <Grid container direction='column'>
                 <Header />
-                <Grid>
+                <Grid className={this.styles.gridContainer}>
                     {this.state.number_of_open_questions === 0 ? (
-                        <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                            <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> There are no questions for this course at the moment... </Typography>
+                        <Paper className={this.styles.paper}>
+                            <Typography variant="h5" color="secondary"> There are no questions for this course at the moment... </Typography>
                         </Paper>
                     ) : null} 
                 </Grid>
-                <Grid>
+                <Grid className={this.styles.gridContainer}>
                     {this.store.questions.map(q => {
                         if (q.question_type === 'free_text') {
                             return (
-                                <Grid item key={q.id}>
-                                    <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                                        <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
+                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                    <Paper className={this.styles.paper}>
+                                        <Typography variant="h5" color="secondary"> {q.question_text} </Typography>
                                         <FRQ question={{ question: q }} />
                                     </Paper>
                                 </Grid>
@@ -96,9 +111,9 @@ class QuestionPage extends Component {
                         }
                         else {
                             return (
-                                <Grid item key={q.id}>
-                                    <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                                        <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
+                                <Grid item className={this.styles.gridItem} pkey={q.id}>
+                                    <Paper className={this.styles.paper}>
+                                        <Typography variant="h5" color="secondary"> {q.question_text} </Typography>
                                         <MCQ questionId={q.id} />
                                     </Paper>
                                 </Grid>
@@ -114,4 +129,4 @@ class QuestionPage extends Component {
 
     }
 }
-export default QuestionPage;
+export default withStyles(styles)(QuestionPage);
