@@ -58,7 +58,6 @@ class MCQ extends Component {
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
         this.question = this.store.getQuestionWithId(this.props.questionId);
-        this.correct_answer = this.question.correct_answer;
     }
     componentDidMount () {
         
@@ -81,6 +80,7 @@ class MCQ extends Component {
             this.setState({
                 correct: Number(a) - 1, 
                 buttonText: "dismiss",
+                disabledInput: true,
                 disabled: false
             });
         } 
@@ -92,8 +92,9 @@ class MCQ extends Component {
         sent: "",
         correct: undefined,
         buttonText: "submit",
+        disabledInput: false,
         dialogue: false, 
-        disabled: false
+        disabled: false,
     }
 
 
@@ -177,7 +178,7 @@ class MCQ extends Component {
                                     }
                                     
                                     return (
-                                        <FormControlLabel value={a} key={a} control={<Radio />} label={a} className={background_style}/>
+                                        <FormControlLabel value={a} key={a} control={<Radio disabled={this.state.disabledInput} />} label={a} className={background_style}/>
                                     );
                                 })}
                             </RadioGroup>
