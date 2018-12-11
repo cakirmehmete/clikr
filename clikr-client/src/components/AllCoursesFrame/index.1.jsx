@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
 import { observer } from 'mobx-react';
 import Icon from '@material-ui/core/Icon';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -75,10 +74,20 @@ class AddStudentsModal extends React.Component {
         const { classes } = this.props;
 
         return (
-            <Grid item>
+            <div>
+                <Tooltip title="edit course" placement="top-start">
+                    <Button variant="text" size="small">
+                        <Icon className={classes.icon} color="secondary">edit</Icon>
+                    </Button>
+                </Tooltip>
                 <Tooltip title="add students" placement="top-start">
                     <Button variant="text" size="small" onClick={this.handleOpen}>
                         <Icon className={classes.icon} color="secondary">person_add</Icon>
+                    </Button>
+                </Tooltip>
+                <Tooltip title="remove course" placement="top-start">
+                    <Button variant="text" size="small">
+                        <Icon className={classes.icon} color='secondary'>delete</Icon>
                     </Button>
                 </Tooltip>
                 <Modal
@@ -94,7 +103,7 @@ class AddStudentsModal extends React.Component {
                         <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Done</Button>
                     </div>
                 </Modal>
-            </Grid>
+            </div>
         );
     }
 }

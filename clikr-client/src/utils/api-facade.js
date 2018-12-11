@@ -38,6 +38,13 @@ export function postNewCourseAPI(course) {
     });
 }
 
+// course: CourseObj
+export function patchUpdateCourseAPI(course, title) {
+    return axios.patch(baseURL + 'professor/courses/' + course.id, {
+        title: title
+    });
+}
+
 // lecture: LectureObj
 export function postNewLectureAPI(lecture) {
     return axios.post(baseURL + 'professor/courses/' + lecture.course_id + '/lectures', {
@@ -51,6 +58,9 @@ export function postEnrollStudentAPI(code) {
     return axios.post(baseURL + 'student/courses', {
         enroll_code: code
     });
+}
+export function deleteCourseAPI(course_id) {
+    return axios.delete(baseURL + 'professor/courses/' + course_id);
 }
 
 export function postAnswerQuestionAPI(answer, question_id) {
