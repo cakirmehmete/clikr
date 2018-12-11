@@ -38,18 +38,20 @@ class QuestionPage extends Component {
         // This method is looking for the event 'change color'
         // socket.on takes a callback function for the first argument
         socket.on('question opened', (data) => {
-            this.store.updateAllQuestions([data.question])
+            this.store.addOneQuestion(data.question)
             this.setState({
                 has_question: true
             })
         })
 
         socket.on('question closed', (msg) => {
-            // var data = JSON.stringify(msg);
-            // setting the color of our button
-            this.setState({
-                has_question: false
-            })
+            this.store.removeQuestionById(msg.question.id)
+
+            if (this.store.questions.length === 0) {
+                this.setState({
+                    has_question: false
+                })
+            }
         })
 
         socket.on('all open questions', (data) => {
@@ -79,7 +81,7 @@ class QuestionPage extends Component {
                         this.store.questions.map(q => {
                             if (q.question_type === 'free_text') {
                                 return (
-                                    <Grid item>
+                                    <Grid item key={q.id}>
                                         <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
                                             <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
                                             <FRQ question={{ question: q }} />
@@ -90,7 +92,7 @@ class QuestionPage extends Component {
                             }
                             else {
                                 return (
-                                    <Grid item>
+                                    <Grid item key={q.id}>
                                         <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
                                             <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
                                             <MCQ questionId={q.id} />

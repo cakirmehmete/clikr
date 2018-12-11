@@ -1,4 +1,6 @@
+
 import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, deleteCourseAPI, patchUpdateCourseAPI } from '../utils/api-facade';
+
 
 export default class APIProfService {
     constructor(professorStore) {
@@ -85,11 +87,14 @@ export default class APIProfService {
                 this._checkAuth(error);
             })
     }
+
     changeCourseTitle(course, title) {
         patchUpdateCourseAPI(course, title)
         .then(res => {
             this.professorStore.updateCourse(course, title)
         })
+    async getLogoutProf() {
+        getLogoutProfAPI()
         .catch(error => {
             console.log(error);
             this._checkAuth(error);
