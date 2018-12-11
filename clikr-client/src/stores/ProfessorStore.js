@@ -34,10 +34,34 @@ export default class ProfessorStore {
     }
 
     @action
+    updateCourse(course) {
+        this.courses.remove(this.courses.find(x=> x.id === course.id));
+        this.courses.push(course);
+    }
+
+    @action
+    deleteCourse(course_id) {
+        this.courses.remove(this.courses.find(x=> x.id === course_id));
+    }
+
+    @action
     addLecture(lecture) {
         this.courses.find(x => x.id === lecture.course_id).lectures.push(lecture)
     }
+    @action
+    removeCourse(course_id) {
+        this.courses.remove(this.courses.find(x=> x.id === course_id));
+    }
 
+    @action
+    removeLecture(lecture_id) {
+        this.lectures.remove(this.course.find(x => x.id === lecture_id));
+    }
+
+    @action
+    removeQuestion(question_id) {
+        this.questions.remove(this.course.find(x => x.id === question_id));
+    }
     @action
     addQuestion(question) {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
