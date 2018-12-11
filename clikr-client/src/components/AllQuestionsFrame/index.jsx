@@ -2,27 +2,29 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
 import List from '@material-ui/core/List';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { observer, inject } from 'mobx-react';
 import AddQuestionModalWrapped from '../AddQuestionModal';
+import QuestionListItem from '../QuestionListItem';
 import PropTypes from 'prop-types';
 
 const styles = theme => ({
     card: {
         minWidth: 275,
     },
+    startLectureBtn: {
+        float: "right"
+    }
 });
 
 @inject('profStore')
+@inject("apiService")
 @observer
 class AllQuestionsFrame extends React.Component {
     state = {
         toNewQuestion: false,
-        referrerQuestionId: -1,
     }
 
     constructor(props) {
@@ -33,12 +35,6 @@ class AllQuestionsFrame extends React.Component {
     handleNewQuestionClick = () => {
         this.setState(() => ({
             toNewQuestion: true
-        }))
-    }
-
-    handleQuestionClick = id => () => {
-        this.setState(() => ({
-            referrerQuestionId: id
         }))
     }
 
@@ -60,10 +56,7 @@ class AllQuestionsFrame extends React.Component {
                         </Typography>
                         <List component="nav">
                             {this.props.parentLecture.questions.map((questionObj, index) => {
-                                return (
-                                    <ListItem divider button key={index} onClick={this.handleQuestionClick(questionObj.id)} >
-                                        <ListItemText primary={questionObj.question_title} />
-                                    </ListItem>
+                                return (<QuestionListItem questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId}/>
                                 )
                             })}
                         </List>
