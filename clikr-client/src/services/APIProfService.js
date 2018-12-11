@@ -1,4 +1,4 @@
-import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI } from '../utils/api-facade';
+import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI } from '../utils/api-facade';
 
 export default class APIProfService {
     constructor(professorStore) {
@@ -73,6 +73,13 @@ export default class APIProfService {
                 console.log(error);
                 this._checkAuth(error);
             })
+    }
+    async getLogoutProf() {
+        getLogoutProfAPI()
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+        })
     }
 
     _checkAuth(error) {

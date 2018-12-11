@@ -42,7 +42,7 @@ class CourseEnrollmentForm extends Component {
                 </form>
                 <Grid container justify="flex-end" style={{ "paddingRight": "1%" }}>
                     <Button onClick={this.handleClick} variant="contained" color="secondary">
-                        <Link to='/student' onClick={this.forceUpdate} style={{ "color": "white", "text-decoration": "none" }}>enroll</Link>
+                        <Link to='/student' onClick={this.forceUpdate} style={{ "color": "white", "textDecoration": "none" }}>enroll</Link>
                     </Button>
                 </Grid>
             </Grid>
