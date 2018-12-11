@@ -102,10 +102,7 @@ class QuestionPage extends Component {
                             return (
                                 // TODO: move Paper and Typography into FRQ component
                                 <Grid item className={this.styles.gridItem} key={q.id}>
-                                    <Paper className={this.styles.paper}>
-                                        <Typography variant="h5" color="secondary"> {q.question_text} </Typography>
-                                        <FRQ question={{ question: q }} />
-                                    </Paper>
+                                    <FRQ questionId={q.id} />
                                 </Grid>
 
                             )

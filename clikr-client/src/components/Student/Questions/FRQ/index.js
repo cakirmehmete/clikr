@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 import { observer, inject } from 'mobx-react';
 import APIStudentService from '../../../../services/APIStudentService'
 import Dialog from '@material-ui/core/Dialog';
@@ -21,7 +23,10 @@ const styles = theme => ({
     },
     buttonContainer: {
         padding: theme.spacing.unit*1.5,
-    }
+    },
+    paper: {
+        padding: theme.spacing.unit,
+    },
 });
 
 // for sliding up motion
@@ -34,35 +39,57 @@ function Transition(props) {
 class FRQ extends Component {
     
     constructor(props) {
-        super(props)
-        this.store = this.props.store
-        this.styles = props.classes
-        this.apiStudentService = new APIStudentService(this.store)
+        super(props);
+        this.store = this.props.store;
+        this.styles = props.classes;
+        this.apiStudentService = new APIStudentService(this.store);
+        this.question = this.store.getQuestionWithId(this.props.questionId);
+        this.correct_answer = this.question.correct_answer;
     }
 
     state = {
         answer: "",
         sent: "",
+        correct: undefined,
+        buttonText: "submit",
         disabled: false,
         dialogue: false
     }
+
+    componentWillReceiveProps(nextProps) {        
+        var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
+    
+        if (a !== undefined) {
+            this.setState({
+                correct: a,
+                buttonText: "dismiss",
+                disabled: false
+            });
+        } 
+    }
+
     handleSubmit = () => {
-        this.apiStudentService.postAnswer(this.state.answer, this.props.question.question.id)
+        this.apiStudentService.postAnswer(this.state.answer, this.question.id)
         this.setState({
             sent: this.state.answer,
             disabled: true
         })
     }
+
     handleClick = (e) => {
-        if (this.state.sent !== "" && this.state.answer !== this.state.sent) {
+        if (this.state.buttonText === "dismiss") {
+            this.store.removeQuestionById(this.props.questionId);
+        }
+        else if (this.state.sent === ""){
+            this.handleSubmit()
+        }
+        else if (this.state.sent !== this.state.answer) {
             this.setState({
                 dialogue: true
-            })
+            });
         }
-        else {
-            this.handleSubmit()
-        }  
     }
+
     handleChange = (e) => {
         
         if (e.target.value === this.state.sent) {
@@ -94,50 +121,53 @@ class FRQ extends Component {
     render() {
         return (
             <div>
-                <Grid container direction="column" className={this.styles.gridContainer}>
-                    <Grid item className={this.styles.gridItem}>
-                        <form noValidate autoComplete="off">
-                            <TextField
-                                id="full-width"
-                                helperText="Enter Response"
-                                name = 'answer'
-                                value={this.state.answer}
-                                onChange={e => this.handleChange(e)}
-                                fullWidth  
-                            />
-                        </form>
+                <Paper className={this.styles.paper}>
+                    <Grid container direction="column" className={this.styles.gridContainer}>
+                        <Typography variant="h5" color="secondary"> {this.question.question_text} </Typography>
+                        <Grid item className={this.styles.gridItem}>
+                            <form noValidate autoComplete="off">
+                                <TextField
+                                    id="full-width"
+                                    helperText="Enter Response"
+                                    name = 'answer'
+                                    value={this.state.answer}
+                                    onChange={e => this.handleChange(e)}
+                                    fullWidth  
+                                />
+                            </form>
+                        </Grid>
                     </Grid>
-                </Grid>
-                <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
-                    <Button onClick={this.handleClick} disabled={this.state.disabled} variant="contained" color="secondary">
-                    submit
-                    </Button>
-                    <Dialog
-                        open={this.state.dialogue}
-                        TransitionComponent={Transition}
-                        keepMounted
-                        onClose={this.handleClose}
-                        aria-labelledby="alert-dialog-slide-title"
-                        aria-describedby="alert-dialog-slide-description"
-                    >
-                        <DialogTitle id="alert-dialog-slide-title">
-                            {"Answer changed- "}
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-slide-description">
-                            "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={this.handleClose} color="primary">
-                            no
-                            </Button>
-                            <Button onClick={this.handleCloseSubmit} color="primary">
-                            yes
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-                </Grid>   
+                    <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
+                        <Button onClick={this.handleClick} disabled={this.state.disabled} variant="contained" color="secondary">
+                        {this.state.buttonText}
+                        </Button>
+                        <Dialog
+                            open={this.state.dialogue}
+                            TransitionComponent={Transition}
+                            keepMounted
+                            onClose={this.handleClose}
+                            aria-labelledby="alert-dialog-slide-title"
+                            aria-describedby="alert-dialog-slide-description"
+                        >
+                            <DialogTitle id="alert-dialog-slide-title">
+                                {"Answer changed- "}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-slide-description">
+                                "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.handleClose} color="primary">
+                                no
+                                </Button>
+                                <Button onClick={this.handleCloseSubmit} color="primary">
+                                yes
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                    </Grid> 
+                </Paper>  
             </div>
         );
     }
