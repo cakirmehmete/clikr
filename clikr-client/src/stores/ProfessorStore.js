@@ -1,65 +1,104 @@
-import { observable, action } from "mobx";
+import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, deleteCourseAPI, patchUpdateCourseAPI } from '../utils/api-facade';
 
-export default class ProfessorStore {
-    @observable
-    courses = [];
-
-    getCourseWithId(course_id) {
-        return this.courses.find(x => x.id === course_id)
+export default class APIProfService {
+    constructor(professorStore) {
+        this.professorStore = professorStore;
     }
 
-    getLectureWithId(lecture_id) {
-        const lectures = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
-        return lectures.find(lecture => lecture.id === lecture_id)
+    loadData() {
+        return getProfDataAPI()
+            .then(res => {
+                this.professorStore.updateData(res.data)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
     }
 
-    getQuestionWithId(lecture, question_id) {
-        if (lecture.questions === undefined)
-            return { questions: [] };
-
-        if (lecture.questions.find(x => x.id === question_id) === undefined)
-            return { questions: [] };
-
-        return lecture.questions.find(x => x.id === question_id)
+    openQuestion(question_id) {
+        postOpenQuestionAPI(question_id)
+            .then(res => {
+                console.log(res)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
     }
 
-    @action
-    updateData(data) {
-        this.courses = data;
+    closeQuestion(question_id) {
+        postCloseQuestionAPI(question_id)
+            .then(res => {
+                console.log(res)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
     }
 
-    @action
-    addCourse(course) {
-        this.courses.push(course);
-    }
-
-    @action
-    updateCourse(course) {
-        this.courses.remove(this.courses.find(x=> x.id === course.id));
-        this.courses.push(course);
-    }
-
-    @action
     addLecture(lecture) {
-        this.courses.find(x => x.id === lecture.course_id).lectures.push(lecture)
-    }
-    @action
-    removeCourse(course_id) {
-        this.courses.remove(this.courses.find(x=> x.id === course_id));
+        postNewLectureAPI(lecture)
+            .then(res => {
+                lecture.id = res.data.id
+                this.professorStore.addLecture(lecture)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
     }
 
-    @action
-    removeLecture(lecture_id) {
-        this.lectures.remove(this.course.find(x => x.id === lecture_id));
+    addCourse(course) {
+        postNewCourseAPI(course)
+            .then(res => {
+                course.id = res.data.id
+                this.professorStore.addCourse(course)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
     }
 
-    @action
-    removeQuestion(question_id) {
-        this.questions.remove(this.course.find(x => x.id === question_id));
+    deleteCourse(course_id) {
+        deleteCourseAPI(course_id)
+        .then(
+            this.professorStore.removeCourse(course_id)
+        )
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+        })
     }
-    @action
+
     addQuestion(question) {
-        this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
-            .find(lecture => lecture.id === question.lecture_id).questions.push(question);
+        // post new question
+        postNewQuestionAPI(question)
+            .then(res => {
+                question.id = res.data.id
+                this.professorStore.addQuestion(question)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+    changeCourseTitle(course) {
+        patchUpdateCourseAPI(course)
+        .then(res => {
+            this.professorStore.updateCourse(course)
+        })
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+        })
+    }
+    _checkAuth(error) {
+        if (error.response !== undefined) {
+            if (error.response.status === 401)
+                window.location.replace('/login-prof')
+        }
     }
 }
