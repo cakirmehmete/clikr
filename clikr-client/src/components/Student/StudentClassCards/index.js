@@ -104,12 +104,15 @@ class ClassCard extends React.Component {
                                     </Typography>
                                 </Link>
                             </Grid>
-                            <Grid item xs={1}>
-                                <Tooltip title="drop course" placement="top-start">
-                                    <Button variant="text" size="small" onClick={this.handleOpen}>
-                                        <Icon className={this.styles.icon} color="secondary">delete</Icon>
-                                    </Button>
-                                </Tooltip>
+                            <Grid item xs={2}>
+                                <Grid container direction="row" justify="flex-end">
+                                    <Tooltip title="drop course" placement="top-start">
+                                        <Button variant="text" size="small" onClick={this.handleOpen}>
+                                            <Icon className={this.styles.icon} color="secondary">delete</Icon>
+                                        </Button>
+                                    </Tooltip>
+                                </Grid>
+                                
                             </Grid>
                             <Dialog
                                 open={this.state.open}
