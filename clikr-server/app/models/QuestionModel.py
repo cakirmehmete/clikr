@@ -48,6 +48,7 @@ class QuestionModel(db.Model):
         self.question_type = data.get('question_type')
         self.question_title = data.get('question_title')
         self.question_text = data.get('question_text')
+        self.correct_answer = data.get('correct_answer')
         self.creator_id = data.get('creator_id')
         self.is_open = False
         self.opened_at = None

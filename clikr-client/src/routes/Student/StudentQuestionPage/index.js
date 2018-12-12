@@ -10,16 +10,32 @@ import APIStudentService from '../../../services/APIStudentService';
 import { observer, inject } from 'mobx-react';
 import FRQ from '../../../components/Student/Questions/FRQ';
 import MCQ from '../../../components/Student/Questions/MCQ';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = theme => ({
+    gridContainer: {
+        padding: theme.spacing.unit,
+    },
+    gridItem: {
+        padding: theme.spacing.unit,
+    },
+    paper: {
+        padding: theme.spacing.unit,
+    }
+
+});
 
 @inject("store")
 @observer
 class QuestionPage extends Component {
     state = {
-        has_question: false,
+        // has_question: false,
+        number_of_open_questions: 0,
     }
 
     constructor(props) {
         super(props)
+        this.styles = props.classes
         this.store = this.props.store
         this.apiStudentService = new APIStudentService(this.store)
     }
@@ -38,23 +54,30 @@ class QuestionPage extends Component {
         // This method is looking for the event 'change color'
         // socket.on takes a callback function for the first argument
         socket.on('question opened', (data) => {
-            this.store.updateAllQuestions([data.question])
+            this.store.addOneQuestion(data.question)
             this.setState({
-                has_question: true
-            })
+                // has_question: true,
+                number_of_open_questions: this.state.number_of_open_questions + 1
+            });
         })
 
         socket.on('question closed', (msg) => {
-            var data = JSON.stringify(msg);
-            // setting the color of our button
+            this.store.updateOneQuestion(msg.question);
             this.setState({
-                has_question: false
-            })
+                number_of_open_questions: this.state.number_of_open_questions - 1
+            });
         })
 
         socket.on('all open questions', (data) => {
-            console.log(data.questions)
-            this.store.updateAllQuestions(data.questions)
+            console.log(data.questions);
+            var num_questions = data.questions.length;
+            if (num_questions > 0) {
+                this.store.updateAllQuestions(data.questions);
+                this.setState({
+                    // has_question: true,
+                    number_of_open_questions: num_questions,
+                });
+            }
         })
 
         socket.on('server message', (msg) => {
@@ -64,42 +87,41 @@ class QuestionPage extends Component {
 
     render() {
         return (
-            <Grid container direction='column' spacing={Number("16")}>
+            <Grid container direction='column'>
                 <Header />
-                {this.state.has_question == false ? (
-                    <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                        <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> There are no questions for this course at the moment... </Typography>
-                    </Paper>
-                ) : (
-                        this.store.questions.map(q => {
-                            if (q.question_type === 'free_text') {
-                                return (
-                                    <Grid item>
-                                        <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                                            <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
-                                            <FRQ question={{ question: q }} />
-                                        </Paper>
-                                    </Grid>
+                <Grid className={this.styles.gridContainer}>
+                    {this.state.number_of_open_questions === 0 ? (
+                        <Paper className={this.styles.paper}>
+                            <Typography variant="h5" color="secondary"> There are no questions for this course at the moment... </Typography>
+                        </Paper>
+                    ) : null} 
+                </Grid>
+                <Grid className={this.styles.gridContainer}>
+                    {this.store.questions.map(q => {
+                        if (q.question_type === 'free_text') {
+                            return (
+                                // TODO: move Paper and Typography into FRQ component
+                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                    <FRQ questionId={q.id} />
+                                </Grid>
 
-                                )
-                            }
-                            else {
-                                return (
-                                    <Grid item>
-                                        <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                                            <Typography variant="h5" color="secondary" style={{ width: "98%", paddingLeft: "1%", paddingRight: "1%" }}> {q.question_text} </Typography>
-                                            <MCQ questionId={q.id} />
-                                        </Paper>
-                                    </Grid>
-                                )
-                            }
+                            )
+                        }
+                        else {
+                            return (
+                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                    <MCQ questionId={q.id} />
+                                </Grid>
+                            )
+                        }
 
-                        })
-                    )}
+                    })}
+
+                </Grid>
 
             </Grid>
-        )
+        );
 
     }
 }
-export default QuestionPage;
+export default withStyles(styles)(QuestionPage);

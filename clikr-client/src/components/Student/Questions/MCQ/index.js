@@ -1,6 +1,9 @@
+
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -13,78 +16,188 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
+
 
 // for sliding up motion
 function Transition(props) {
     return <Slide direction="up" {...props} />;
-  }
+}
+
+const styles = theme => ({
+    gridContainer: {
+        margin: theme.spacing.unit,
+    },
+    buttonContainer: {
+        padding: theme.spacing.unit*1.5,
+    },
+    correctAnswer: {
+        backgroundColor: theme.palette.primary.light,
+        marginLeft: theme.spacing.unit*0.3,
+    },
+    wrongAnswer: {
+        backgroundColor: theme.palette.primary.dark,
+        marginLeft: theme.spacing.unit*0.3,
+    },
+    neutralAnswer: {
+        marginLeft: theme.spacing.unit*0.3,
+    },
+    paper: {
+        padding: theme.spacing.unit,
+    },
+
+});
 
 @inject("store")
-@observer
+@observer    
 class MCQ extends Component {
-
-    constructor(props) {
-        super(props)
-        this.store = this.props.store
-        this.apiStudentService = new APIStudentService(this.store)
-    }
     
-    componentDidMount() {
-
+    constructor(props) {
+        super(props);
+        this.store = this.props.store;
+        this.styles = props.classes;
+        this.apiStudentService = new APIStudentService(this.store);
+        this.question = this.store.getQuestionWithId(this.props.questionId);
+    }
+    componentDidMount () {
+        
         var answers = []
 
-        var mcq = this.store.getQuestionWithId(this.props.questionId);
-        for (var i = 1; i <= mcq['number_of_options']; i++) {
-            var qstring = mcq["option" + i.toString()];
+        for (var i = 1; i <= this.question['number_of_options']; i++) {
+            var qstring = this.question["option" + i.toString()];
             answers.push(qstring)
         }
 
         this.setState({
             answerchoices: answers
         })
-        
+    }
+
+    componentWillReceiveProps(nextProps) {
+        var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
+    
+        if (a !== undefined) {
+            if (a !== null) {
+                this.setState({
+                    correct: Number(a) - 1
+                });
+            } else {
+                this.setState({
+                    correct: null
+                })
+            }
+            this.setState({ 
+                buttonText: "dismiss",
+                disabledInput: true,
+                disabled: false
+            });
+        } 
     }
 
     state = {
-        question: "What is the meaning of life?",
         answerchoices: [],
         answer: "",
         sent: "",
-        dialogue: false
+        correct: undefined,
+        buttonText: "submit",
+        disabledInput: false,
+        dialogue: false, 
+        disabled: false,
     }
+
 
     handleChange = (e) => {
         this.setState({
             answer: e.target.value
         });
+        if (e.target.value === this.state.sent) {
+            this.setState({
+                disabled: true
+            })
+        }
+        else{
+            this.setState({
+                disabled: false
+            }) 
+        }
     };
 
     handleSubmit = () => {
-        this.apiStudentService.postAnswer(this.state.answerchoices.indexOf(this.state.answer) + 1, this.props.question.question.id)
-        console.log(this.state.answerchoices.indexOf(this.state.answer) + 1)
+        this.apiStudentService.postAnswer((this.state.answerchoices.indexOf(this.state.answer) + 1).toString(), this.props.questionId)
         this.setState({
-            sent: this.state.answer
+            sent: this.state.answer,
+            disabled: true
         })
-    }
+    };
+
+    handleClick = () => {
+        if (this.state.buttonText === "dismiss") {
+            this.store.removeQuestionById(this.props.questionId);
+        }
+        else if (this.state.sent === ""){
+            this.handleSubmit()
+        }
+        else if (this.state.sent !== this.state.answer) {
+            this.setState({
+                dialogue: true
+            });
+        }
+    };
+
+    // close dialogue box
+    handleClose = () => {
+        this.setState({ 
+            dialogue: false,
+            answer: this.state.sent,
+            disabled: true
+         });
+      };
+
+    // close dialogue box and resubmit
+    handleCloseSubmit = () => {
+        this.setState({ dialogue: false });
+        this.handleSubmit()
+      };
+   
 
     render() {
         return (
-            <Grid item>
-                <Grid container direction="column" justify="center" style={{ padding: "1%" }}>
-                    <FormControl component="fieldset">
-                        <RadioGroup
-                            name="answers"
-                            value={this.state.answer}
-                            onChange={this.handleChange}
-                        >
-                            {this.state.answerchoices.map(a => (
-                                <FormControlLabel value={a} control={<Radio />} label={a} />
-                            ))}
-                        </RadioGroup>
-                    </FormControl>
-                    <Grid container justify="flex-end" style={{ "paddingRight": "1%" }}>
+            <div>
+                <Paper className={this.styles.paper}>
+                    <Grid container direction="column" className={this.styles.gridContainer}>
+                
+                        <Typography variant="h5" color="secondary"> {this.question.question_text} </Typography>
+                        <FormControl component="fieldset">
+                            <RadioGroup
+                                name="answers"
+                                value={this.state.answer}
+                                onChange={this.handleChange}
+                            >
+                                {this.state.answerchoices.map((a, index) => {
+                                    var background_style;
+                                    if (this.state.correct === undefined || this.state.correct === null) {
+                                        background_style = this.styles.neutralAnswer;
+                                    }
+                                    else if (index === this.state.correct) {
+                                        background_style = this.styles.correctAnswer;
+                                    }
+                                    else if (this.state.answerchoices.indexOf(this.state.sent) === index) {
+                                        background_style = this.styles.wrongAnswer;
+                                    }
+                                    
+                                    return (
+                                        <FormControlLabel value={a} key={a} control={<Radio disabled={this.state.disabledInput} />} label={a} className={background_style}/>
+                                    );
+                                })}
+                            </RadioGroup>
+                        </FormControl>
+                    </Grid>
+                    
+                
+                        
+                    <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
                         <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
-                            submit
+                            {this.state.buttonText}
                         </Button>
                         <Dialog
                             open={this.state.dialogue}
@@ -112,9 +225,11 @@ class MCQ extends Component {
                             </DialogActions>
                         </Dialog>
                     </Grid>
-                </Grid>
-            </Grid>
+                </Paper>
+            </div>
+            
+
         );
     }
 }
-export default MCQ;
+export default withStyles(styles)(MCQ);

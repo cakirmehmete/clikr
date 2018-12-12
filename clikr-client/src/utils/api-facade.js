@@ -58,6 +58,12 @@ export function postAnswerQuestionAPI(answer, question_id) {
         answer: answer
     });
 }
+export function getLogoutStudentAPI() {
+    return axios.get(baseURL + 'student/logout');
+}
+export function getLogoutProfAPI() {
+    return axios.get(baseURL + 'professor/logout');
+}
 
 export function postNewQuestionAPI(question) {
     return axios.post(baseURL + 'professor/lectures/' + question.lecture_id + '/questions', {
