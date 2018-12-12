@@ -57,7 +57,16 @@ export default class APIStudentService {
     async enrollCourse(code) {
         postEnrollStudentAPI(code)
             .then(res => {
-                return res.data
+                return res.data;
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+        getStudentCoursesAPI()
+            .then(res => {
+                this.studentStore.updateAllCourses(res.data)
+
             })
             .catch(error => {
                 console.log(error);
