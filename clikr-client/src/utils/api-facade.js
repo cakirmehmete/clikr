@@ -70,7 +70,6 @@ export function postNewQuestionAPI(question) {
         lecture_id: question.lecture_id,
         question_type: question.question_type,
         question_title: question.question_title,
-        question_text: question.question_text,
         correct_answer: question.correct_answer,
         creator_id: question.creator_id,
         option1: question.option1,
@@ -82,4 +81,3 @@ export function postNewQuestionAPI(question) {
         word_limit: question.word_limit
     });
 }
-

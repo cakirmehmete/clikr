@@ -69,14 +69,14 @@ class ProfessorAddMCQuestion extends React.Component {
                 break;
             case "correct_answer":
                 if (isNaN(value)) {
-                    errors.correct_answer = "Should be a number";
+                    errors.correct_answer = "Should be a number between 1-5";
                     correctValid = false
                 }
                 else if (value === '') {
                     errors.correct_answer = '';
                     correctValid = true
                 }
-                else if (value > 5 | value < 1) {
+                else if (value > 5 || value < 1) {
                     errors.correct_answer = "Should be between 1-5";
                     correctValid = false
                 }
@@ -170,7 +170,11 @@ class ProfessorAddMCQuestion extends React.Component {
                     errors.number_of_options = "This field is required";
                     optionsValid = false
                 }
-                else if (value > 5 | value < 1) {
+                else if (isNaN(value)) {
+                    errors.number_of_options = "Should be a number between 1-5";
+                    optionsValid = false
+                }
+                else if (value > 5 || value < 1) {
                     errors.number_of_options = "Should be between 1-5";
                     optionsValid = false
                 }
@@ -179,12 +183,15 @@ class ProfessorAddMCQuestion extends React.Component {
                     optionsValid = true
                 }
                 break;
+            default:
+                break;
         }
-
         if (this.state.title === '') {
             errors.title = "This field is required";
             titleValid = false
         }
+
+
 
         this.setState({ errors: errors,
                         titleValid: titleValid,
@@ -245,7 +252,7 @@ class ProfessorAddMCQuestion extends React.Component {
                         className={this.styles.textField}
                         value={this.state.title}
                         onChange={this.handleChange('title')}
-                        margin="dense"
+                        margin="normal"
                         helperText={this.state.errors["title"]}
                     />
                     <TextField

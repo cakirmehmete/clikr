@@ -49,9 +49,9 @@ const styles = theme => ({
 });
 
 @inject("store")
-@observer    
+@observer
 class MCQ extends Component {
-    
+
     constructor(props) {
         super(props);
         this.store = this.props.store;
@@ -60,7 +60,7 @@ class MCQ extends Component {
         this.question = this.store.getQuestionWithId(this.props.questionId);
     }
     componentDidMount () {
-        
+
         var answers = []
 
         for (var i = 1; i <= this.question['number_of_options']; i++) {
@@ -75,7 +75,7 @@ class MCQ extends Component {
 
     componentWillReceiveProps(nextProps) {
         var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
-    
+
         if (a !== undefined) {
             if (a !== null) {
                 this.setState({
@@ -86,12 +86,12 @@ class MCQ extends Component {
                     correct: null
                 })
             }
-            this.setState({ 
+            this.setState({
                 buttonText: "dismiss",
                 disabledInput: true,
                 disabled: false
             });
-        } 
+        }
     }
 
     state = {
@@ -101,7 +101,7 @@ class MCQ extends Component {
         correct: undefined,
         buttonText: "submit",
         disabledInput: false,
-        dialogue: false, 
+        dialogue: false,
         disabled: false,
     }
 
@@ -118,7 +118,7 @@ class MCQ extends Component {
         else{
             this.setState({
                 disabled: false
-            }) 
+            })
         }
     };
 
@@ -146,7 +146,7 @@ class MCQ extends Component {
 
     // close dialogue box
     handleClose = () => {
-        this.setState({ 
+        this.setState({
             dialogue: false,
             answer: this.state.sent,
             disabled: true
@@ -158,15 +158,15 @@ class MCQ extends Component {
         this.setState({ dialogue: false });
         this.handleSubmit()
       };
-   
+
 
     render() {
         return (
             <div>
                 <Paper className={this.styles.paper}>
                     <Grid container direction="column" className={this.styles.gridContainer}>
-                
-                        <Typography variant="h5" color="secondary"> {this.question.question_text} </Typography>
+
+                        <Typography variant="h5" color="secondary"> {this.question.question_title} </Typography>
                         <FormControl component="fieldset">
                             <RadioGroup
                                 name="answers"
@@ -184,7 +184,7 @@ class MCQ extends Component {
                                     else if (this.state.answerchoices.indexOf(this.state.sent) === index) {
                                         background_style = this.styles.wrongAnswer;
                                     }
-                                    
+
                                     return (
                                         <FormControlLabel value={a} key={a} control={<Radio disabled={this.state.disabledInput} />} label={a} className={background_style}/>
                                     );
@@ -192,9 +192,9 @@ class MCQ extends Component {
                             </RadioGroup>
                         </FormControl>
                     </Grid>
-                    
-                
-                        
+
+
+
                     <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
                         <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
                             {this.state.buttonText}
@@ -227,7 +227,7 @@ class MCQ extends Component {
                     </Grid>
                 </Paper>
             </div>
-            
+
 
         );
     }

@@ -43,9 +43,9 @@ function Transition(props) {
   }
 
 @inject("store")
-@observer    
+@observer
 class FRQ extends Component {
-    
+
     constructor(props) {
         super(props);
         this.store = this.props.store;
@@ -65,9 +65,9 @@ class FRQ extends Component {
         dialogue: false
     }
 
-    componentWillReceiveProps(nextProps) {        
+    componentWillReceiveProps(nextProps) {
         var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
-    
+
         if (a !== undefined) {
             this.setState({
                 correct: a,
@@ -89,7 +89,7 @@ class FRQ extends Component {
                     helperText: "Correct Answer: " + a
                 });
             }
-        } 
+        }
     }
 
     handleSubmit = () => {
@@ -115,7 +115,7 @@ class FRQ extends Component {
     }
 
     handleChange = (e) => {
-        
+
         if (e.target.value === this.state.sent) {
             this.setState({
                 disabled: true
@@ -158,7 +158,7 @@ class FRQ extends Component {
             <div>
                 <Paper className={this.styles.paper}>
                     <Grid container direction="column" className={this.styles.gridContainer}>
-                        <Typography variant="h5" color="secondary"> {this.question.question_text} </Typography>
+                        <Typography variant="h5" color="secondary"> {this.question.question_title} </Typography>
                         <Grid item className={this.styles.gridItem}>
                             <TextField
                                 id="full-width"
@@ -201,8 +201,8 @@ class FRQ extends Component {
                                 </Button>
                             </DialogActions>
                         </Dialog>
-                    </Grid> 
-                </Paper>  
+                    </Grid>
+                </Paper>
             </div>
         );
     }
