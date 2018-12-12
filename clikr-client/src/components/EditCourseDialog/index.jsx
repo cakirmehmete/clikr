@@ -37,6 +37,7 @@ class EditCourseDialog extends React.Component {
     state = {
         open: false,
         title: "",
+        disabled: true,
     };
 
     componentDidMount () {
@@ -46,9 +47,19 @@ class EditCourseDialog extends React.Component {
         });
     }
     handleChange = (e) => {
-        this.setState({
-            [e.target.name]: e.target.value
-        })
+        if (e.target.value.length > 0) {
+            this.setState({
+                [e.target.name]: e.target.value,
+                disabled: false,
+            })
+        }
+        else {
+            this.setState({
+                disabled: true,
+                [e.target.name]: e.target.value,
+            })
+        }
+        
     }  
     handleOpen = () => {
         this.setState({ open: true });
@@ -91,7 +102,7 @@ class EditCourseDialog extends React.Component {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleSubmit} color="secondary">
+                    <Button onClick={this.handleSubmit} disabled={this.state.disabled} color="secondary">
                         submit
                     </Button>
                     <Button onClick={this.handleClose} color="secondary">
