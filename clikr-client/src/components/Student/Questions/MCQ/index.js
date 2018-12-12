@@ -77,8 +77,16 @@ class MCQ extends Component {
         var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
     
         if (a !== undefined) {
-            this.setState({
-                correct: Number(a) - 1, 
+            if (a !== null) {
+                this.setState({
+                    correct: Number(a) - 1
+                });
+            } else {
+                this.setState({
+                    correct: null
+                })
+            }
+            this.setState({ 
                 buttonText: "dismiss",
                 disabledInput: true,
                 disabled: false
@@ -167,7 +175,7 @@ class MCQ extends Component {
                             >
                                 {this.state.answerchoices.map((a, index) => {
                                     var background_style;
-                                    if (this.state.correct === undefined) {
+                                    if (this.state.correct === undefined || this.state.correct === null) {
                                         background_style = this.styles.neutralAnswer;
                                     }
                                     else if (index === this.state.correct) {
