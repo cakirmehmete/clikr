@@ -15,6 +15,9 @@ export function hasStudentQuestions(course_id) {
     return Promise.all(axios.get(baseURL + 'student/courses/' + course_id + '/questions'));
 }
 
+export function getProfCoursesAPI() {
+    return axios.get(baseURL + 'professor/courses');
+}
 export function getStudentQuestionsByCourseAPI(course_id) {
     return axios.get(baseURL + 'student/courses/' + course_id + '/questions');
 }

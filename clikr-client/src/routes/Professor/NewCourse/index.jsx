@@ -70,7 +70,6 @@ class ProfessorNewCourse extends React.Component {
         this.apiProfService.addCourse(
             new CourseObj(this.state.name)
         )
-
         // Close modal
         this.setState({ toHome: true });
     }

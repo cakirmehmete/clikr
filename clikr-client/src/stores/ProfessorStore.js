@@ -29,7 +29,8 @@ export default class ProfessorStore {
     }
 
     @action
-    addCourse(course) {
+    addCourse(courses, course) {
+        course.enroll_code = courses.find(x => x.id === course.id).enroll_code
         this.courses.push(course);
     }
 
