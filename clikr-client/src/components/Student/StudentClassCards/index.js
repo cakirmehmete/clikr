@@ -17,9 +17,25 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 const styles = theme => ({
-    card: {
+    yellowCard: {
         margin: theme.spacing.unit,
         width: '98%',
+        background: theme.palette.primary.main
+    },
+    navyCard: {
+        margin: theme.spacing.unit,
+        width: '98%',
+        background: theme.palette.secondary.light
+    },
+    greenCard: {
+        margin: theme.spacing.unit,
+        width: '98%',
+        background: theme.palette.primary.light
+    },
+    orangeCard: {
+        margin: theme.spacing.unit,
+        width: '98%',
+        background: theme.palette.primary.dark
     },
     link: {
         width: '98%',
@@ -27,6 +43,9 @@ const styles = theme => ({
     },
     icon: {
         margin: theme.spacing.unit
+    },
+    typography: {
+        width: '100%'
     }
 
 });
@@ -40,11 +59,19 @@ class ClassCard extends React.Component {
         this.store = props.store
         this.apiStudentService = new APIStudentService(this.store)
         this.styles = props.classes
-        
-        
     }
+    
     state = {
         link:'student/questions',
+        colorStyle: undefined,
+        open:false,
+    }
+
+    componentDidMount () {
+        var colors = [this.styles.orangeCard, this.styles.greenCard, this.styles.yellowCard, this.styles.navyCard];
+        this.setState({
+            colorStyle: colors[this.props.colorIndex]
+        });
     }
     handleOpen = () => {
         this.setState({ open: true });
@@ -62,22 +89,22 @@ class ClassCard extends React.Component {
     
     render() {
         return (
-                <Card className={this.styles.card}>
+                <Card className={this.state.colorStyle}>
                     <CardContent>
-                        <Grid container direction="row" justify="space-between" alignItems="stretch">
-                            <Grid item>
+                        <Grid container direction="row" justify="space-between" alignItems="stretch" spacing={24}>
+                            <Grid item xs={10}>
                                 <Link className={this.styles.link} to={{
                                 pathname: '/student/questions',
                                 state : {
                                     course_id: this.props.id,
                                 }
                                 }}>
-                                    <Typography variant="h4">
+                                    <Typography className={this.styles.typography} variant="h4">
                                         {this.props.name}
                                     </Typography>
                                 </Link>
                             </Grid>
-                            <Grid item>
+                            <Grid item xs={1}>
                                 <Tooltip title="drop course" placement="top-start">
                                     <Button variant="text" size="small" onClick={this.handleOpen}>
                                         <Icon className={this.styles.icon} color="secondary">delete</Icon>
