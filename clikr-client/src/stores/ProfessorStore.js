@@ -36,8 +36,8 @@ export default class ProfessorStore {
 
     @action
     updateCourse(course) {
-        this.courses.remove(this.courses.find(x=> x.id === course.id));
-        this.courses.push(course);
+        const oldCourse = this.courses.find(x=> x.id === course.id);
+        oldCourse.title = course.title
     }
 
     @action
