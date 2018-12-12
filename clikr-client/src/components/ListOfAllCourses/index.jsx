@@ -48,7 +48,7 @@ class ListOfAllCoures extends React.Component {
                                 <ListItemText primary={courseObj.title} />
                                     <ListItemSecondaryAction>
                                         <Grid container direction="row" justify="flex-end">
-                                            <EditCourseDialog course={courseObj} />
+                                            <EditCourseDialog course={courseObj}/>
                                             <DeleteCourseDialog course={courseObj}/>
                                             <AddStudentsModalWrapped joinCode={courseObj.enroll_code}/>
                                         </Grid>
