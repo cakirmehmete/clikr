@@ -21,7 +21,7 @@ class QuestionStats extends React.Component {
         super(props)
         this.styles = props.classes
         this.state = {
-            question: {},
+            question: { id: 0 },
             data: {}
         }
         defaults.global.legend.display = false;
@@ -93,7 +93,7 @@ class QuestionStats extends React.Component {
         }
 
         return (
-            <Card className={this.styles.card}>
+            <Card className={this.styles.card} hidden={this.state.question.id === 0}>
                 <CardContent>
                     <Typography variant="h6" color="inherit">
                         Statistics for {this.state.question.question_title}
