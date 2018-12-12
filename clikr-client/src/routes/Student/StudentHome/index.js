@@ -4,9 +4,23 @@ import Header from '../../../components/Student/LoggedinHeader';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import AddCourseButton from '../../../components/Student/Buttons/AddCourseButton';
 import { observer, inject } from 'mobx-react';
 import APIStudentService from '../../../services/APIStudentService';
+import { withStyles } from '@material-ui/core/styles'
+import AddCourseDialog from '../../../components/Student/AddCourseDialog';
+
+
+const styles = theme => ({
+    gridContainer: {
+        margin: theme.spacing.unit,
+    },
+    gridItem: {
+        padding: theme.spacing.unit,
+    },
+    paper: {
+        padding: theme.spacing.unit*2,
+    }
+});
 
 @inject("store")
 @observer
@@ -15,29 +29,31 @@ class StudentHome extends Component {
         super(props)
         this.store = props.store
         this.apiStudentService = new APIStudentService(this.store)
+        this.styles = props.classes
         
     }
     state = {
         course_ids: []
     }
-    componentDidMount() {
+    componentWillReceiveProps() {
         this.apiStudentService.loadAllCourses()
-    } 
+    }
     render() {
         return (
            
             <Grid container direction='column' spacing={Number("16")}>
                 <Header />
-                <Grid item>
-                    <Paper style={{ paddingTop: "1%", paddingBottom: "1%" }}>
-                        <Grid container direction="row" alignItems="flex-start" justify="space-between" style={{ paddingLeft: "1%", paddingRight: "2%" }}>
-                            <Typography variant="h2" color="secondary"> My Classes </Typography>
-                            <AddCourseButton />      
+                <Grid item className={this.styles.gridItem}>
+                    <Paper className={this.styles.paper}>
+                        <Grid container direction="row" alignItems="flex-start" justify="space-between" className={this.styles.gridContainer}>
+                            <Typography variant="h2" color="secondary" className={this.styles.typeography}> My Classes </Typography>
+                            <AddCourseDialog />      
                         </Grid>
-                        <Grid container justify="center" alignItems="flex-end" style={{ paddingTop: "1%" }}>
-                            { this.store.courses.map(function (courseObj, index) {
+                        <Grid container justify="center" alignItems="flex-end">
+                            {this.store.courses.map(function (courseObj, index) {
+                                const colorIndex = index%4;
                                 return (
-                                    <ClassCard key={index} name={courseObj.title} number={courseObj.num} id={courseObj.id} />
+                                    <ClassCard key={index} name={courseObj.title} id={courseObj.id} colorIndex={colorIndex}/>
                                 );
                             })}
                         </Grid>
@@ -47,4 +63,4 @@ class StudentHome extends Component {
         )
     }
 }
-export default StudentHome;
+export default withStyles(styles)(StudentHome);

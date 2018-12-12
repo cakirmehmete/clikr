@@ -71,13 +71,11 @@ class QuestionPage extends Component {
         socket.on('all open questions', (data) => {
             console.log(data.questions);
             var num_questions = data.questions.length;
-            if (num_questions > 0) {
-                this.store.updateAllQuestions(data.questions);
-                this.setState({
-                    // has_question: true,
-                    number_of_open_questions: num_questions,
-                });
-            }
+            this.store.updateAllQuestions(data.questions);
+            this.setState({
+                // has_question: true,
+                number_of_open_questions: num_questions,
+            });
         })
 
         socket.on('server message', (msg) => {
@@ -87,7 +85,7 @@ class QuestionPage extends Component {
 
     render() {
         return (
-            <Grid container direction='column'>
+            <Grid container direction='column' spacing={Number("16")}>
                 <Header />
                 <Grid className={this.styles.gridContainer}>
                     {this.state.number_of_open_questions === 0 ? (

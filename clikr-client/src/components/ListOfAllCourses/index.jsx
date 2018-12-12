@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
@@ -28,13 +29,13 @@ class ListOfAllCoures extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
     }
-    
+   
     handleCourseClick = id => () => {
         this.setState(() => ({
             referrerCourseId: id
         }))
     }
-    
+
     render() {
         // Handle routes
         if (this.state.referrerCourseId !== null) {
@@ -50,7 +51,7 @@ class ListOfAllCoures extends React.Component {
                                         <Grid container direction="row" justify="flex-end">
                                             <EditCourseDialog course={courseObj}/>
                                             <DeleteCourseDialog course={courseObj}/>
-                                            <AddStudentsModalWrapped joinCode={courseObj.enroll_code}/>
+                                            <AddStudentsModalWrapped joinCode={courseObj.enroll_code} id={courseObj.id}/>
                                         </Grid>
                                     </ListItemSecondaryAction>
                         </ListItem>

@@ -29,14 +29,15 @@ export default class ProfessorStore {
     }
 
     @action
-    addCourse(course) {
+    addCourse(courses, course) {
+        course.enroll_code = courses.find(x => x.id === course.id).enroll_code
         this.courses.push(course);
     }
 
     @action
     updateCourse(course) {
-        this.courses.remove(this.courses.find(x=> x.id === course.id));
-        this.courses.push(course);
+        const oldCourse = this.courses.find(x=> x.id === course.id);
+        oldCourse.title = course.title
     }
 
     @action

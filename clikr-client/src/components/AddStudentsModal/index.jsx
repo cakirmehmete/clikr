@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import Icon from '@material-ui/core/Icon';
 import Tooltip from '@material-ui/core/Tooltip';
 
@@ -47,15 +47,24 @@ const styles = theme => ({
     }
 });
 
+@inject('profStore')
 @observer
 class AddStudentsModal extends React.Component {
     state = {
         open: false,
+        code: ""
     };
 
     constructor(props) {
         super(props)
         this.joinCode = props.joinCode
+        this.profStore = props.profStore
+    }
+    componentDidMount() {
+        const joincode = this.profStore.getCourseWithId(this.props.id).enroll_code
+        this.setState({
+            code: joincode
+        })
     }
 
     handleOpen = () => {
@@ -89,7 +98,7 @@ class AddStudentsModal extends React.Component {
                 >
                     <div style={getModalStyle()} className={classes.paper}>
                         <Typography variant="h6">
-                            {this.joinCode}
+                            {this.state.code}
                         </Typography>
                         <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Done</Button>
                     </div>

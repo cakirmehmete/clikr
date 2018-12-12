@@ -53,7 +53,6 @@ class AllLecturesFrame extends React.Component {
     }
 
     handleLectureClick = index => {
-        console.log("lecture clicked")
         this.setState(() => ({
             referrerLectureIndex: index
         }))
