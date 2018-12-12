@@ -3,7 +3,10 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 import { observer } from 'mobx-react';
+import Icon from '@material-ui/core/Icon';
+import Tooltip from '@material-ui/core/Tooltip';
 
 function getModalStyle() {
     const top = 50;
@@ -39,6 +42,9 @@ const styles = theme => ({
     menu: {
         width: 200,
     },
+    icon: {
+        margin: theme.spacing.unit
+    }
 });
 
 @observer
@@ -69,8 +75,12 @@ class AddStudentsModal extends React.Component {
         const { classes } = this.props;
 
         return (
-            <div>
-                <Button variant="text" size="small" color="secondary" onClick={this.handleOpen}>Add Students</Button>
+            <Grid item>
+                <Tooltip title="add students" placement="top-start">
+                    <Button variant="text" size="small" onClick={this.handleOpen}>
+                        <Icon className={classes.icon} color="secondary">person_add</Icon>
+                    </Button>
+                </Tooltip>
                 <Modal
                     aria-labelledby="simple-modal-title"
                     aria-describedby="simple-modal-description"
@@ -84,7 +94,7 @@ class AddStudentsModal extends React.Component {
                         <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Done</Button>
                     </div>
                 </Modal>
-            </div>
+            </Grid>
         );
     }
 }
