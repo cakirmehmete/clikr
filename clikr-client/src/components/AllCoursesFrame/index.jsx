@@ -7,11 +7,19 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { observer } from 'mobx-react';
 import ListOfAllCourses from '../ListOfAllCourses';
+import Icon from '@material-ui/core/Icon';
+import Grid from '@material-ui/core/Grid';
 
 const styles = theme => ({
     card: {
         minWidth: 275,
     },
+    icon: {
+        margin: theme.spacing.unit,
+    },
+    title: {
+        margin: theme.spacing.unit,
+    }
 });
 
 @observer
@@ -46,11 +54,18 @@ class AllCoursesFrame extends React.Component {
                 </Typography>
                 <Card className={this.styles.card}>
                     <CardContent>
-                        <Typography variant="h6" color="inherit">
-                            Courses
-                        </Typography>
+                        <Grid container direction='row' justify='space-between' alignItems='stretch'>
+                            <Grid item>
+                                <Typography className={this.styles.title} variant="h6" color="inherit">Courses</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Button onClick={this.handleNewCourseClick} color="primary">
+                                    <Icon className={this.styles.icon} color="primary">add_circle</Icon>
+                                    Add Class
+                                </Button>
+                            </Grid>
+                        </Grid>  
                         <ListOfAllCourses profStore={this.profStore} />
-                        <Button onClick={this.handleNewCourseClick} variant="outlined" color="primary">Add Class</Button>
                     </CardContent>
                 </Card>
             </div>

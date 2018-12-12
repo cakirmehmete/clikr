@@ -35,14 +35,37 @@ class ProfessorAddLecture extends React.Component {
             title: '',
             date: '',
             description: '',
-            courseId: courseId
+            courseId: courseId,
+            errors: {title: ''},
+            titleValid: true,
+            formValid: false
         }
     }
+
+    handleValidation() {
+        let titleValid = this.state.titleValid;
+        let errors = this.state.errors;
+
+        if (this.state.title === '') {
+            errors.title = "This field is required."
+            titleValid = false
+        }
+        else {
+            titleValid = true
+        }
+
+        this.setState({ titleValid: titleValid }, this.validateForm);
+    }
+
+    validateForm() {
+        this.setState({formValid: this.state.titleValid });
+    }
+
 
     handleChange = name => event => {
         this.setState({
             [name]: event.target.value,
-        });
+        }, () => { this.handleValidation() });
     };
 
     handleSubmit = () => {
@@ -66,12 +89,15 @@ class ProfessorAddLecture extends React.Component {
                 </Typography>
                 <form className={this.styles.container} noValidate autoComplete="off">
                     <TextField
+                        required
+                        error={!this.state.titleValid}
                         id="standard-name"
                         label="Lecture Title"
                         className={this.styles.textField}
                         value={this.state.title}
                         onChange={this.handleChange('title')}
                         margin="normal"
+                        helperText={this.state.errors["title"]}
                     />
                     <TextField
                         id="standard-name"
@@ -89,7 +115,13 @@ class ProfessorAddLecture extends React.Component {
                         onChange={this.handleChange('date')}
                         margin="normal"
                     />
-                    <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Submit</Button>
+                    <Button
+                        disabled={!this.state.formValid}
+                        variant="outlined"
+                        color="primary"
+                        onClick={this.handleSubmit}>
+                            Submit
+                    </Button>
                 </form>
             </div>
         );

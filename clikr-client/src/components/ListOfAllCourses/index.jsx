@@ -7,6 +7,9 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { observer } from 'mobx-react';
 import AddStudentsModalWrapped from '../AddStudentsModal';
+import DeleteCourseDialog from '../DeleteCourseDialog';
+import Grid from '@material-ui/core/Grid';
+import EditCourseDialog from '../EditCourseDialog'
 
 const styles = theme => ({
     card: {
@@ -17,7 +20,7 @@ const styles = theme => ({
 @observer
 class ListOfAllCoures extends React.Component {
     state = {
-        referrerCourseId: null
+        referrerCourseId: null,
     }
 
     constructor(props) {
@@ -25,28 +28,31 @@ class ListOfAllCoures extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
     }
-
+    
     handleCourseClick = id => () => {
         this.setState(() => ({
             referrerCourseId: id
         }))
     }
-
+    
     render() {
         // Handle routes
         if (this.state.referrerCourseId !== null) {
             return <Redirect to={'/professor/' + this.state.referrerCourseId + '/lectures'} push />
         }
-        
         return (
             <List component="nav">
                 {this.profStore.courses.map((courseObj, index) => {
                     return (
                         <ListItem divider button key={index} onClick={this.handleCourseClick(courseObj.id)} >
-                            <ListItemText primary={courseObj.title} />
-                            <ListItemSecondaryAction>
-                                <AddStudentsModalWrapped joinCode={courseObj.enroll_code}/>
-                            </ListItemSecondaryAction>
+                                <ListItemText primary={courseObj.title} />
+                                    <ListItemSecondaryAction>
+                                        <Grid container direction="row" justify="flex-end">
+                                            <EditCourseDialog course={courseObj}/>
+                                            <DeleteCourseDialog course={courseObj}/>
+                                            <AddStudentsModalWrapped joinCode={courseObj.enroll_code}/>
+                                        </Grid>
+                                    </ListItemSecondaryAction>
                         </ListItem>
                     )
                 })}

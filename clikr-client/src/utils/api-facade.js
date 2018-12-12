@@ -65,12 +65,22 @@ export function getLogoutProfAPI() {
     return axios.get(baseURL + 'professor/logout');
 }
 
+// course: CourseObj
+export function patchUpdateCourseAPI(course) {
+    return axios.patch(baseURL + 'professor/courses/' + course.id, {
+        title: course.title
+    });
+}
+// delete the course
+export function deleteCourseAPI(course_id) {
+    return axios.delete(baseURL + 'professor/courses/' + course_id);
+}
+
 export function postNewQuestionAPI(question) {
     return axios.post(baseURL + 'professor/lectures/' + question.lecture_id + '/questions', {
         lecture_id: question.lecture_id,
         question_type: question.question_type,
         question_title: question.question_title,
-        question_text: question.question_text,
         correct_answer: question.correct_answer,
         creator_id: question.creator_id,
         option1: question.option1,
@@ -82,4 +92,3 @@ export function postNewQuestionAPI(question) {
         word_limit: question.word_limit
     });
 }
-
