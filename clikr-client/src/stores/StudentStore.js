@@ -22,6 +22,10 @@ export default class StudentStore {
         element.dept, element.description, element.term, element.enroll_code, element.year))
     })
   }
+  @action
+  dropCourse(course_id) {
+      this.courses.remove(this.courses.find(x=> x.id === course_id));
+  }
 
   getQuestionWithId(question_id) {
     return this.questions.find(x => x.id === question_id);

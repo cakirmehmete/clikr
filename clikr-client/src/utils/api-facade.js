@@ -71,9 +71,13 @@ export function patchUpdateCourseAPI(course) {
         title: course.title
     });
 }
-// delete the course
+// delete the course 
 export function deleteCourseAPI(course_id) {
     return axios.delete(baseURL + 'professor/courses/' + course_id);
+}
+// drop = delete for studnet
+export function deleteDropCourseAPI(course_id) {
+    return axios.delete(baseURL + 'student/courses/' + course_id);
 }
 
 export function postNewQuestionAPI(question) {
