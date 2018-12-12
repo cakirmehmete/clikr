@@ -30,8 +30,8 @@ class DeleteCourseDialog extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = new APIProfService(this.profStore)
-        this.courseId = props.courseId
-        this.courseTitle = props.courseTitle
+        this.courseId = props.course.id
+        this.courseTitle = props.course.title
     }
 
     state = {
@@ -45,7 +45,12 @@ class DeleteCourseDialog extends React.Component {
             courseTitle: this.courseTitle,
         });
     }
-      
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            courseId: nextProps.course.id,
+            courseTitle: nextProps.course.title,
+        });
+    }
     handleOpen = () => {
         this.setState({ open: true });
     };
