@@ -92,8 +92,6 @@ class ProfessorAddFreeTextQuestion extends React.Component {
     }
 
     validateForm() {
-        console.log("titleValid: " + this.state.titleValid)
-        console.log("limitValid: " + this.state.limitValid)
         this.setState({formValid: this.state.titleValid
                                     && this.state.limitValid});
     }
