@@ -30,9 +30,12 @@ class ProfessorAddFreeTextQuestion extends React.Component {
     state = {
         toQuestions: false,
         title: '',
-        text: '',
         correct_answer: '',
-        word_limit: ''
+        word_limit: '',
+        errors: {title:'', word_limit:''},
+        formValid: false,
+        titleValid: true,
+        limitValid: true
     };
 
     constructor(props) {
@@ -40,10 +43,64 @@ class ProfessorAddFreeTextQuestion extends React.Component {
         this.styles = props.classes
     }
 
+    handleValidation(name, value) {
+        let titleValid = this.state.titleValid;
+        let limitValid = this.state.limitValid;
+        let errors = this.state.errors;
+
+        switch(name) {
+            case "title":
+                if (value === '') {
+                    errors.title = "This field is required";
+                    titleValid = false
+                }
+                else {
+                    errors.title = '';
+                    titleValid = true
+                }
+                break;
+            case "word_limit":
+                if (value === '') {
+                    errors.word_limit = '';
+                    limitValid = true
+                }
+                else if (isNaN(value)) {
+                    errors.word_limit = "Should be a number";
+                    limitValid = false
+                }
+                else if (value > 1000 || value < 1) {
+                    errors.word_limit = "Out of range";
+                    limitValid = false
+                }
+                else {
+                    errors.word_limit = '';
+                    limitValid = true
+                }
+                break;
+            default:
+                break;
+        }
+        if (this.state.title === '') {
+            errors.title = "This field is required";
+            titleValid = false
+        }
+
+        this.setState({ errors: errors,
+                        titleValid: titleValid,
+                        limitValid: limitValid }, this.validateForm);
+
+    }
+
+    validateForm() {
+        this.setState({formValid: this.state.titleValid
+                                    && this.state.limitValid});
+    }
+
     handleChange = name => event => {
+        let value = event.target.value;
         this.setState({
-            [name]: event.target.value,
-        });
+            [name]: value,
+        }, () => { this.handleValidation(name, value) });
     };
 
     handleSubmit = () => {
@@ -51,7 +108,7 @@ class ProfessorAddFreeTextQuestion extends React.Component {
 
         // Send course to API
         this.props.apiService.addQuestion(
-            new FreeTextQuestionObj(null, lectureId, "free_text", this.state.title, this.state.text, this.state.correct_answer, null, null, null, null, null, null, this.state.word_limit)
+            new FreeTextQuestionObj(null, lectureId, "free_text", this.state.title, this.state.correct_answer, null, null, null, null, null, null, this.state.word_limit)
         )
 
         this.setState({ toQuestions: true });
@@ -71,20 +128,15 @@ class ProfessorAddFreeTextQuestion extends React.Component {
                 </Typography>
                 <form className={this.styles.container} noValidate autoComplete="off">
                     <TextField
+                        required
+                        error={!this.state.titleValid}
                         id="standard-name"
                         label="Question Title"
                         className={this.styles.textField}
                         value={this.state.title}
                         onChange={this.handleChange('title')}
                         margin="normal"
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Question Text"
-                        className={this.styles.textField}
-                        value={this.state.text}
-                        onChange={this.handleChange('text')}
-                        margin="normal"
+                        helperText={this.state.errors["title"]}
                     />
                     <TextField
                         id="standard-name"
@@ -95,14 +147,20 @@ class ProfessorAddFreeTextQuestion extends React.Component {
                         margin="normal"
                     />
                     <TextField
+                        error={!this.state.limitValid}
                         id="standard-name"
                         label="Answer Word Limit"
                         className={this.styles.textField}
                         value={this.state.word_limit}
                         onChange={this.handleChange('word_limit')}
                         margin="normal"
+                        helperText={this.state.errors["word_limit"]}
                     />
-                    <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Submit</Button>
+                    <Button
+                        disabled={!this.state.formValid}
+                        variant="outlined"
+                        color="primary"
+                        onClick={this.handleSubmit}>Submit</Button>
                 </form>
             </div>
         );
