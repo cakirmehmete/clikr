@@ -49,7 +49,7 @@ class ListOfAllCoures extends React.Component {
                                     <ListItemSecondaryAction>
                                         <Grid container direction="row" justify="flex-end">
                                             <EditCourseDialog course={courseObj} sendData={this.getData}/>
-                                            <DeleteCourseDialog courseId={courseObj.id} courseTitle={courseObj.title}/>
+                                            <DeleteCourseDialog course={courseObj}/>
                                             <AddStudentsModalWrapped joinCode={courseObj.enroll_code}/>
                                         </Grid>
                                     </ListItemSecondaryAction>
