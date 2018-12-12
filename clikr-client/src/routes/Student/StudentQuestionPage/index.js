@@ -87,7 +87,7 @@ class QuestionPage extends Component {
 
     render() {
         return (
-            <Grid container direction='column'>
+            <Grid container direction='column' spacing={Number("16")}>
                 <Header />
                 <Grid className={this.styles.gridContainer}>
                     {this.state.number_of_open_questions === 0 ? (

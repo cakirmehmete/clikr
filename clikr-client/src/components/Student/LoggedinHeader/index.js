@@ -4,6 +4,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Grid from '@material-ui/core/Grid';
 import logo from '../../../assets/clikrlogo.png'
 import LogoutButton from '../Buttons/LogoutButton';
+import { Link } from 'react-router-dom';
 
 
 class Header extends React.Component {
@@ -14,7 +15,9 @@ class Header extends React.Component {
             <AppBar position="static" color='primary'>
                 <Toolbar>
                     <Grid container direction="row" justify="space-between" alignItems='center'>
-                        <img src = {logo} alt = "logo" width="100"></img>
+                        <Link to="/student">
+                            <img src = {logo} alt = "logo" width="100"></img>
+                        </Link>
                         <LogoutButton />
                     </Grid>
                 </Toolbar>

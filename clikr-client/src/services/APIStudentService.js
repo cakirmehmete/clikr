@@ -1,4 +1,4 @@
-import { getStudentCoursesAPI, postEnrollStudentAPI, getStudentQuestionsByCourseAPI, postAnswerQuestionAPI, getLogoutStudentAPI } from '../utils/api-facade';
+import { getStudentCoursesAPI, postEnrollStudentAPI, getStudentQuestionsByCourseAPI, postAnswerQuestionAPI, getLogoutStudentAPI, deleteDropCourseAPI } from '../utils/api-facade';
 
 export default class APIStudentService {
     constructor(studentStore) {
@@ -31,6 +31,17 @@ export default class APIStudentService {
             })
         
     }
+    // remove the course
+    dropCourse(course_id) {
+        deleteDropCourseAPI(course_id)
+        .then(
+            this.studentStore.dropCourse(course_id)
+        )
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+        })
+    }
 
     async postAnswer(answer, question_id) {
         postAnswerQuestionAPI(answer, question_id)
@@ -46,7 +57,16 @@ export default class APIStudentService {
     async enrollCourse(code) {
         postEnrollStudentAPI(code)
             .then(res => {
-                return res.data
+                return res.data;
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+        getStudentCoursesAPI()
+            .then(res => {
+                this.studentStore.updateAllCourses(res.data)
+
             })
             .catch(error => {
                 console.log(error);
