@@ -8,6 +8,7 @@ import { socketioURL } from '../../../constants/api';
 import socketIOClient from 'socket.io-client'
 import Typography from '@material-ui/core/Typography';
 import AllQuestionsFrame from '../../../components/AllQuestionsFrame';
+import QuestionStats from '../../../components/QuestionStats';
 const socket = socketIOClient(socketioURL)
 
 const styles = theme => ({
@@ -63,15 +64,6 @@ class ProfessorViewQuestions extends React.Component {
                 currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
             })
         })
-
-        socket.on('new results', (msg) => {
-            var data = JSON.stringify(msg);
-            console.log(data)
-        })
-
-        socket.on('server message', (msg) => {
-            console.log('Received message:' + msg);
-        });
     }
 
     handleBtnClick = () => {
@@ -125,13 +117,16 @@ class ProfessorViewQuestions extends React.Component {
                     <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3}>
                         {this.state.btnStatus === 0 ? "Open Question" :
                             this.state.btnStatus === 1 ? "Close Question" :
-                            this.state.btnStatus === 2 ? "Open Next Question" :
-                            "No More Questions"}
+                                this.state.btnStatus === 2 ? "Open Next Question" :
+                                    "No More Questions"}
                     </Button>
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={8}>
-                        <AllQuestionsFrame parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId}/>
+                        <AllQuestionsFrame parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <QuestionStats parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
                     </Grid>
                 </Grid>
             </div>
