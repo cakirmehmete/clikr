@@ -238,10 +238,10 @@ def submit_answer(current_user, question_id):
 def _compute_question_statistics(question_id):
     results_raw = AnswerModel.query.filter_by(question_id=question_id).with_entities(AnswerModel.answer, func.count(AnswerModel.answer)).group_by(AnswerModel.answer).all()
 
-    answers = []
+    answers = {}
     count = 0
     for one_answer in results_raw:
-        answers.append({one_answer[0]: one_answer[1]})
+        answers[one_answer[0]] = one_answer[1]
         count += one_answer[1]
 
     results = {}

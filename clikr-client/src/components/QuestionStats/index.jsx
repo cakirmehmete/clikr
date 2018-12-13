@@ -32,12 +32,15 @@ class QuestionStats extends React.Component {
         socket.on('new results', (msg) => {
             const values = []
 
+            // FIXME: Just a temporary fix for MC questions -- this should really depend on the question type!
             const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
             for (var i = 1; i <= question.number_of_options; i++) {
-                values[i - 1] = msg[i]
-                if (msg[i] === undefined)
-                    msg[i] = 0
+                values[i - 1] = msg.answers[i]
+                if (msg.answers[i] === undefined)
+                    values[i - 1] = 0;
             }
+
+            console.log("number of answers: " + msg.count);
 
             this.setState({
                 data: {
