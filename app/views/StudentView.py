@@ -228,18 +228,26 @@ def submit_answer(current_user, question_id):
         message = 'answer created'
 
     # push updated results to professor using socketio
-    results_raw = AnswerModel.query.filter_by(question_id=answer.question_id).with_entities(AnswerModel.answer, func.count(AnswerModel.answer)).group_by(AnswerModel.answer).all()
-    print(str(results_raw))
-
-    results = {}
-    for one_answer in results_raw:
-        results[one_answer[0]] = one_answer[1]
-
+    results = _compute_question_statistics(answer.question_id)
     socketio.emit('new results', results, room=answer.question_id)
 
     # prepare response
     answer_data = answer_schema.dump(answer).data
     return custom_response({'message': message, 'id': answer_data['id'], 'question_id': answer_data['question_id']}, 200)
+
+def _compute_question_statistics(question_id):
+    results_raw = AnswerModel.query.filter_by(question_id=question_id).with_entities(AnswerModel.answer, func.count(AnswerModel.answer)).group_by(AnswerModel.answer).all()
+
+    answers = []
+    count = 0
+    for one_answer in results_raw:
+        answers.append({one_answer[0]: one_answer[1]})
+        count += one_answer[1]
+
+    results = {}
+    results['answers'] = answers
+    results['count'] = count
+    return results
 
 @student_api.route('/questions/<question_id>', methods=['DELETE'])
 @Auth.student_auth_required
