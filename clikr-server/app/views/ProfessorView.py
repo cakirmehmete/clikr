@@ -13,6 +13,7 @@ from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response
+from ..shared.SocketIOUtil import emit_question_statistics
 
 from flask_socketio import emit, join_room
 from .. import socketio
@@ -47,8 +48,10 @@ def on_join(question_id):
         emit('server message', 'permission denied')
         return
 
+    # join room and broadcast previous statistics
     join_room(question_id)
     emit('server message', 'you joined the room (question) ' + question_id)
+    emit_question_statistics(question_id)
 
 @professor_api.route('/data', methods=['GET'])
 @Auth.professor_auth_required
