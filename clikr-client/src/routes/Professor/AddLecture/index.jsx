@@ -34,7 +34,6 @@ class ProfessorAddLecture extends React.Component {
             toLecture: false,
             title: '',
             date: '',
-            description: '',
             courseId: courseId,
             errors: {title: ''},
             titleValid: true,
@@ -71,7 +70,7 @@ class ProfessorAddLecture extends React.Component {
     handleSubmit = () => {
         // Send course to API
         this.props.apiService.addLecture(
-            new LectureObj(this.state.title, this.state.description, this.state.date, null, this.state.courseId)
+            new LectureObj(this.state.title, this.state.date, null, this.state.courseId)
         )
 
         this.setState({ toLecture: true });
@@ -98,14 +97,6 @@ class ProfessorAddLecture extends React.Component {
                         onChange={this.handleChange('title')}
                         margin="normal"
                         helperText={this.state.errors["title"]}
-                    />
-                    <TextField
-                        id="standard-name"
-                        label="Lecture Description"
-                        className={this.styles.textField}
-                        value={this.state.description}
-                        onChange={this.handleChange('description')}
-                        margin="normal"
                     />
                     <TextField
                         id="standard-name"
