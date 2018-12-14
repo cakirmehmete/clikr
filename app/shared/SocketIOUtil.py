@@ -6,12 +6,15 @@ from .. import socketio
 # SocketIO shared functions
 def emit_question_statistics(question_id):
     """
-    computes answer statistics for the question and broadcasts them in the question room (i.e., to the professor)
+    broadcasts answer statistics for this question in the question room (i.e., to the professor)
     """
+    results = compute_question_statistics(question_id)
+    socketio.emit('new results', results, room=question_id)
 
-    print("in the util function")
-
-    # compute statistics
+def compute_question_statistics(question_id):
+    """
+    computes answer statistics for the question
+    """
     results_raw = AnswerModel.query.filter_by(question_id=question_id).with_entities(AnswerModel.answer, func.count(AnswerModel.answer)).group_by(AnswerModel.answer).all()
 
     answers = {}
@@ -23,5 +26,4 @@ def emit_question_statistics(question_id):
     results = {}
     results['answers'] = answers
     results['count'] = count
-
-    socketio.emit('new results', results, room=question_id)
+    return results

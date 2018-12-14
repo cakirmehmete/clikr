@@ -13,7 +13,7 @@ from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response
-from ..shared.SocketIOUtil import emit_question_statistics
+from ..shared.SocketIOUtil import emit_question_statistics, compute_question_statistics
 
 from flask_socketio import emit, join_room
 from .. import socketio
@@ -546,6 +546,48 @@ def get_answers(current_user, question_id):
     # retrieve answers and return
     answer_data = answer_schema.dump(question.answers, many=True).data
     return custom_response(answer_data, 200)
+
+@professor_api.route('/questions/<question_id>/statistics', methods=['GET'])
+@Auth.professor_auth_required
+def get_answer_statistics(current_user, question_id):
+    """
+    returns a summary of the answers to this question (count of answers per answer option and total count)
+    """
+    question = QuestionModel.get_question_by_uuid(question_id)
+    if not question:
+        return custom_response({'error': 'question does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = question.lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    results = compute_question_statistics(question_id)
+    return custom_response(results, 200)
+
+@professor_api.route('/lectures/<lecture_id>/statistics', methods=['GET'])
+@Auth.professor_auth_required
+def get_answer_statistics_for_lecture(current_user, lecture_id):
+    """
+    Returns the answer statistics for all questions in a lecture
+    """
+    # retrieve lecture and check if valid
+    lecture = LectureModel.get_lecture_by_uuid(lecture_id)
+    if not lecture:
+        return custom_response({'error': 'lecture does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    result = {}
+    questions = lecture.questions
+    for question in questions:
+        question_id = question.id
+        result[question_id] = compute_question_statistics(question_id)
+
+    return custom_response(result, 200)
 
 @professor_api.route('/questions/<question_id>', methods=['POST'])
 @Auth.professor_auth_required
