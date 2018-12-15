@@ -118,6 +118,20 @@ class FreeTextModel(QuestionModel):
 
         self.word_limit = data.get('word_limit')
 
+class SliderModel(QuestionModel):
+    lower_label = db.Column(db.String(32), nullable=True)
+    upper_label = db.Column(db.String(32), nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'slider'
+    }
+
+    def __init__(self, data):
+        super().__init__(data)
+
+        self.lower_label = data.get('lower_label')
+        self.upper_label = data.get('upper_label')
+
 class QuestionSchema(Schema):
     """
     Question Schema
@@ -145,3 +159,7 @@ class MultipleChoiceSchema(QuestionSchema):
 
 class FreeTextSchema(QuestionSchema):
     word_limit = CustomIntegerField()
+
+class SliderSchema(QuestionSchema):
+    lower_label = CustomStringField()
+    upper_label = CustomStringField()

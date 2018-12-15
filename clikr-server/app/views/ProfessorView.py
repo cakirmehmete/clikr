@@ -8,11 +8,12 @@ from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
-from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema
+from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema, SliderModel, SliderSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response
+from ..shared.MarshmallowUtil import dump_questions, dump_one_question, load_one_question
 
 from flask_socketio import emit, join_room
 from .. import socketio
@@ -68,7 +69,7 @@ def get_all_data(current_user):
             lecture_data = lecture_schema.dump(lecture).data
 
             questions = lecture.questions
-            questions_data = _dump_questions(questions)
+            questions_data = dump_questions(questions)
             lecture_data['questions'] = questions_data
 
             lectures_data.append(lecture_data)
@@ -479,7 +480,7 @@ def get_questions(current_user, lecture_id):
 
     # retrieve questions and return
     questions = lecture.questions
-    question_data = _dump_questions(questions)
+    question_data = dump_questions(questions)
     return custom_response(question_data, 200)
 
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['POST'])
@@ -505,7 +506,7 @@ def create_question(current_user, lecture_id):
 
     # try to load the appropriate schema and create new question
     try:
-        question = _load_one_question(req_data)
+        question = load_one_question(req_data)
     except Exception as e:
         return custom_response({'error': str(e)}, 400)
 
@@ -516,7 +517,7 @@ def create_question(current_user, lecture_id):
     db.session.commit()
 
     all_questions = lecture.questions
-    all_questions_data = _dump_questions(all_questions)
+    all_questions_data = dump_questions(all_questions)
     return custom_response({'message': 'question created', 'id': question.id, 'questions': all_questions_data}, 201)
 
 @professor_api.route('/questions/<question_id>', methods=['GET'])
@@ -533,7 +534,7 @@ def get_question_info(current_user, question_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     # dump using appropriate schema and return
-    question_data = _dump_one_question(question)
+    question_data = dump_one_question(question)
     return custom_response(question_data, 200)
 
 @professor_api.route('/questions/<question_id>', methods=['DELETE'])
@@ -652,7 +653,7 @@ def _open_question(question, course):
 
     # push question to students using socketIO
     response_data = {}
-    response_data['question'] = _dump_one_question(question, exclude=['correct_answer'])
+    response_data['question'] = dump_one_question(question, exclude=['correct_answer'])
     response_data['message'] = 'question opened'
     socketio.emit('question opened', response_data, room=course.id)
 
@@ -676,65 +677,12 @@ def _close_question(question, course):
 
     # push question data (incl. correct answer) to students
     response_data = {}
-    response_data['question'] = _dump_one_question(question)
+    response_data['question'] = dump_one_question(question)
     response_data['message'] = 'question closed'
 
     socketio.emit('question closed', response_data, room=course.id)
 
     return True
-
-def _dump_questions(questions, exclude=[]):
-    """
-    dumps a list of questions, using the appropriate schema for each question
-    """
-    questions_data = []
-
-    # process each question
-    for question in questions:
-        question_data = _dump_one_question(question, exclude)
-        questions_data.append(question_data)
-
-    return questions_data
-
-def _dump_one_question(question, exclude=[]):
-    """
-    checks the question type and uses the appropriate schema to dump the question
-    """
-    if question.question_type == 'multiple_choice':
-        question_data = MultipleChoiceSchema(exclude=exclude).dump(question).data
-    elif question.question_type == 'free_text':
-        question_data = FreeTextSchema(exclude=exclude).dump(question).data
-    else:
-        raise Exception('invalid question type')
-
-    return question_data
-
-def _load_one_question(input_data):
-    """
-    tries to create a question object of the appropriate question subclass
-    raises an exception if the question type is missing or invalid
-    """
-    # check if question_type is present
-    try:
-        question_type = input_data['question_type']
-    except:
-        raise Exception('question_type missing')
-
-    # load the appropriate schema and create object
-    if question_type == 'multiple_choice':
-        data, error = MultipleChoiceSchema().load(input_data)
-        if error:
-            raise Exception(error)
-        question = MultipleChoiceModel(data)
-    elif question_type == 'free_text':
-        data, error = FreeTextSchema().load(input_data)
-        if error:
-            raise Exception(error)
-        question = FreeTextModel(data)
-    else:
-        raise Exception('invalid question_type')
-
-    return question
 
 @professor_api.route('/login', methods=['GET', 'POST'])
 def login():
