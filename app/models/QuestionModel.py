@@ -132,6 +132,40 @@ class SliderModel(QuestionModel):
         self.lower_label = data.get('lower_label')
         self.upper_label = data.get('upper_label')
 
+class DragAndDropModel(QuestionModel):
+    # answer1 is the correct match for opttion1, etc.
+    question1 = db.Column(db.String(1024), nullable=True)
+    question2 = db.Column(db.String(1024), nullable=True)
+    question3 = db.Column(db.String(1024), nullable=True)
+    question4 = db.Column(db.String(1024), nullable=True)
+    question5 = db.Column(db.String(1024), nullable=True)
+    answer1 = db.Column(db.String(1024), nullable=True)
+    answer2 = db.Column(db.String(1024), nullable=True)
+    answer3 = db.Column(db.String(1024), nullable=True)
+    answer4 = db.Column(db.String(1024), nullable=True)
+    answer5 = db.Column(db.String(1024), nullable=True)
+    # TODO: how can I add a not null constraint below, but still allow other question types to be inserted into the DB?
+    number_of_questions = db.Column(db.Integer, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'drag_and_drop'
+    }
+
+    def __init__(self, data):
+        super().__init__(data)
+
+        self.question1 = data.get('question1')
+        self.question2 = data.get('question2')
+        self.question3 = data.get('question3')
+        self.question4 = data.get('question4')
+        self.question5 = data.get('question5')
+        self.answer1 = data.get('answer1')
+        self.answer2 = data.get('answer2')
+        self.answer3 = data.get('answer3')
+        self.answer4 = data.get('answer4')
+        self.answer5 = data.get('answer5')
+        self.number_of_questions = data.get('number_of_questions')
+
 class QuestionSchema(Schema):
     """
     Question Schema
@@ -163,3 +197,16 @@ class FreeTextSchema(QuestionSchema):
 class SliderSchema(QuestionSchema):
     lower_label = CustomStringField()
     upper_label = CustomStringField()
+
+class DragAndDropSchema(QuestionSchema):
+    question1 = CustomStringField()
+    question2 = CustomStringField()
+    question3 = CustomStringField()
+    question4 = CustomStringField()
+    question5 = CustomStringField()
+    answer1 = CustomStringField()
+    answer2 = CustomStringField()
+    answer3 = CustomStringField()
+    answer4 = CustomStringField()
+    answer5 = CustomStringField()
+    number_of_questions = CustomIntegerField(required=True)
