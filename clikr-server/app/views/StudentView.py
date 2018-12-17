@@ -11,6 +11,7 @@ from .. import db, cas
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response
 from ..shared.SocketIOUtil import emit_question_statistics
+from ..shared.MarshmallowUtil import dump_one_question
 
 from sqlalchemy import func
 
@@ -20,8 +21,6 @@ from .. import socketio
 student_api = Blueprint('students', __name__)
 student_schema = StudentSchema()
 course_schema = CourseSchema()
-multiple_choice_schema = MultipleChoiceSchema(exclude=['correct_answer'])
-free_text_schema = FreeTextSchema(exclude=['correct_answer'])
 answer_schema = AnswerSchema()
 
 @socketio.on('subscribe student')
@@ -55,7 +54,7 @@ def on_join(course_id):
     for question in open_questions:
         if question.lecture.course_id == course_id:
             # use the appropriate question schema
-            question_data = _dump_one_question(question)
+            question_data = dump_one_question(question, exclude=['correct_answer'])
             questions_data.append(question_data)
 
     emit('all open questions', {'questions': questions_data, 'message': 'you joined the room (course) ' + course_id})
@@ -152,7 +151,7 @@ def get_open_questions(current_user, course_id):
     for question in open_questions:
         if question.lecture.course_id == course_id:
             # use the appropriate question schema
-            question_data = _dump_one_question(question)
+            question_data = dump_one_question(question, exclude=['correct_answer'])
             questions_data.append(question_data)
 
     return custom_response(questions_data, 200)
@@ -260,19 +259,6 @@ def delete_answer(current_user, question_id):
     db.session.commit()
 
     return custom_response({'message': 'answer deleted'}, 200)
-
-def _dump_one_question(question):
-    """
-    checks the question type and uses the appropriate schema to dump the question
-    """
-    if question.question_type == 'multiple_choice':
-        question_data = multiple_choice_schema.dump(question).data
-    elif question.question_type == 'free_text':
-        question_data = free_text_schema.dump(question).data   
-    else:
-        raise Exception('invalid question type')
-
-    return question_data 
 
 @student_api.route('/login', methods=['GET', 'POST'])
 def login():
