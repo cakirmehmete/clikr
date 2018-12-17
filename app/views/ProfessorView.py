@@ -8,12 +8,13 @@ from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
-from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema
+from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema, SliderModel, SliderSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response
 from ..shared.SocketIOUtil import emit_question_statistics, compute_question_statistics
+from ..shared.MarshmallowUtil import dump_questions, dump_one_question, load_one_question
 
 from flask_socketio import emit, join_room
 from .. import socketio
@@ -23,9 +24,6 @@ professor_schema = ProfessorSchema()
 student_schema = StudentSchema()
 course_schema = CourseSchema()
 lecture_schema = LectureSchema()
-multiple_choice_schema = MultipleChoiceSchema()
-free_text_schema = FreeTextSchema()
-answer_schema = AnswerSchema()
 
 @socketio.on('subscribe professor')
 def on_join(question_id):
@@ -74,7 +72,7 @@ def get_all_data(current_user):
             lecture_data = lecture_schema.dump(lecture).data
 
             questions = lecture.questions
-            questions_data = _dump_questions(questions)
+            questions_data = dump_questions(questions)
             lecture_data['questions'] = questions_data
 
             lectures_data.append(lecture_data)
@@ -396,6 +394,39 @@ def get_lecture_info(current_user, lecture_id):
     lecture_data['num_questions'] = len(lecture.questions)
     return custom_response(lecture_data, 200)
 
+@professor_api.route('/lectures/<lecture_id>', methods=['POST'])
+@Auth.professor_auth_required
+def handle_question_action_for_lecture(current_user, lecture_id):
+    # retrieve lecture and check if valid
+    lecture = LectureModel.get_lecture_by_uuid(lecture_id)
+    if not lecture:
+        return custom_response({'error': 'lecture_id does not exist'}, 400)
+
+    # retrieve course and check permissions
+    course = lecture.course
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # get data from request body
+    req_data = request.get_json()
+
+    # open or close all questions
+    questions = lecture.questions 
+    try:
+        action = req_data['action']
+    except:
+        return custom_response({'error': 'action required'}, 400)
+    if action == 'open':
+        for question in questions:
+            _open_question(question, course)
+        return custom_response({'message': 'all questions opened'}, 200)
+    elif action == 'close':
+        for question in questions:
+            _close_question(question, course)
+        return custom_response({'message': 'all questions closed'}, 200)
+    else:
+        return custom_response({'error': 'invalid action'}, 400)
+
 @professor_api.route('/lectures/<lecture_id>', methods=['PATCH'])
 @Auth.professor_auth_required
 def update_lecture(current_user, lecture_id):
@@ -452,7 +483,7 @@ def get_questions(current_user, lecture_id):
 
     # retrieve questions and return
     questions = lecture.questions
-    question_data = _dump_questions(questions)
+    question_data = dump_questions(questions)
     return custom_response(question_data, 200)
 
 @professor_api.route('/lectures/<lecture_id>/questions', methods=['POST'])
@@ -478,7 +509,7 @@ def create_question(current_user, lecture_id):
 
     # try to load the appropriate schema and create new question
     try:
-        question = _load_one_question(req_data)
+        question = load_one_question(req_data)
     except Exception as e:
         return custom_response({'error': str(e)}, 400)
 
@@ -489,7 +520,7 @@ def create_question(current_user, lecture_id):
     db.session.commit()
 
     all_questions = lecture.questions
-    all_questions_data = _dump_questions(all_questions)
+    all_questions_data = dump_questions(all_questions)
     return custom_response({'message': 'question created', 'id': question.id, 'questions': all_questions_data}, 201)
 
 @professor_api.route('/questions/<question_id>', methods=['GET'])
@@ -506,7 +537,7 @@ def get_question_info(current_user, question_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     # dump using appropriate schema and return
-    question_data = _dump_one_question(question)
+    question_data = dump_one_question(question)
     return custom_response(question_data, 200)
 
 @professor_api.route('/questions/<question_id>', methods=['DELETE'])
@@ -544,7 +575,7 @@ def get_answers(current_user, question_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     # retrieve answers and return
-    answer_data = answer_schema.dump(question.answers, many=True).data
+    answer_data = AnswerSchema().dump(question.answers, many=True).data
     return custom_response(answer_data, 200)
 
 @professor_api.route('/questions/<question_id>/statistics', methods=['GET'])
@@ -613,10 +644,19 @@ def handle_question_action(current_user, question_id):
         action = req_data['action']
     except:
         return custom_response({'error': 'action required'}, 400)
+
     if action == 'open':
-        return _open_question(current_user, question, course)
+        success = _open_question(question, course)
+        if success:
+            return custom_response({'message': 'question opened'}, 200)
+        else:
+            return custom_response({'message': 'question is already open'}, 400)
     elif action == 'close':
-        return _close_question(current_user, question, course)
+        success = _close_question(question, course)
+        if success:
+            return custom_response({'message': 'question closed'}, 200)
+        else:
+            return custom_response({'message': 'question is not open'}, 400)
     else:
         return custom_response({'error': 'invalid action'}, 400)
 
@@ -639,10 +679,14 @@ def update_question(current_user, question_id):
 
     return custom_response({'message': 'question updated'}, 200)
 
-def _open_question(current_user, question, course):
+def _open_question(question, course):
+    """
+    opens the question and broadcasts it via SocketIO
+    returns true if the question was successfully opened, false if it was already open
+    """
     # check if question is opened already
     if question.is_open:
-        return custom_response({'error': 'question is open already'}, 400)
+        return False
 
     # open the question (note that that questions can be opened and closed multiple times)
     updated_data = {
@@ -653,22 +697,21 @@ def _open_question(current_user, question, course):
     question.update(updated_data)
 
     # push question to students using socketIO
-    if question.question_type == 'multiple_choice':
-        detailed_schema = MultipleChoiceSchema(exclude=['correct_answer'])  # TODO: maybe separate schemas to send questions to students vs. to profs?
-    elif question.question_type == 'free_text':
-        detailed_schema = FreeTextSchema(exclude=['correct_answer'])
-
     response_data = {}
-    response_data['question'] = detailed_schema.dump(question).data
+    response_data['question'] = dump_one_question(question, exclude=['correct_answer'])
     response_data['message'] = 'question opened'
     socketio.emit('question opened', response_data, room=course.id)
 
-    return custom_response({'message': 'question opened'}, 200)
+    return True
 
-def _close_question(current_user, question, course):
+def _close_question(question, course):
+    """
+    closes the question and broadcasts it (incl. correct answer) via SocketIO
+    returns true if the question was successfully closed, false if it was already closed
+    """
     # check if question is open
     if not question.is_open:
-        return custom_response({'error': 'question is not open'}, 400)
+        return False
 
     # close the question
     updated_data = {
@@ -679,65 +722,12 @@ def _close_question(current_user, question, course):
 
     # push question data (incl. correct answer) to students
     response_data = {}
-    response_data['question'] = _dump_one_question(question)
+    response_data['question'] = dump_one_question(question)
     response_data['message'] = 'question closed'
 
     socketio.emit('question closed', response_data, room=course.id)
 
-    return custom_response({'message': 'question closed'}, 200)
-
-def _dump_questions(questions):
-    """
-    dumps a list of questions, using the appropriate schema for each question
-    """
-    questions_data = []
-
-    # process each question
-    for question in questions:
-        question_data = _dump_one_question(question)
-        questions_data.append(question_data)
-
-    return questions_data
-
-def _dump_one_question(question):
-    """
-    checks the question type and uses the appropriate schema to dump the question
-    """
-    if question.question_type == 'multiple_choice':
-        question_data = multiple_choice_schema.dump(question).data
-    elif question.question_type == 'free_text':
-        question_data = free_text_schema.dump(question).data
-    else:
-        raise Exception('invalid question type')
-
-    return question_data
-
-def _load_one_question(input_data):
-    """
-    tries to create a question object of the appropriate question subclass
-    raises an exception if the question type is missing or invalid
-    """
-    # check if question_type is present
-    try:
-        question_type = input_data['question_type']
-    except:
-        raise Exception('question_type missing')
-
-    # load the appropriate schema and create object
-    if question_type == 'multiple_choice':
-        data, error = multiple_choice_schema.load(input_data)
-        if error:
-            raise Exception(error)
-        question = MultipleChoiceModel(data)
-    elif question_type == 'free_text':
-        data, error = free_text_schema.load(input_data)
-        if error:
-            raise Exception(error)
-        question = FreeTextModel(data)
-    else:
-        raise Exception('invalid question_type')
-
-    return question
+    return True
 
 @professor_api.route('/login', methods=['GET', 'POST'])
 def login():
