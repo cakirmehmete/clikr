@@ -45,7 +45,6 @@ export function postNewCourseAPI(course) {
 export function postNewLectureAPI(lecture) {
     return axios.post(baseURL + 'professor/courses/' + lecture.course_id + '/lectures', {
         title: lecture.title,
-        description: lecture.description,
         date: lecture.date,
     });
 }
