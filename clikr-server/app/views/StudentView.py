@@ -10,6 +10,7 @@ from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db, cas
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response
+from ..shared.SocketIOUtil import emit_question_statistics
 from ..shared.MarshmallowUtil import dump_one_question
 
 from sqlalchemy import func
@@ -226,14 +227,7 @@ def submit_answer(current_user, question_id):
         message = 'answer created'
 
     # push updated results to professor using socketio
-    results_raw = AnswerModel.query.filter_by(question_id=answer.question_id).with_entities(AnswerModel.answer, func.count(AnswerModel.answer)).group_by(AnswerModel.answer).all()
-    print(str(results_raw))
-
-    results = {}
-    for one_answer in results_raw:
-        results[one_answer[0]] = one_answer[1]
-
-    socketio.emit('new results', results, room=answer.question_id)
+    emit_question_statistics(question_id)
 
     # prepare response
     answer_data = answer_schema.dump(answer).data
