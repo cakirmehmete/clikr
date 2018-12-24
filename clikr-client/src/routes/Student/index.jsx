@@ -7,6 +7,9 @@ import StudentHome from './StudentHome';
 import StudentEnroll from './StudentEnrollment';
 import QuestionPage from './StudentQuestionPage';
 import CheckQuestions from './CheckQuestions';
+import Home from '../Home';
+import Login from '../Login';
+
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -39,6 +42,8 @@ class StudentRoutes extends React.Component {
             <div>
                 <Router>
                     <Switch>
+                        <Route exact path='/' component={Home} />
+                        <Route exact path='/login-student' component={Login} />
                         <Route exact path='/student' component={StudentHome} />
                         <Route exact path='/student/enroll' component={StudentEnroll} />
                         <Route path='/student/checkquestions' component={CheckQuestions} />
