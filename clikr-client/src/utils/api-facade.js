@@ -68,14 +68,25 @@ export function getLogoutProfAPI() {
 }
 
 // course: CourseObj
-export function patchUpdateCourseAPI(course) {
-    return axios.patch(baseURL + 'professor/courses/' + course.id, {
-        title: course.title
+export function patchUpdateCourseAPI(course_id, course_title) {
+    return axios.patch(baseURL + 'professor/courses/' + course_id, {
+        title: course_title
+    });
+}
+// course: CourseObj
+export function patchUpdateLectureAPI(lecture_id, lecture_title) {
+    return axios.patch(baseURL + 'professor/lectures/' + lecture_id, {
+        title: lecture_title,
     });
 }
 // delete the course 
 export function deleteCourseAPI(course_id) {
     return axios.delete(baseURL + 'professor/courses/' + course_id);
+}
+
+// delete all lectures in array by id
+export function deleteLecturesAPI(lecture_id) {
+    return axios.delete(baseURL + 'professor/lectures/' + lecture_id);
 }
 // drop = delete for studnet
 export function deleteDropCourseAPI(course_id) {
