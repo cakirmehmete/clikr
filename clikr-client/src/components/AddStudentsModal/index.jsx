@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import Icon from '@material-ui/core/Icon';
 import Tooltip from '@material-ui/core/Tooltip';
 
@@ -41,13 +41,10 @@ const styles = theme => ({
     },
     menu: {
         width: 200,
-    },
-    icon: {
-        margin: theme.spacing.unit
     }
 });
 
-@inject('profStore')
+
 @observer
 class AddStudentsModal extends React.Component {
     state = {
@@ -61,9 +58,9 @@ class AddStudentsModal extends React.Component {
         this.profStore = props.profStore
     }
     componentDidMount() {
-        const joincode = this.profStore.getCourseWithId(this.props.id).enroll_code
+        
         this.setState({
-            code: joincode
+            code: this.joinCode
         })
     }
 
@@ -87,7 +84,7 @@ class AddStudentsModal extends React.Component {
             <Grid item>
                 <Tooltip title="add students" placement="top-start">
                     <Button variant="text" size="small" onClick={this.handleOpen}>
-                        <Icon className={classes.icon} color="secondary">person_add</Icon>
+                        <Icon color="secondary">person_add</Icon>
                     </Button>
                 </Tooltip>
                 <Modal
