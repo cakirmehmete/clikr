@@ -4,6 +4,8 @@ export default class ProfessorStore {
     @observable
     courses = [];
 
+
+
     getCourseWithId(course_id) {
         return this.courses.find(x => x.id === course_id)
     }
@@ -11,6 +13,11 @@ export default class ProfessorStore {
     getLectureWithId(lecture_id) {
         const lectures = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
         return lectures.find(lecture => lecture.id === lecture_id)
+    }
+
+    @action
+    getCourseLectures(course_id) {
+        return this.courses.find(x => x.id === course_id).lectures;
     }
 
     getQuestionWithId(lecture, question_id) {
@@ -40,6 +47,7 @@ export default class ProfessorStore {
         oldCourse.title = course.title
     }
 
+
     @action
     deleteCourse(course_id) {
         this.courses.remove(this.courses.find(x=> x.id === course_id));
@@ -55,8 +63,9 @@ export default class ProfessorStore {
     }
 
     @action
-    removeLecture(lecture_id) {
-        this.lectures.remove(this.course.find(x => x.id === lecture_id));
+    removeLecture(lecture_id, course_id) {
+        const lectures = this.courses.find(x => x.id === course_id).lectures;
+        lectures.remove(lectures.find(x => x.id === lecture_id));
     }
 
     @action
