@@ -7,6 +7,8 @@ import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import PropTypes from 'prop-types';
+import Icon from '@material-ui/core/Icon';
+import Grid from '@material-ui/core/Grid';
 
 function getModalStyle() {
     const top = 50;
@@ -55,6 +57,7 @@ class AddQuestionModal extends React.Component {
         open: false,
         toNewMCQuestion: false,
         toNewFreeTextQuestion: false,
+        toNewSliderQuestion: false,
         lectureId: null
     };
 
@@ -76,6 +79,10 @@ class AddQuestionModal extends React.Component {
         this.setState({ open: false, toNewFreeTextQuestion: true});
     }
 
+    handleSlider = () => {
+        this.setState({ open: false, toNewSliderQuestion: true })
+    }
+
     render() {
         const { classes } = this.props;
         if (this.state.toNewMCQuestion === true) {
@@ -83,6 +90,9 @@ class AddQuestionModal extends React.Component {
             return <Redirect to={'/professor/' + this.props.lectureId + '/questions/new-mc'} push />
         } else if (this.state.toNewFreeTextQuestion === true) {
             return <Redirect to={'/professor/' + this.props.lectureId + '/questions/new-free-text'} push />
+        }
+        else  if (this.state.toNewFreeTextQuestion === true) {
+            return <Redirect to={'/professor/' + this.props.lectureId + '/questions/new-slider'} push />
         }
 
         return (
@@ -95,22 +105,38 @@ class AddQuestionModal extends React.Component {
                     onClose={this.handleClose}
                 >
                     <div style={getModalStyle()} className={classes.paper}>
-                        <IconButton className={classes.button} aria-label="Delete" onClick={this.handleMC}>
-                            <div className={classes.vert}>
-                                <List color="primary" fontSize="large" />
-                                <Typography>
-                                    Multiple Choice
-                                </Typography>
-                            </div>
-                        </IconButton>
-                        <IconButton className={classes.button} aria-label="Delete" onClick={this.handleFreeText}>
-                            <div className={classes.vert}>
-                                <ChatBubbleOutline color="primary" fontSize="large" />
-                                <Typography>
-                                    Free Text
-                                </Typography>
-                            </div>
-                        </IconButton>
+                        <Grid container direction="row" justify="space-evenly" alignItems="center">
+                            <Grid item>
+                                <IconButton className={classes.button} aria-label="multiple choice" onClick={this.handleMC}>
+                                    <div className={classes.vert}>
+                                        <List color="primary" fontSize="large" />
+                                        <Typography>
+                                            Multiple Choice
+                                        </Typography>
+                                    </div>
+                                </IconButton>
+                            </Grid>
+                            <Grid item>
+                                <IconButton className={classes.button} aria-label="free text" onClick={this.handleFreeText}>
+                                    <div className={classes.vert}>
+                                        <ChatBubbleOutline color="primary" fontSize="large" />
+                                        <Typography>
+                                            Free Text
+                                        </Typography>
+                                    </div>
+                                </IconButton>
+                            </Grid>
+                            <Grid item>
+                                <IconButton className={classes.button} aria-label="slider" onClick={this.handleSlider}>
+                                    <div className={classes.vert}>
+                                        <Icon color="primary" fontSize="large">linear_scale</Icon>
+                                        <Typography>
+                                            Slider
+                                        </Typography>
+                                    </div>
+                                </IconButton>
+                            </Grid>
+                        </Grid>
                     </div>
                 </Modal>
             </div>
