@@ -74,14 +74,12 @@ class QuestionPage extends Component {
 
         socket.on('all open questions', (data) => {
             console.log(data.questions);
-            console.log(data.prev_questions);
             var num_questions = data.questions.length;
             this.store.updateAllQuestions(data.questions);
             this.setState({
                 // has_question: true,
                 number_of_open_questions: num_questions,
             });
-            this.store.updateAllPrevQuestions(data.prev_questions);
         })
 
         socket.on('server message', (msg) => {
@@ -90,7 +88,10 @@ class QuestionPage extends Component {
     }
 
     handleClick = () => {
+        const { course_id } = this.props.location.state;
+
         if (this.state.button_text === "Show Previous Questions") {
+            this.apiStudentService.loadAllPrevQuestions(course_id);
             this.setState({
                 show_previous_questions: true,
                 button_text: "Hide Previous Questions",
@@ -137,32 +138,34 @@ class QuestionPage extends Component {
 
                 </Grid>
                 <Grid className={this.styles.gridContainer}>
-                    <Button onClick={this.handleClick} disabled={this.store.prevQuestions.length === 0} variant="outlined" color="secondary">
+                    <Button onClick={this.handleClick} variant="outlined" color="secondary">
                         {this.state.button_text}
                     </Button>
                 </Grid>
                 <Grid className={this.styles.gridContainer}>
                     {this.state.show_previous_questions ? (
-                        this.store.prevQuestions.map(q => {
-                            if (q.question_type === 'free_text') {
-                                return (
-                                    <Grid item className={this.styles.gridItem} key={q.id}>
-                                        <PrevFRQ questionId={q.id} />
-                                    </Grid>
-
-                                )
-                            }
-                            else {
-                                // TODO: handle slider and drag-and-drop questions!
-                                return (
-                                    <Grid item className={this.styles.gridItem} key={q.id}>
-                                        <PrevMCQ questionId={q.id}/>
-                                    </Grid>
-                                )
-                            }
-
-                        })) : 
-                    null}
+                        this.store.prevQuestions.length > 0 ? (
+                            this.store.prevQuestions.map(q => {
+                                if (q.question_type === 'free_text') {
+                                    return (
+                                        <Grid item className={this.styles.gridItem} key={q.id}>
+                                            <PrevFRQ questionId={q.id} />
+                                        </Grid>
+    
+                                    )
+                                }
+                                else {
+                                    // TODO: handle slider and drag-and-drop questions!
+                                    return (
+                                        <Grid item className={this.styles.gridItem} key={q.id}>
+                                            <PrevMCQ questionId={q.id}/>
+                                        </Grid>
+                                    )
+                                }
+    
+                            })) : 
+                            <Typography>There are no previous questions</Typography>
+                        ) : null}
 
                 </Grid>
 

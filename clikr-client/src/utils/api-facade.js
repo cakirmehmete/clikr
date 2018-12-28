@@ -18,8 +18,13 @@ export function hasStudentQuestions(course_id) {
 export function getProfCoursesAPI() {
     return axios.get(baseURL + 'professor/courses');
 }
+
 export function getStudentQuestionsByCourseAPI(course_id) {
     return axios.get(baseURL + 'student/courses/' + course_id + '/questions');
+}
+
+export function getStudentPrevQuestionsByCourseAPI(course_id) {
+    return axios.get(baseURL + 'student/courses/' + course_id + '/prevquestions');
 }
 
 export function postOpenQuestionAPI(question_id) {
