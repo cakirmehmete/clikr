@@ -1,54 +1,88 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
-import List from '@material-ui/core/List';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import CourseObj from '../../models/LectureObj';
+import ListOfAllLectures from '../ListOfAllLectures';
+import Icon from '@material-ui/core/Icon';
+import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
+import DeleteLecturesList from '../DeleteLecturesList';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 const styles = theme => ({
     card: {
         minWidth: 275,
     },
+    icon: {
+        margin: theme.spacing.unit,
+    },
+    title: {
+        margin: theme.spacing.unit,
+    }
+
 });
 
-@inject('profStore')
-@inject('apiService')
+
 @observer
 class AllLecturesFrame extends React.Component {
     state = {
         toNewLecture: false,
         referrerLectureIndex: -1,
-        parentCourse: new CourseObj()
+        parentCourse: new CourseObj(),
+        numLects: undefined,
+        deletions: [],
+        deleteMode: false,
+        heading: "Here are your lectures",
+        delTitles: [], // only holds titles
+        delIds: [],
+        open: false
+    }
+    constructor(props) {
+        super(props)
+        this.styles = props.classes
+        this.profStore = props.profStore
+        this.apiProfService = props.apiProfService
+        this.courseId = props.courseId
     }
 
     componentDidMount() {
-        this.props.apiService.loadData().then(() => {
+        this.apiProfService.loadData().then(() => {
             this.setState({
-                parentCourse: this.props.profStore.getCourseWithId(this.props.courseId)
+                parentCourse: this.profStore.getCourseWithId(this.courseId)
             })
         })
     }
 
     componentDidUpdate() {
         if (this.state.parentCourse.id !== this.props.courseId) {
-            this.props.apiService.loadData().then(() => {
+            this.apiProfService.loadData().then(() => {
                 this.setState({
-                    parentCourse: this.props.profStore.getCourseWithId(this.props.courseId)
+                    parentCourse: this.profStore.getCourseWithId(this.courseId)
                 })
             })
         }
     }
 
+    // gets lectures to be deleted from child component
+    getDeletions = (delLectures) => {
+        this.setState({
+            deletions: delLectures
+        })
+    }
     handleNewLectureClick = () => {
         this.setState(() => ({
-            toNewLecture: true
+            toNewLecture: true,
+            numLects: this.profStore.getCourseLectures(this.courseId).length + 1
         }))
     }
 
@@ -58,38 +92,129 @@ class AllLecturesFrame extends React.Component {
         }))
     }
 
+    handleDelete = () => {
+        if (!this.state.deleteMode) {
+            this.setState({
+                deleteMode: true,
+                heading: "Select courses to delete"
+            })
+        }
+        else {
+            const lectArr = [];
+            const delTitles = []
+            for (let i = 0; i < this.state.deletions.length; i++) {
+                if (this.state.deletions[i].checked) {
+                    lectArr.push(this.state.deletions[i].id);
+                    delTitles.push(this.state.deletions[i].title);
+                }
+            }
+            if (lectArr.length > 0) {
+                this.setState({
+                    delTitles: delTitles,
+                    delIds: lectArr,
+                    open: true
+                })
+            }
+            else {
+                this.handleClose()
+            }
+        }
+        
+    }
+    handleClose = () => {
+        this.setState({ 
+            deleteMode: false,
+            heading: "Here are your lectures",
+            open: false,
+            delIds: [],
+            delTitles: [],
+            deletions: [],
+        });
+    };
+
+    handleFinalDeletion = () => {
+        this.apiProfService.deleteLectures(this.state.delIds, this.state.parentCourse.id);
+        this.handleClose()
+    };
+
     render() {
         // Handle routes
         if (this.state.toNewLecture === true) {
-            return <Redirect to={'/professor/' + this.state.parentCourse.id + '/new'} push />
+            return <Redirect to={{
+                pathname: '/professor/' + this.courseId + '/new',
+                state: { numLects: this.state.numLects }
+            }} />
         } else if (this.state.referrerLectureIndex !== -1) {
             return <Redirect to={'/professor/' + this.state.referrerLectureIndex + '/questions'} push />
         }
 
+        let list = <ListOfAllLectures courseId={this.state.parentCourse.id} profStore={this.profStore} apiProfService={this.apiProfService}/>
+        let deleteAction="delete"
+        
+        if (this.state.deleteMode) {
+            list = <DeleteLecturesList courseId={this.state.parentCourse.id} profStore={this.profStore} getDeletions={this.getDeletions} />
+            deleteAction="done"
+        }
+        
         return (
             <div>
+                
                 <Typography variant="subtitle1" color="textPrimary">
-                    Here are your lectures:
+                    {this.state.heading}: 
                 </Typography>
+             
                 <Card className={this.props.classes.card}>
                     <CardContent>
-                        <Typography variant="h6" color="inherit">
-                            Lectures for {this.state.parentCourse.title}
-                        </Typography>
-                        {this.state.parentCourse.lectures === undefined ? '' : (
-                            <List component="nav">
-                                {this.state.parentCourse.lectures.map((lectureObj, index) => {
-                                    return (
-                                        <ListItem divider button key={index} onClick={() => this.handleLectureClick(lectureObj.id)} >
-                                            <ListItemText primary={lectureObj.title + " Lecture on " + lectureObj.date} />
-                                        </ListItem>
-                                    )
-                                })}
-                            </List>
-                        )}
-                        <Button onClick={this.handleNewLectureClick} variant="outlined" color="primary">Add Lecture</Button>
+                        <Grid container direction='row' justify='space-between' alignItems='stretch'>
+                            <Grid item>
+                                <Typography className={this.styles.title} variant="h6" color="inherit">Lectures for {this.state.parentCourse.title} </Typography>
+                            </Grid>
+                            <Grid item>
+                                <Grid container direction="row" justify="flex-end">
+                                    <Grid item>
+                                        <Tooltip title={deleteAction} placement="top-start">
+                                            <Button variant="text" size="small" onClick={this.handleDelete.bind(this)}>
+                                                <Icon className={this.styles.icon} color="secondary">{deleteAction}</Icon>
+                                            </Button>
+                                        </Tooltip>
+                                    </Grid>
+                                    <Grid item>
+                                        <Button onClick={this.handleNewLectureClick} color="primary">
+                                            <Icon className={this.styles.icon} color="primary">add_circle</Icon>
+                                            Add Lectures
+                                        </Button>
+                                    </Grid>    
+                                </Grid>  
+                            </Grid>
+                        </Grid> 
+                        {list}
                     </CardContent>
                 </Card>
+                <Dialog
+                    open={this.state.open}
+                    onClose={this.handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the folowing lecture(s): "}</DialogTitle>
+                    <DialogContent>
+                        {this.state.delTitles.map((title, index) =>
+                            <DialogContentText key={index} id="alert-dialog-description">
+                                {title}
+                            </DialogContentText>
+                                        
+                        )}
+    
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.handleFinalDeletion} color="secondary">
+                            yes
+                        </Button>
+                        <Button onClick={this.handleClose} autoFocus color="secondary">
+                            no
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </div>
         );
     }

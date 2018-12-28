@@ -3,14 +3,8 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
 import List from '@material-ui/core/List';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { observer } from 'mobx-react';
-import AddStudentsModalWrapped from '../AddStudentsModal';
-import DeleteCourseDialog from '../DeleteCourseDialog';
-import Grid from '@material-ui/core/Grid';
-import EditCourseDialog from '../EditCourseDialog'
+import CourseListItemNavEdit from '../CourseListItemNavEdit';
 
 const styles = theme => ({
     card: {
@@ -19,7 +13,7 @@ const styles = theme => ({
 });
 
 @observer
-class ListOfAllCoures extends React.Component {
+class ListOfAllCourses extends React.Component {
     state = {
         referrerCourseId: null,
     }
@@ -28,6 +22,7 @@ class ListOfAllCoures extends React.Component {
         super(props)
         this.styles = props.classes
         this.profStore = props.profStore
+        this.apiProfService = props.apiProfService
     }
    
     handleCourseClick = id => () => {
@@ -45,16 +40,7 @@ class ListOfAllCoures extends React.Component {
             <List component="nav">
                 {this.profStore.courses.map((courseObj, index) => {
                     return (
-                        <ListItem divider button key={index} onClick={this.handleCourseClick(courseObj.id)} >
-                                <ListItemText primary={courseObj.title} />
-                                    <ListItemSecondaryAction>
-                                        <Grid container direction="row" justify="flex-end">
-                                            <EditCourseDialog course={courseObj}/>
-                                            <DeleteCourseDialog course={courseObj}/>
-                                            <AddStudentsModalWrapped joinCode={courseObj.enroll_code} id={courseObj.id}/>
-                                        </Grid>
-                                    </ListItemSecondaryAction>
-                        </ListItem>
+                        <CourseListItemNavEdit key={index} profStore={this.profStore} apiProfService={this.apiProfService} courseId={courseObj.id} courseTitle={courseObj.title} joinCode={courseObj.enroll_code} />
                     )
                 })}
             </List>
@@ -62,4 +48,4 @@ class ListOfAllCoures extends React.Component {
     }
 }
 
-export default withStyles(styles)(ListOfAllCoures);
+export default withStyles(styles)(ListOfAllCourses);
