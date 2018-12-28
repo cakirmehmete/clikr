@@ -43,7 +43,7 @@ class ProfessorRoutes extends React.Component {
             <Router>
                 <div>
                     <Route exact path='/' component={Home} />
-                    <Route exact path='/login-prof' component={Login} />
+                    <Route exact path='/login-(prof|student)' component={Login} />
                     <Route path='/professor' component={TopMenuBar} />
                     <Route path='/professor' component={SideMenuBar} />
                     <main className={this.styles.content}>

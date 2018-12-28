@@ -12,18 +12,27 @@ import logostudent from '../../assets/clikrlogo.png';
 const styles = theme => ({
   profPaper: {
     backgroundColor: theme.palette.secondary.main,
+    maxWidth: 500,
+  },
+  clickGrid: {
+    maxWidth: 500,
   },
   profTypography: {
     color: theme.palette.primary.main,
-    padding: theme.spacing.unit*2
+    padding: theme.spacing.unit*2,
   },
   studentPaper: {
     backgroundColor: theme.palette.primary.main,
+    maxWidth:500,
+    minWidth: 400,
   },
   studentTypography: {
     color: theme.palette.secondary.main,
-    padding: theme.spacing.unit*2
-  }
+    padding: theme.spacing.unit*2,
+  },
+  root: {
+    flexGrow: 1
+  },
 });
 
 
@@ -59,40 +68,42 @@ class Home extends Component {
       return <Redirect to={'/login-student'} push />
     }
     return (
-      <Grid container direction="row" spacing={24}>
-        <Grid item xs>
-          <Button onClick={this.handleLoginProf}>
-            <Paper elevation={3} className={this.styles.profPaper}>
-              <Grid container direction="column">
-                <Grid item>
-                  <img src={logoprof} alt="logo" width="25%"></img>
+      <div className={this.styles.root}>
+        <Grid container spacing={24} justify="center">
+          <Grid item className={this.styles.clickGrid}>
+            <Button onClick={this.handleLoginProf}>
+              <Paper elevation={3} className={this.styles.profPaper}>
+                <Grid item container direction="column" spacing={12} >
+                  <Grid item xs={12}>
+                    <img src={logoprof} alt="logo" width={100}></img>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="h2" gutterBottom className={this.styles.profTypography}>
+                      Instructor Login
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <Typography component="h2" variant="h1" gutterBottom className={this.styles.profTypography}>
-                    Instructor Login
-                  </Typography>
+              </Paper>
+            </Button>
+          </Grid>
+          <Grid item className={this.styles.clickGrid}>
+            <Button onClick={this.handleLoginStudent}>
+              <Paper elevation={3} className={this.styles.studentPaper}>
+                <Grid item container direction="column" spacing={12} >
+                  <Grid item xs={12}>
+                    <img src={logostudent} alt="logo" width={100}></img>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="h2" gutterBottom className={this.styles.studentTypography}>
+                      Student Login
+                    </Typography>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Paper>
-          </Button>
+              </Paper>
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item xs>
-        <Button onClick={this.handleLoginStudent}>
-            <Paper elevation={3} className={this.styles.studentPaper}>
-              <Grid container direction="column">
-                <Grid item>
-                  <img src={logostudent} alt="logo" width="25%"></img>
-                </Grid>
-                <Grid item>
-                  <Typography component="h2" variant="h1" gutterBottom className={this.styles.studentTypography}>
-                    Student Login
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Button>
-        </Grid>
-      </Grid>
+      </div>
     );
   }
 }

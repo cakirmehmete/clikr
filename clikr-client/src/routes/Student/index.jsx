@@ -43,7 +43,7 @@ class StudentRoutes extends React.Component {
                 <Router>
                     <Switch>
                         <Route exact path='/' component={Home} />
-                        <Route exact path='/login-student' component={Login} />
+                        <Route exact path='/login-(prof|student)' component={Login} />
                         <Route exact path='/student' component={StudentHome} />
                         <Route exact path='/student/enroll' component={StudentEnroll} />
                         <Route path='/student/checkquestions' component={CheckQuestions} />
