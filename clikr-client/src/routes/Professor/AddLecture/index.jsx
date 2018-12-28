@@ -99,7 +99,7 @@ class ProfessorAddLecture extends React.Component {
     handleSubmit = () => {
         // Send course to API
         this.props.apiService.addLecture(
-            new LectureObj(this.state.title, this.state.date, null, this.state.courseId)
+            new LectureObj(this.state.title, this.state.selectedDate, null, this.state.courseId)
         )
         this.setState({ toLecture: true });
     }
