@@ -7,6 +7,8 @@ import Typography from '@material-ui/core/Typography';
 import { Redirect } from "react-router-dom";
 import { inject } from 'mobx-react';
 import LectureObj from '../../../models/LectureObj';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
 
 const styles = theme => ({
     paper: {
@@ -40,21 +42,7 @@ class ProfessorAddLecture extends React.Component {
         this.courseId = this.props.match.params.courseId
         
         const date = new Date();
-        let year = date.getFullYear();
-        let month = date.getMonth();
-        if (month.toString().length === 1) {
-            month = "0" + month.toString();
-        }
-        else {
-            month = month.toString();
-        }
-        let day = date.getDate();
-        if (day.toString().length === 1) {
-            day = "0" + day.toString();
-        } 
-        else {
-            day = day.toString();
-        }
+       
         this.state = {
             toLecture: false,
             title: "Lecture ",
@@ -63,7 +51,7 @@ class ProfessorAddLecture extends React.Component {
             errors: {title: ''},
             titleValid: true,
             formValid: false,
-            date: year + "-" + month + "-" + day
+            selectedDate: date
         }
     }
 
@@ -96,9 +84,9 @@ class ProfessorAddLecture extends React.Component {
     }
 
 
-    handleDate = (e) => {
+    handleDateChange = date => {
         this.setState({
-            [e.target.name]: e.target.value
+            selectedDate: date
         })
     }  
 
@@ -113,7 +101,6 @@ class ProfessorAddLecture extends React.Component {
         this.props.apiService.addLecture(
             new LectureObj(this.state.title, this.state.date, null, this.state.courseId)
         )
-
         this.setState({ toLecture: true });
     }
 
@@ -144,19 +131,17 @@ class ProfessorAddLecture extends React.Component {
                             helperText={this.state.errors["title"]}
                         />
                     </Grid>
-                    <Grid item className={this.styles.gridItem}>
-                        <TextField
-                            id="date"
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <Grid item className={this.styles.gridItem}>
+                        <DatePicker
+                            margin="normal"
+                            label="Lecture Date"
+                            value={this.state.selectedDate}
+                            onChange={this.handleDateChange}
                             className={this.styles.textField}
-                            name='date'
-                            onChange={e => this.handleDate(e)}
-                            type="date"
-                            defaultValue={this.state.date}
-                            InputLabelProps={{
-                            shrink: true,
-                            }}
                         />
-                    </Grid>
+                        </Grid>
+                    </MuiPickersUtilsProvider>
                     <Grid item className={this.styles.gridItemButton}>
                         <Button
                             disabled={!this.state.formValid}
