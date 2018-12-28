@@ -1,6 +1,5 @@
 
 import React, { Component } from 'react';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -108,14 +107,6 @@ class PrevMCQ extends Component {
                                 })}
                             </RadioGroup>
                         </FormControl>
-                    </Grid>
-
-
-
-                    <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
-                        <Button disabled variant="contained" color="secondary">
-                            closed
-                        </Button>
                     </Grid>
                 </Paper>
             </div>

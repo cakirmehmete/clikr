@@ -34,8 +34,7 @@ class QuestionPage extends Component {
     state = {
         number_of_open_questions: 0,
         show_previous_questions: false,
-        button_text: "Show All Previous Questions",
-        lastQuestion: null,
+        show_last_question: false,
     }
 
     constructor(props) {
@@ -62,14 +61,17 @@ class QuestionPage extends Component {
             this.store.addOneQuestion(data.question)
             this.setState({
                 // has_question: true,
-                number_of_open_questions: this.state.number_of_open_questions + 1
+                number_of_open_questions: this.state.number_of_open_questions + 1,
+                show_previous_questions: false,
             });
         })
 
         socket.on('question closed', (msg) => {
             this.store.updateOneQuestion(msg.question);
             this.setState({
-                number_of_open_questions: this.state.number_of_open_questions - 1
+                number_of_open_questions: this.state.number_of_open_questions - 1,
+                show_previous_questions: false,
+                show_last_question: true,
             });
             this.store.updateLastQuestion(msg.question);
         })
@@ -79,8 +81,8 @@ class QuestionPage extends Component {
             var num_questions = data.questions.length;
             this.store.updateAllQuestions(data.questions);
             this.setState({
-                // has_question: true,
                 number_of_open_questions: num_questions,
+                show_previous_questions: false,
             });
         })
 
@@ -92,16 +94,15 @@ class QuestionPage extends Component {
     handleClick = () => {
         const { course_id } = this.props.location.state;
 
-        if (this.state.button_text === "Show All Previous Questions") {
+        if (!this.state.show_previous_questions) {
             this.apiStudentService.loadAllPrevQuestions(course_id);
             this.setState({
                 show_previous_questions: true,
-                button_text: "Hide Previous Questions",
+                show_last_question: false,
             });
         } else {
             this.setState({
                 show_previous_questions: false,
-                button_text: "Show All Previous Questions",
             }); 
         }
     };
@@ -141,24 +142,28 @@ class QuestionPage extends Component {
                 </Grid>
                 <Grid className={this.styles.gridContainer}>
                     <Paper className={this.styles.paper}>
-                        <Typography variant="h5" color="secondary"> Previous Questions: </Typography>
-                        <Grid className={this.styles.gridContainer}>
-                            {this.store.lastQuestion !== null ? (
-                                this.store.lastQuestion.question_type === "multiple_choice" ? (
-                                    <PrevMCQ isLast={true} />
+                        <Typography variant="h5" color="secondary"> {this.state.show_last_question ? "Recently Closed" : "Previous Questions"} </Typography>
+                        {this.state.show_last_question ? (
+                            <Grid className={this.styles.gridContainer}>
+                                {this.store.lastQuestion !== null ? (
+                                    this.store.lastQuestion.question_type === "multiple_choice" ? (
+                                        <PrevMCQ isLast={true} />
+                                    ) : (
+                                        <PrevFRQ isLast={true} />
+                                    ) // TODO: handle new question types
                                 ) : (
-                                    <PrevFRQ isLast={true} />
-                                ) // TODO: handle new question types
-                            ) : null} 
-                        </Grid>
+                                    <Typography color="secondary"> None. </Typography>
+                                )} 
+                            </Grid>
+                        ) : null}
                         <Grid className={this.styles.gridContainer}>
                             <Button onClick={this.handleClick} variant="outlined" color="secondary">
-                                {this.state.button_text}
+                                {this.state.show_previous_questions ? "Hide Previous Questions" : "Show All Previous Questions"}
                             </Button>
                         </Grid>
                         <Grid >
                             {this.state.show_previous_questions ? (
-                                this.store.prevQuestions.length > 0 ? (
+                                this.store.prevQuestions.length > 1 ? (
                                     this.store.prevQuestions.map(q => {
                                         if (q.question_type === 'free_text') {
                                             return (
@@ -178,7 +183,7 @@ class QuestionPage extends Component {
                                         }
             
                                     })) : 
-                                    <Typography>There are no previous questions</Typography>
+                                    <Typography color="secondary"> There are no previous questions </Typography>
                                 ) : null}
                         </Grid>
                     </Paper>
