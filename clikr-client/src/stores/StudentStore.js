@@ -13,6 +13,22 @@ export default class StudentStore {
   @observable
   prevQuestions = []; // QuestionObj[]
 
+  @observable
+  lastQuestion = null;
+
+  @observable
+  lastAnswer = null;
+
+  @action
+  updateLastQuestion(question) {
+    this.lastQuestion = question;
+  }
+
+  @action
+  updateLastAnswer(answer) {
+    this.lastAnswer = answer;
+  }
+
   @action
   updateAllCourses(courses) {
     this.courses = []

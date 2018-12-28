@@ -68,27 +68,31 @@ class FRQ extends Component {
     componentWillReceiveProps(nextProps) {
         var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
 
-        if (a !== undefined) {
-            this.setState({
-                correct: a,
-                buttonText: "dismiss",
-                disabled: false,
-                disabledInput: true
-            });
+        if (a !== undefined && this.store.lastQuestion !== this.question) {
+            // store this question and the answer into the last_question of the store
+            this.store.removeQuestionById(this.props.questionId);
+            this.store.updateLastAnswer(this.state.sent);
 
-            if (a === "" || a === null) {
-                this.setState({
-                    helperText: "Your Answer"
-                });
-            } else if (this.state.answer === a) {
-                this.setState({
-                    helperText: "Correct"
-                });
-            } else {
-                this.setState({
-                    helperText: "Correct Answer: " + a
-                });
-            }
+            // this.setState({
+            //     correct: a,
+            //     buttonText: "dismiss",
+            //     disabled: false,
+            //     disabledInput: true
+            // });
+
+            // if (a === "" || a === null) {
+            //     this.setState({
+            //         helperText: "Your Answer"
+            //     });
+            // } else if (this.state.answer === a) {
+            //     this.setState({
+            //         helperText: "Correct"
+            //     });
+            // } else {
+            //     this.setState({
+            //         helperText: "Correct Answer: " + a
+            //     });
+            // }
         }
     }
 

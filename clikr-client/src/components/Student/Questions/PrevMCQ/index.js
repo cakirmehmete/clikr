@@ -45,11 +45,22 @@ class PrevMCQ extends Component {
         this.store = this.props.store;
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
-        this.question = this.store.getPrevQuestionWithId(this.props.questionId);
+        this.question = null;
+        this.answer = null;
+        this.answerchoices = [];
+        this.correct = null;
     }
 
-    componentDidMount() {
+    render() {
+        if (this.props.isLast) {
+            this.question = this.store.lastQuestion;
+            this.answer = this.store.lastAnswer;
+        } else {
+            this.question = this.store.getPrevQuestionWithId(this.props.questionId);
+            this.answer = this.question.answer;
+        }
 
+        // answer choices
         var answers = []
 
         for (var i = 1; i <= this.question['number_of_options']; i++) {
@@ -57,31 +68,18 @@ class PrevMCQ extends Component {
             answers.push(qstring)
         }
 
-        this.setState({
-            answerchoices: answers
-        });
+        this.answerchoices = answers;
 
         // compute correct answer
         var a =  this.question.correct_answer
         if (a !== undefined) {
             if (a !== null) {
-                this.setState({
-                    correct: Number(a) - 1
-                });
+                this.correct = Number(a) - 1;
             } else {
-                this.setState({
-                    correct: null
-                })
+                this.correct = null;
             }
         }
-    }
 
-    state = {
-        answerchoices: [],
-        correct: undefined,
-    }
-
-    render() {
         return (
             <div>
                 <Paper className={this.styles.paper}>
@@ -92,20 +90,20 @@ class PrevMCQ extends Component {
                             <RadioGroup
                                 name="answers"
                             >
-                                {this.state.answerchoices.map((a, index) => {
+                                {this.answerchoices.map((a, index) => {
                                     var background_style;
-                                    if (this.state.correct === undefined || this.state.correct === null) {
+                                    if (this.correct === undefined || this.correct === null) {
                                         background_style = this.styles.neutralAnswer;
                                     }
-                                    else if (index === this.state.correct) {
+                                    else if (index === this.correct) {
                                         background_style = this.styles.correctAnswer;
                                     }
-                                    else if (parseInt(this.question.answer, 10)-1 === index) {
+                                    else if (parseInt(this.answer, 10)-1 === index) {
                                         background_style = this.styles.wrongAnswer;
                                     }
 
                                     return (
-                                        <FormControlLabel value={a} key={a} control={<Radio disabled checked={index === parseInt(this.question.answer)-1} />} label={a} className={background_style}/>
+                                        <FormControlLabel value={a} key={a} control={<Radio disabled checked={index === parseInt(this.answer)-1} />} label={a} className={background_style}/>
                                     );
                                 })}
                             </RadioGroup>

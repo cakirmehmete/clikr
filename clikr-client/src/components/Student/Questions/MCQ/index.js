@@ -76,21 +76,25 @@ class MCQ extends Component {
     componentWillReceiveProps(nextProps) {
         var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
 
-        if (a !== undefined) {
-            if (a !== null) {
-                this.setState({
-                    correct: Number(a) - 1
-                });
-            } else {
-                this.setState({
-                    correct: null
-                })
-            }
-            this.setState({
-                buttonText: "dismiss",
-                disabledInput: true,
-                disabled: false
-            });
+        if (a !== undefined && this.store.lastQuestion !== this.question) {
+            // store this question and the answer into the last_question of the store
+            this.store.removeQuestionById(this.props.questionId);
+            this.store.updateLastAnswer(this.state.answerchoices.indexOf(this.state.sent) + 1);
+
+            // if (a !== null) {
+            //     this.setState({
+            //         correct: Number(a) - 1
+            //     });
+            // } else {
+            //     this.setState({
+            //         correct: null
+            //     })
+            // }
+            // this.setState({
+            //     buttonText: "dismiss",
+            //     disabledInput: true,
+            //     disabled: false
+            // });
         }
     }
 

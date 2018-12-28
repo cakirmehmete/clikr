@@ -40,42 +40,38 @@ class PrevFRQ extends Component {
         this.store = this.props.store;
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
-        this.question = this.store.getPrevQuestionWithId(this.props.questionId);
-    }
-
-    state = {
-        correct: undefined,
-        helperText: "",
-    }
-
-    componentDidMount() {
-        var a =  this.question.correct_answer
-
-        if (a !== undefined) {
-            this.setState({
-                correct: a
-            });
-
-            if (a === "" || a === null) {
-                this.setState({
-                    helperText: "Your Answer"
-                });
-            } else if (this.question.answer === a) {
-                this.setState({
-                    helperText: "Correct"
-                });
-            } else {
-                this.setState({
-                    helperText: "Correct Answer: " + a
-                });
-            }
-        }
+        this.question = null;
+        this.answer = null;
+        this.correct = null;
+        this.helperText = "";
     }
 
     render() {
+        if (this.props.isLast) {
+            this.question = this.store.lastQuestion;
+            this.answer = this.store.lastAnswer;
+        } else {
+            this.question = this.store.getPrevQuestionWithId(this.props.questionId);
+            this.answer = this.question.answer;
+        }
+
+        // correct answer
+        var a =  this.question.correct_answer
+        if (a !== undefined) {
+            this.correct = a;
+
+            if (a === "" || a === null) {
+                this.helperText = "Your Answer: "
+            } else if (this.answer === a) {
+                this.helperText = "Correct"
+            } else {
+                this.helperText = "Correct Answer: " + a
+            }
+        }
+
         var backgroundStyle;
-        if (this.state.correct && this.state.correct !== "") {
-            if (this.question.answer === this.state.correct) {
+        if (this.correct && this.correct !== "") {
+            if (this.answer === this.correct) {
                 backgroundStyle = this.styles.correctAnswer;
             } else {
                 backgroundStyle = this.styles.wrongAnswer;
@@ -92,9 +88,9 @@ class PrevFRQ extends Component {
                         <Grid item className={this.styles.gridItem}>
                             <TextField
                                 id="full-width"
-                                helperText={this.state.helperText}
+                                helperText={this.helperText}
                                 name = 'answer'
-                                value={this.question.answer}
+                                value={this.answer}
                                 fullWidth
                                 disabled
                                 className={backgroundStyle}
