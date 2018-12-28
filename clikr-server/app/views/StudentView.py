@@ -279,7 +279,9 @@ def login():
         else:
             role = ''
 
-        return render_template('login_student.html', role=role, netId=netId)
+        # if not logged in as professor, return login page
+        if not netId or role != 'student':
+            return render_template('login_student.html', role=role, netId=netId)
     else:
         netId = request.form.get('netId')
 
@@ -292,13 +294,14 @@ def login():
         session['username'] = netId
         session['role'] = 'student'
 
-        service_url = request.args.get('service')
+    # redirection after successful login
+    service_url = request.args.get('service')
 
-        if service_url:
-            print('redirecting to' + service_url)
-            return redirect(service_url)
-        else:
-            return render_template('login_student.html', role=session['role'], netId=session['username'])
+    if service_url:
+        print('redirecting to' + service_url)
+        return redirect(service_url)
+    else:
+        return render_template('login_student.html', role=session['role'], netId=session['username'])
 
 @student_api.route('/logout', methods=['GET'])
 def logout():
