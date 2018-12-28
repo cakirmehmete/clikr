@@ -161,8 +161,8 @@ class AllCoursesFrame extends React.Component {
                 >
                     <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the folowing course(s): "}</DialogTitle>
                     <DialogContent>
-                        {this.state.delTitles.map(title =>
-                            <DialogContentText key={title} id="alert-dialog-description">
+                        {this.state.delTitles.map((title, index) => 
+                            <DialogContentText key={index} id="alert-dialog-description">
                                 {title}
                             </DialogContentText>
                                         
