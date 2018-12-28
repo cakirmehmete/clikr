@@ -10,7 +10,8 @@ export default class StudentStore {
   @observable
   questions = []; // QuestionObj[]
 
-
+  @observable
+  prevQuestions = []; // QuestionObj[]
 
   @action
   updateAllCourses(courses) {
@@ -32,6 +33,10 @@ export default class StudentStore {
     return this.questions.find(x => x.id === question_id);
   }
 
+  getPrevQuestionWithId(question_id) {
+    return this.prevQuestions.find(x => x.id === question_id);
+  }
+
   @action
   updateAllQuestions(questions) {
       this.questions = []
@@ -41,17 +46,39 @@ export default class StudentStore {
           this.questions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
             element.question_type, element.question_title,
             element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-            element.closed_at, element.created_at, element.modified_at, element.option1,
+            element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
             element.option2, element.option3, element.option4, element.option5, element.number_of_options))
         }
         else {
           this.questions.push(new FreeTextQuestionObj(element.id, element.lecture_id,
             element.question_type, element.question_title,
             element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-            element.closed_at, element.created_at, element.modified_at, element.word_limit))
+            element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit))
         }
 
       });
+  }
+
+  @action
+  updateAllPrevQuestions(questions) {
+    this.prevQuestions = [];
+
+    questions.forEach(element => {
+      if (element.question_type === 'multiple_choice') {
+        this.prevQuestions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
+          element.question_type, element.question_title,
+          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
+          element.option2, element.option3, element.option4, element.option5, element.number_of_options))
+      }
+      else {
+        this.prevQuestions.push(new FreeTextQuestionObj(element.id, element.lecture_id,
+          element.question_type, element.question_title,
+          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit))
+      }
+
+    });
   }
 
   @action
@@ -60,13 +87,13 @@ export default class StudentStore {
       this.questions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
         element.question_type, element.question_title,
         element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-        element.closed_at, element.created_at, element.modified_at, element.option1,
+        element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
         element.option2, element.option3, element.option4, element.option5, element.number_of_options));
     } else if (element.question_type === 'free_text') {
       this.questions.push(new FreeTextQuestionObj(element.id, element.lecture_id,
         element.question_type, element.question_title,
         element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-        element.closed_at, element.created_at, element.modified_at, element.word_limit));
+        element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit));
     } else {
       console.log('unsupported question type');
     }
@@ -87,13 +114,13 @@ export default class StudentStore {
         updatedQuestion = new MultipleChoiceQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title,
           element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-          element.closed_at, element.created_at, element.modified_at, element.option1,
+          element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
           element.option2, element.option3, element.option4, element.option5, element.number_of_options);
       } else if (element.question_type === 'free_text') {
         updatedQuestion = new FreeTextQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title, 
           element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-          element.closed_at, element.created_at, element.modified_at, element.word_limit);
+          element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit);
       } else {
         console.log('unsupported question type');
         return;

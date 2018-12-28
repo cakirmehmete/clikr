@@ -57,7 +57,27 @@ def on_join(course_id):
             question_data = dump_one_question(question, exclude=['correct_answer'])
             questions_data.append(question_data)
 
-    emit('all open questions', {'questions': questions_data, 'message': 'you joined the room (course) ' + course_id})
+    # return list of all previous (already closed) questions for this course
+    # query database to get ALL previously closed questions # TODO: this may be way too inefficient
+    prev_questions = QuestionModel.query.filter(QuestionModel.closed_at != None).order_by(QuestionModel.closed_at.desc()).all()
+
+    # filter for the specified course
+    prev_questions_data = []
+    for question in prev_questions:
+        if question.lecture.course_id == course_id:
+            # use the appropriate question schema
+            question_data = dump_one_question(question)
+
+            # retrieve the student's answer to this question
+            answer_tuple = AnswerModel.query.filter_by(question_id=question.id, student_id=current_user.id).first()
+            if answer_tuple:
+                question_data['answer'] = answer_tuple.answer
+            else:
+                question_data['answer'] = None
+            
+            prev_questions_data.append(question_data)
+    
+    emit('all open questions', {'questions': questions_data, 'prev_questions': prev_questions_data, 'message': 'you joined the room (course) ' + course_id})
 
 @student_api.route('/courses', methods=['GET'])
 @Auth.student_auth_required

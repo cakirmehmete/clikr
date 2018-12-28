@@ -10,6 +10,8 @@ import APIStudentService from '../../../services/APIStudentService';
 import { observer, inject } from 'mobx-react';
 import FRQ from '../../../components/Student/Questions/FRQ';
 import MCQ from '../../../components/Student/Questions/MCQ';
+import PrevMCQ from '../../../components/Student/Questions/PrevMCQ';
+import PrevFRQ from '../../../components/Student/Questions/PrevFRQ';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
@@ -70,12 +72,14 @@ class QuestionPage extends Component {
 
         socket.on('all open questions', (data) => {
             console.log(data.questions);
+            console.log(data.prev_questions);
             var num_questions = data.questions.length;
             this.store.updateAllQuestions(data.questions);
             this.setState({
                 // has_question: true,
                 number_of_open_questions: num_questions,
             });
+            this.store.updateAllPrevQuestions(data.prev_questions);
         })
 
         socket.on('server message', (msg) => {
@@ -98,7 +102,6 @@ class QuestionPage extends Component {
                     {this.store.questions.map(q => {
                         if (q.question_type === 'free_text') {
                             return (
-                                // TODO: move Paper and Typography into FRQ component
                                 <Grid item className={this.styles.gridItem} key={q.id}>
                                     <FRQ questionId={q.id} />
                                 </Grid>
@@ -106,9 +109,39 @@ class QuestionPage extends Component {
                             )
                         }
                         else {
+                            // TODO: handle slider and drag-and-drop questions!
                             return (
                                 <Grid item className={this.styles.gridItem} key={q.id}>
                                     <MCQ questionId={q.id} />
+                                </Grid>
+                            )
+                        }
+
+                    })}
+
+                </Grid>
+                <Grid className={this.styles.gridContainer}>
+                    {this.store.prevQuestions.length !== 0 ? (
+                        <Paper className={this.styles.paper}>
+                            <Typography variant="h5" color="secondary"> Previous Questions </Typography>
+                        </Paper>
+                    ) : null} 
+                </Grid>
+                <Grid className={this.styles.gridContainer}>
+                    {this.store.prevQuestions.map(q => {
+                        if (q.question_type === 'free_text') {
+                            return (
+                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                    <PrevFRQ questionId={q.id} />
+                                </Grid>
+
+                            )
+                        }
+                        else {
+                            // TODO: handle slider and drag-and-drop questions!
+                            return (
+                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                    <PrevMCQ questionId={q.id}/>
                                 </Grid>
                             )
                         }
