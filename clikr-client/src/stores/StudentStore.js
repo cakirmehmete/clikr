@@ -25,17 +25,14 @@ export default class StudentStore {
   }
 
   @action
-<<<<<<< HEAD
   resetQuestions() {
-    this.questions = []
-    this.prevQuestions = []
-    this.lastAnswer = null
-    this.lastQuestion = null
+    this.questions = [];
+    this.prevQuestions = [];
+    this.lastAnswer = null;
+    this.lastQuestion = null;
   }
 
   @action
-=======
->>>>>>> b0cf22b259e598d8964b1c4ae8bb59d6983abb38
   updateLastAnswer(answer) {
     this.lastAnswer = answer;
   }

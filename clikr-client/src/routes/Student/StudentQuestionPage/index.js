@@ -32,15 +32,9 @@ const styles = theme => ({
 class QuestionPage extends Component {
 
     state = {
-<<<<<<< HEAD
         show_previous_questions: false,
         show_last_question: true,
         last_question: null,
-=======
-        number_of_open_questions: 0,
-        show_previous_questions: false,
-        show_last_question: false,
->>>>>>> b0cf22b259e598d8964b1c4ae8bb59d6983abb38
     }
     
     constructor(props) {

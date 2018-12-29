@@ -22,7 +22,6 @@ export default class SocketIOStudentService {
     detectOpenQuestion() {
         this.socket.on('question opened', (data) => {
             this.store.addOneQuestion(data.question);
-            console.log(data.question);
         });
     }
     
