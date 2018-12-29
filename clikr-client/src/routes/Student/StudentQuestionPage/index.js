@@ -112,33 +112,34 @@ class QuestionPage extends Component {
             <Grid container direction='column' spacing={Number("16")}>
                 <Header />
                 <Grid className={this.styles.gridContainer}>
-                    {this.state.number_of_open_questions === 0 ? (
-                        <Paper className={this.styles.paper}>
-                            <Typography variant="h5" color="secondary"> There are no questions for this course at the moment... </Typography>
-                        </Paper>
-                    ) : null} 
-                </Grid>
-                <Grid className={this.styles.gridContainer}>
-                    {this.store.questions.map(q => {
-                        if (q.question_type === 'free_text') {
-                            return (
-                                <Grid item className={this.styles.gridItem} key={q.id}>
-                                    <FRQ questionId={q.id} />
-                                </Grid>
+                    <Paper className={this.styles.paper} style={{backgroundColor: "secondary"}}>
+                        <Typography variant="h5" color="secondary"> {this.state.number_of_open_questions !== 0 ? "Open Questions" : "No Open Questions..."} </Typography>
+                        {this.state.number_of_open_questions !== 0 ? (
+                            <Grid>
+                                {this.store.questions.map(q => {
+                                    if (q.question_type === 'free_text') {
+                                        return (
+                                            <Grid item className={this.styles.gridItem} key={q.id}>
+                                                <FRQ questionId={q.id} />
+                                            </Grid>
+            
+                                        )
+                                    }
+                                    else {
+                                        // TODO: handle slider and drag-and-drop questions!
+                                        return (
+                                            <Grid item className={this.styles.gridItem} key={q.id}>
+                                                <MCQ questionId={q.id} />
+                                            </Grid>
+                                        )
+                                    }
+            
+                                })}
+            
+                            </Grid>
+                        ) : null} 
 
-                            )
-                        }
-                        else {
-                            // TODO: handle slider and drag-and-drop questions!
-                            return (
-                                <Grid item className={this.styles.gridItem} key={q.id}>
-                                    <MCQ questionId={q.id} />
-                                </Grid>
-                            )
-                        }
-
-                    })}
-
+                    </Paper>
                 </Grid>
                 <Grid className={this.styles.gridContainer}>
                     <Paper className={this.styles.paper}>
