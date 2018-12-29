@@ -30,7 +30,7 @@ export default class SocketIOStudentService {
     detectCloseQuestion() {
         this.socket.on('question closed', (msg) => {
             this.store.updateLastQuestion(msg.question);
-            this.store.removeQuestionById(msg.question.id);
+            this.store.updateOneQuestion(msg.question);
         });
     }
     
