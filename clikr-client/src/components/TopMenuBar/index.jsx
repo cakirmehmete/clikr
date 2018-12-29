@@ -65,7 +65,7 @@ class TopMenuBar extends React.Component {
 
         if (this.state.logout) {
             this.apiProfService.getLogoutProf()
-            return <Redirect to='/login-prof'/>
+            return <Redirect to='/' push/>
         }
 
 
