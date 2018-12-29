@@ -1,4 +1,4 @@
-import { getStudentCoursesAPI, postEnrollStudentAPI, getStudentQuestionsByCourseAPI, postAnswerQuestionAPI, getLogoutStudentAPI, deleteDropCourseAPI } from '../utils/api-facade';
+import { getStudentCoursesAPI, postEnrollStudentAPI, getStudentQuestionsByCourseAPI, getStudentPrevQuestionsByCourseAPI, postAnswerQuestionAPI, getLogoutStudentAPI, deleteDropCourseAPI } from '../utils/api-facade';
 
 export default class APIStudentService {
     constructor(studentStore) {
@@ -31,6 +31,20 @@ export default class APIStudentService {
             })
         
     }
+
+    loadAllPrevQuestions(course_id) {
+        getStudentPrevQuestionsByCourseAPI(course_id)
+            .then(res => {
+                console.log(res.data)
+                this.studentStore.updateAllPrevQuestions(res.data)
+
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
     // remove the course
     dropCourse(course_id) {
         deleteDropCourseAPI(course_id)

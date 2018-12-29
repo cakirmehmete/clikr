@@ -223,7 +223,7 @@ class ProfessorAddMCQuestion extends React.Component {
             new MultipleChoiceQuestionObj(null,
                 lectureId, "multiple_choice",
                 this.state.title, this.state.correct_answer,
-                null, null, null, null, null, null,
+                null, null, null, null, null, null, null,
                 this.state.option1, this.state.option2, this.state.option3, this.state.option4, this.state.option5,
                 this.state.number_of_options)
         )
