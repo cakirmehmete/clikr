@@ -32,9 +32,15 @@ const styles = theme => ({
 class QuestionPage extends Component {
 
     state = {
+<<<<<<< HEAD
         show_previous_questions: false,
         show_last_question: true,
         last_question: null,
+=======
+        number_of_open_questions: 0,
+        show_previous_questions: false,
+        show_last_question: false,
+>>>>>>> b0cf22b259e598d8964b1c4ae8bb59d6983abb38
     }
     
     constructor(props) {
@@ -77,6 +83,22 @@ class QuestionPage extends Component {
             this.setState({
                 show_previous_questions: false,
                 show_last_question: true,
+            }); 
+        }
+    };
+
+    handleClick = () => {
+        const { course_id } = this.props.location.state;
+
+        if (!this.state.show_previous_questions) {
+            this.apiStudentService.loadAllPrevQuestions(course_id);
+            this.setState({
+                show_previous_questions: true,
+                show_last_question: false,
+            });
+        } else {
+            this.setState({
+                show_previous_questions: false,
             }); 
         }
     };
