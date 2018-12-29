@@ -31,15 +31,7 @@ const styles = theme => ({
     buttonContainer: {
         padding: theme.spacing.unit*1.5,
     },
-    correctAnswer: {
-        backgroundColor: theme.palette.primary.light,
-        marginLeft: theme.spacing.unit*0.3,
-    },
-    wrongAnswer: {
-        backgroundColor: theme.palette.primary.dark,
-        marginLeft: theme.spacing.unit*0.3,
-    },
-    neutralAnswer: {
+    answerOption: {
         marginLeft: theme.spacing.unit*0.3,
     },
     paper: {
@@ -76,21 +68,10 @@ class MCQ extends Component {
     componentWillReceiveProps(nextProps) {
         var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
 
-        if (a !== undefined) {
-            if (a !== null) {
-                this.setState({
-                    correct: Number(a) - 1
-                });
-            } else {
-                this.setState({
-                    correct: null
-                })
-            }
-            this.setState({
-                buttonText: "dismiss",
-                disabledInput: true,
-                disabled: false
-            });
+        if (a !== undefined && this.store.lastQuestion !== this.question) {
+            // store this question and the answer into the last_question of the store
+            this.store.removeQuestionById(this.props.questionId);
+            this.store.updateLastAnswer(this.state.answerchoices.indexOf(this.state.sent) + 1);
         }
     }
 
@@ -98,9 +79,6 @@ class MCQ extends Component {
         answerchoices: [],
         answer: "",
         sent: "",
-        correct: undefined,
-        buttonText: "submit",
-        disabledInput: false,
         dialogue: false,
         disabled: false,
     }
@@ -131,10 +109,7 @@ class MCQ extends Component {
     };
 
     handleClick = () => {
-        if (this.state.buttonText === "dismiss") {
-            this.store.removeQuestionById(this.props.questionId);
-        }
-        else if (this.state.sent === ""){
+        if (this.state.sent === ""){
             this.handleSubmit()
         }
         else if (this.state.sent !== this.state.answer) {
@@ -174,21 +149,10 @@ class MCQ extends Component {
                                 onChange={this.handleChange}
                             >
                                 {this.state.answerchoices.map((a, index) => {
-                                    var background_style;
-                                    if (this.state.correct === undefined || this.state.correct === null) {
-                                        background_style = this.styles.neutralAnswer;
-                                    }
-                                    else if (index === this.state.correct) {
-                                        background_style = this.styles.correctAnswer;
-                                    }
-                                    else if (this.state.answerchoices.indexOf(this.state.sent) === index) {
-                                        background_style = this.styles.wrongAnswer;
-                                    }
-
                                     return (
-                                        <FormControlLabel value={a} key={a} control={<Radio disabled={this.state.disabledInput} />} label={a} className={background_style}/>
-                                    );
-                                })}
+                                        <FormControlLabel value={a} key={a} control={<Radio />} label={a} className={this.styles.answerOption}/>
+                                    )})
+                                }
                             </RadioGroup>
                         </FormControl>
                     </Grid>
@@ -197,7 +161,7 @@ class MCQ extends Component {
 
                     <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
                         <Button onClick={this.handleClick} disabled={this.state.disabled} value={this.state.answer} variant="contained" color="secondary">
-                            {this.state.buttonText}
+                            Submit
                         </Button>
                         <Dialog
                             open={this.state.dialogue}

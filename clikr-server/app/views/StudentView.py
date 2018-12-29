@@ -56,7 +56,7 @@ def on_join(course_id):
             # use the appropriate question schema
             question_data = dump_one_question(question, exclude=['correct_answer'])
             questions_data.append(question_data)
-
+    
     emit('all open questions', {'questions': questions_data, 'message': 'you joined the room (course) ' + course_id})
 
 @student_api.route('/courses', methods=['GET'])
@@ -155,6 +155,43 @@ def get_open_questions(current_user, course_id):
             questions_data.append(question_data)
 
     return custom_response(questions_data, 200)
+
+@student_api.route('/courses/<course_id>/prevquestions', methods=['GET'])
+@Auth.student_auth_required
+def get_previous_questions(current_user, course_id):
+    """
+    returns all previous questions along with the submitted answer for this course
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check permissions (enrollment)
+    if not current_user in course.students:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # return list of all previous (already closed) questions for this course
+    # query database to get ALL previously closed questions # TODO: this may be way too inefficient
+    prev_questions = QuestionModel.query.filter(QuestionModel.closed_at != None).order_by(QuestionModel.closed_at.desc()).all()
+
+    # filter for the specified course
+    prev_questions_data = []
+    for question in prev_questions:
+        if question.lecture.course_id == course_id:
+            # use the appropriate question schema
+            question_data = dump_one_question(question)
+
+            # retrieve the student's answer to this question
+            answer_tuple = AnswerModel.query.filter_by(question_id=question.id, student_id=current_user.id).first()
+            if answer_tuple:
+                question_data['answer'] = answer_tuple.answer
+            else:
+                question_data['answer'] = None
+            
+            prev_questions_data.append(question_data)
+
+    return custom_response(prev_questions_data, 200)
 
 @student_api.route('/questions/<question_id>', methods=['GET'])
 @Auth.student_auth_required

@@ -6,10 +6,13 @@ import { socketioURL } from '../../../constants/api';
 import socketIOClient from 'socket.io-client'
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 import APIStudentService from '../../../services/APIStudentService';
 import { observer, inject } from 'mobx-react';
 import FRQ from '../../../components/Student/Questions/FRQ';
 import MCQ from '../../../components/Student/Questions/MCQ';
+import PrevMCQ from '../../../components/Student/Questions/PrevMCQ';
+import PrevFRQ from '../../../components/Student/Questions/PrevFRQ';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
@@ -29,8 +32,9 @@ const styles = theme => ({
 @observer
 class QuestionPage extends Component {
     state = {
-        // has_question: false,
         number_of_open_questions: 0,
+        show_previous_questions: false,
+        show_last_question: false,
     }
 
     constructor(props) {
@@ -57,15 +61,19 @@ class QuestionPage extends Component {
             this.store.addOneQuestion(data.question)
             this.setState({
                 // has_question: true,
-                number_of_open_questions: this.state.number_of_open_questions + 1
+                number_of_open_questions: this.state.number_of_open_questions + 1,
+                show_previous_questions: false,
             });
         })
 
         socket.on('question closed', (msg) => {
             this.store.updateOneQuestion(msg.question);
             this.setState({
-                number_of_open_questions: this.state.number_of_open_questions - 1
+                number_of_open_questions: this.state.number_of_open_questions - 1,
+                show_previous_questions: false,
+                show_last_question: true,
             });
+            this.store.updateLastQuestion(msg.question);
         })
 
         socket.on('all open questions', (data) => {
@@ -73,8 +81,8 @@ class QuestionPage extends Component {
             var num_questions = data.questions.length;
             this.store.updateAllQuestions(data.questions);
             this.setState({
-                // has_question: true,
                 number_of_open_questions: num_questions,
+                show_previous_questions: false,
             });
         })
 
@@ -83,39 +91,105 @@ class QuestionPage extends Component {
         });
     }
 
+    handleClick = () => {
+        const { course_id } = this.props.location.state;
+
+        if (!this.state.show_previous_questions) {
+            this.apiStudentService.loadAllPrevQuestions(course_id);
+            this.setState({
+                show_previous_questions: true,
+                show_last_question: false,
+            });
+        } else {
+            this.setState({
+                show_previous_questions: false,
+            }); 
+        }
+    };
+
     render() {
         return (
             <Grid container direction='column' spacing={Number("16")}>
                 <Header />
                 <Grid className={this.styles.gridContainer}>
-                    {this.state.number_of_open_questions === 0 ? (
-                        <Paper className={this.styles.paper}>
-                            <Typography variant="h5" color="secondary"> There are no questions for this course at the moment... </Typography>
-                        </Paper>
-                    ) : null} 
+                    <Paper className={this.styles.paper} style={{backgroundColor: "secondary"}}>
+                        <Typography variant="h5" color="secondary"> {this.state.number_of_open_questions !== 0 ? "Open Questions" : "No Open Questions..."} </Typography>
+                        {this.state.number_of_open_questions !== 0 ? (
+                            <Grid>
+                                {this.store.questions.map(q => {
+                                    if (q.question_type === 'free_text') {
+                                        return (
+                                            <Grid item className={this.styles.gridItem} key={q.id}>
+                                                <FRQ questionId={q.id} />
+                                            </Grid>
+            
+                                        )
+                                    }
+                                    else {
+                                        // TODO: handle slider and drag-and-drop questions!
+                                        return (
+                                            <Grid item className={this.styles.gridItem} key={q.id}>
+                                                <MCQ questionId={q.id} />
+                                            </Grid>
+                                        )
+                                    }
+            
+                                })}
+            
+                            </Grid>
+                        ) : null} 
+
+                    </Paper>
                 </Grid>
                 <Grid className={this.styles.gridContainer}>
-                    {this.store.questions.map(q => {
-                        if (q.question_type === 'free_text') {
-                            return (
-                                // TODO: move Paper and Typography into FRQ component
-                                <Grid item className={this.styles.gridItem} key={q.id}>
-                                    <FRQ questionId={q.id} />
-                                </Grid>
-
-                            )
-                        }
-                        else {
-                            return (
-                                <Grid item className={this.styles.gridItem} key={q.id}>
-                                    <MCQ questionId={q.id} />
-                                </Grid>
-                            )
-                        }
-
-                    })}
-
+                    <Paper className={this.styles.paper}>
+                        <Typography variant="h5" color="secondary"> {this.state.show_last_question ? "Recently Closed" : "Previous Questions"} </Typography>
+                        {this.state.show_last_question ? (
+                            <Grid className={this.styles.gridContainer}>
+                                {this.store.lastQuestion !== null ? (
+                                    this.store.lastQuestion.question_type === "multiple_choice" ? (
+                                        <PrevMCQ isLast={true} />
+                                    ) : (
+                                        <PrevFRQ isLast={true} />
+                                    ) // TODO: handle new question types
+                                ) : (
+                                    <Typography color="secondary"> None. </Typography>
+                                )} 
+                            </Grid>
+                        ) : null}
+                        <Grid className={this.styles.gridContainer}>
+                            <Button onClick={this.handleClick} variant="outlined" color="secondary">
+                                {this.state.show_previous_questions ? "Hide Previous Questions" : "Show All Previous Questions"}
+                            </Button>
+                        </Grid>
+                        <Grid >
+                            {this.state.show_previous_questions ? (
+                                this.store.prevQuestions.length > 1 ? (
+                                    this.store.prevQuestions.map(q => {
+                                        if (q.question_type === 'free_text') {
+                                            return (
+                                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                                    <PrevFRQ questionId={q.id} />
+                                                </Grid>
+            
+                                            )
+                                        }
+                                        else {
+                                            // TODO: handle slider and drag-and-drop questions!
+                                            return (
+                                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                                    <PrevMCQ questionId={q.id}/>
+                                                </Grid>
+                                            )
+                                        }
+            
+                                    })) : 
+                                    <Typography color="secondary"> There are no previous questions </Typography>
+                                ) : null}
+                        </Grid>
+                    </Paper>
                 </Grid>
+                
 
             </Grid>
         );
