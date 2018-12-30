@@ -40,10 +40,12 @@ class PrevFRQ extends Component {
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
         this.question = null;
-        this.answer = undefined;
+        this.answer = "";
         this.correct = null;
         this.helperText = "";
     }
+
+    
 
     render() {
         if (this.props.isLast) {
