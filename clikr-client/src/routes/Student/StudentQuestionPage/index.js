@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 //import './style.css'; // Not our preferred way of importing style
 import Header from '../../../components/Student/LoggedinHeader';
 import Paper from '@material-ui/core/Paper';
-import { socketioURL } from '../../../constants/api';
-import socketIOClient from 'socket.io-client'
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -14,6 +12,7 @@ import MCQ from '../../../components/Student/Questions/MCQ';
 import PrevMCQ from '../../../components/Student/Questions/PrevMCQ';
 import PrevFRQ from '../../../components/Student/Questions/PrevFRQ';
 import { withStyles } from '@material-ui/core/styles';
+import SocketIOStudentService from '../../../services/SocketIOStudentService';
 
 const styles = theme => ({
     gridContainer: {
@@ -31,65 +30,38 @@ const styles = theme => ({
 @inject("store")
 @observer
 class QuestionPage extends Component {
-    state = {
-        number_of_open_questions: 0,
-        show_previous_questions: false,
-        show_last_question: false,
-    }
 
+    state = {
+        show_previous_questions: false,
+        show_last_question: true,
+    }
+    
     constructor(props) {
         super(props)
         this.styles = props.classes
         this.store = this.props.store
         this.apiStudentService = new APIStudentService(this.store)
+        this.socketIOStudentService = new SocketIOStudentService(this.store)  
     }
 
     componentDidMount() {
+        this.socketIOStudentService.reset();
+
         const { course_id } = this.props.location.state
-        const socket = socketIOClient(socketioURL)
+        
+        this.socketIOStudentService.subscribe(course_id);
 
-        // this emits an event to the socket (your server) with an argument of 'red'
-        // you can make the argument any color you would like, or any kind of data you want to send.
+        this.socketIOStudentService.detectOpenQuestion();
+        
+        this.socketIOStudentService.detectCloseQuestion();
 
-        socket.emit('subscribe student', course_id)
-        // socket.emit('change color', 'red', 'yellow') | you can have multiple arguments
+        this.socketIOStudentService.getAllQuestions();
 
-        // socket.on is another method that checks for incoming events from the server
-        // This method is looking for the event 'change color'
-        // socket.on takes a callback function for the first argument
-        socket.on('question opened', (data) => {
-            this.store.addOneQuestion(data.question)
-            this.setState({
-                // has_question: true,
-                number_of_open_questions: this.state.number_of_open_questions + 1,
-                show_previous_questions: false,
-            });
-        })
+        this.socketIOStudentService.listen();
 
-        socket.on('question closed', (msg) => {
-            this.store.updateOneQuestion(msg.question);
-            this.setState({
-                number_of_open_questions: this.state.number_of_open_questions - 1,
-                show_previous_questions: false,
-                show_last_question: true,
-            });
-            this.store.updateLastQuestion(msg.question);
-        })
-
-        socket.on('all open questions', (data) => {
-            console.log(data.questions);
-            var num_questions = data.questions.length;
-            this.store.updateAllQuestions(data.questions);
-            this.setState({
-                number_of_open_questions: num_questions,
-                show_previous_questions: false,
-            });
-        })
-
-        socket.on('server message', (msg) => {
-            console.log('Received message:' + msg);
-        });
     }
+
+    
 
     handleClick = () => {
         const { course_id } = this.props.location.state;
@@ -103,6 +75,7 @@ class QuestionPage extends Component {
         } else {
             this.setState({
                 show_previous_questions: false,
+                show_last_question: true,
             }); 
         }
     };
@@ -113,8 +86,8 @@ class QuestionPage extends Component {
                 <Header />
                 <Grid className={this.styles.gridContainer}>
                     <Paper className={this.styles.paper} style={{backgroundColor: "secondary"}}>
-                        <Typography variant="h5" color="secondary"> {this.state.number_of_open_questions !== 0 ? "Open Questions" : "No Open Questions..."} </Typography>
-                        {this.state.number_of_open_questions !== 0 ? (
+                        <Typography variant="h5" color="secondary"> {this.store.getNumberOfQuestions() !== 0 ? "Open Questions" : "No Open Questions..."} </Typography>
+                        {this.store.getNumberOfQuestions() !== 0 ? (
                             <Grid>
                                 {this.store.questions.map(q => {
                                     if (q.question_type === 'free_text') {
@@ -143,7 +116,7 @@ class QuestionPage extends Component {
                 </Grid>
                 <Grid className={this.styles.gridContainer}>
                     <Paper className={this.styles.paper}>
-                        <Typography variant="h5" color="secondary"> {this.state.show_last_question ? "Recently Closed" : "Previous Questions"} </Typography>
+                        <Typography variant="h5" color="secondary"> {this.state.show_last_question && this.store.lastQuestion !== null ? "Recently Closed" : "Previous Questions"} </Typography>
                         {this.state.show_last_question ? (
                             <Grid className={this.styles.gridContainer}>
                                 {this.store.lastQuestion !== null ? (
@@ -152,9 +125,7 @@ class QuestionPage extends Component {
                                     ) : (
                                         <PrevFRQ isLast={true} />
                                     ) // TODO: handle new question types
-                                ) : (
-                                    <Typography color="secondary"> None. </Typography>
-                                )} 
+                                ) : null } 
                             </Grid>
                         ) : null}
                         <Grid className={this.styles.gridContainer}>

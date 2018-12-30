@@ -54,6 +54,7 @@ class ProfessorRoutes extends React.Component {
                         <Route exact path='/professor/:lectureId/questions' component={ProfessorViewQuestions} />
                         <Route path='/professor/:lectureId/questions/new-mc' component={ProfessorAddMCQuestion} />
                         <Route path='/professor/:lectureId/questions/new-free-text' component={ProfessorAddFreeTextQuestion} />
+                        {/* <Route path='/professor/:lectureId/questions/new-slider' component={ProfessorAddSliderQuestion} /> */}
                     </main>
                 </div>
             </Router>

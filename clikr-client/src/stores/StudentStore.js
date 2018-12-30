@@ -25,6 +25,14 @@ export default class StudentStore {
   }
 
   @action
+  resetQuestions() {
+    this.questions = [];
+    this.prevQuestions = [];
+    this.lastAnswer = null;
+    this.lastQuestion = null;
+  }
+
+  @action
   updateLastAnswer(answer) {
     this.lastAnswer = answer;
   }
@@ -80,6 +88,7 @@ export default class StudentStore {
     this.prevQuestions = [];
 
     questions.forEach(element => {
+      console.log(element.question_title)
       if (element.question_type === 'multiple_choice') {
         this.prevQuestions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title,
@@ -99,20 +108,25 @@ export default class StudentStore {
 
   @action
   addOneQuestion(element) {
-    if (element.question_type === 'multiple_choice') {
-      this.questions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
-        element.question_type, element.question_title,
-        element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-        element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
-        element.option2, element.option3, element.option4, element.option5, element.number_of_options));
-    } else if (element.question_type === 'free_text') {
-      this.questions.push(new FreeTextQuestionObj(element.id, element.lecture_id,
-        element.question_type, element.question_title,
-        element.correct_answer, element.creator_id, element.is_open, element.opened_at,
-        element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit));
-    } else {
-      console.log('unsupported question type');
+    if (this.questions.find(x => x.id === element.id) === undefined) {
+      console.log(element.question_title)
+      if (element.question_type === 'multiple_choice') {
+        this.questions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
+          element.question_type, element.question_title,
+          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
+          element.option2, element.option3, element.option4, element.option5, element.number_of_options));
+      } else if (element.question_type === 'free_text') {
+        this.questions.push(new FreeTextQuestionObj(element.id, element.lecture_id,
+          element.question_type, element.question_title,
+          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit));
+      } else {
+        console.log('unsupported question type');
+      }
+
     }
+    
   }
 
   @action
@@ -147,13 +161,13 @@ export default class StudentStore {
 
   @action
   removeQuestionById(question_id) {
-    var question = this.questions.find(x => x.id === question_id);
-    var index = this.questions.indexOf(question);
-    if (index > -1) {
-      this.questions.splice(index, 1);
-    } else {
-      console.log('question_id not in the store');
-    }
+   
+      this.questions.remove(this.questions.find(x => x.id === question_id));
+  }
+
+  // get number of open questions for course 
+  getNumberOfQuestions() {
+    return this.questions.length;  
   }
 
 }

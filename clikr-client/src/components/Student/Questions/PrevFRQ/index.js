@@ -40,18 +40,24 @@ class PrevFRQ extends Component {
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
         this.question = null;
-        this.answer = null;
+        this.answer = "";
         this.correct = null;
         this.helperText = "";
     }
 
+    
+
     render() {
         if (this.props.isLast) {
             this.question = this.store.lastQuestion;
-            this.answer = this.store.lastAnswer;
+            if (this.store.lastAnswer !== null) {
+                this.answer = this.store.lastAnswer;
+            } 
         } else {
             this.question = this.store.getPrevQuestionWithId(this.props.questionId);
-            this.answer = this.question.answer;
+            if (this.question.answer !== null) {
+                this.answer = this.question.answer;
+            }   
         }
 
         // correct answer
