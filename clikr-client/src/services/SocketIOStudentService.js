@@ -49,11 +49,4 @@ export default class SocketIOStudentService {
         });
     }
 
-    // get number of open questions for course 
-    getNumberOfQuestions() {
-        return this.store.questions.length;
-        
-    }
-
-
 }

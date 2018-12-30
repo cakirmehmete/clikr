@@ -91,7 +91,7 @@ class AddQuestionModal extends React.Component {
         } else if (this.state.toNewFreeTextQuestion === true) {
             return <Redirect to={'/professor/' + this.props.lectureId + '/questions/new-free-text'} push />
         }
-        else  if (this.state.toNewFreeTextQuestion === true) {
+        else  if (this.state.toNewSliderQuestion === true) {
             return <Redirect to={'/professor/' + this.props.lectureId + '/questions/new-slider'} push />
         }
 
