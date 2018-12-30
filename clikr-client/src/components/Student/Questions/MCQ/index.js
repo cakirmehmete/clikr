@@ -106,6 +106,7 @@ class MCQ extends Component {
             sent: this.state.answer,
             disabled: true
         })
+        this.store.updateLastAnswer(this.state.answerchoices.indexOf(this.state.answer) + 1);
     };
 
     handleClick = () => {
