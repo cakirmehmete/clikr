@@ -11,6 +11,7 @@ import ProfessorViewLectures from './ViewLectures';
 import ProfessorViewQuestions from './ViewQuestions';
 import ProfessorAddMCQuestion from './AddMCQuestion';
 import ProfessorAddFreeTextQuestion from './AddFreeTextQuestion';
+import ProfessorAddSliderQuestion from './AddSliderQuestion';
 import ProfessorAddLecture from './AddLecture';
 import Home from '../Home';
 import Login from '../Login';
@@ -54,7 +55,7 @@ class ProfessorRoutes extends React.Component {
                         <Route exact path='/professor/:lectureId/questions' component={ProfessorViewQuestions} />
                         <Route path='/professor/:lectureId/questions/new-mc' component={ProfessorAddMCQuestion} />
                         <Route path='/professor/:lectureId/questions/new-free-text' component={ProfessorAddFreeTextQuestion} />
-                        {/* <Route path='/professor/:lectureId/questions/new-slider' component={ProfessorAddSliderQuestion} /> */}
+                        <Route path='/professor/:lectureId/questions/new-slider' component={ProfessorAddSliderQuestion} />
                     </main>
                 </div>
             </Router>
