@@ -34,7 +34,6 @@ class QuestionPage extends Component {
     state = {
         show_previous_questions: false,
         show_last_question: true,
-        last_question: null,
     }
     
     constructor(props) {
@@ -81,22 +80,6 @@ class QuestionPage extends Component {
         }
     };
 
-    handleClick = () => {
-        const { course_id } = this.props.location.state;
-
-        if (!this.state.show_previous_questions) {
-            this.apiStudentService.loadAllPrevQuestions(course_id);
-            this.setState({
-                show_previous_questions: true,
-                show_last_question: false,
-            });
-        } else {
-            this.setState({
-                show_previous_questions: false,
-            }); 
-        }
-    };
-
     render() {
         return (
             <Grid container direction='column' spacing={Number("16")}>
@@ -133,7 +116,7 @@ class QuestionPage extends Component {
                 </Grid>
                 <Grid className={this.styles.gridContainer}>
                     <Paper className={this.styles.paper}>
-                        <Typography variant="h5" color="secondary"> {this.state.show_last_question ? "Recently Closed" : "Previous Questions"} </Typography>
+                        <Typography variant="h5" color="secondary"> {this.state.show_last_question && this.store.lastQuestion !== null ? "Recently Closed" : "Previous Questions"} </Typography>
                         {this.state.show_last_question ? (
                             <Grid className={this.styles.gridContainer}>
                                 {this.store.lastQuestion !== null ? (
@@ -142,9 +125,7 @@ class QuestionPage extends Component {
                                     ) : (
                                         <PrevFRQ isLast={true} />
                                     ) // TODO: handle new question types
-                                ) : (
-                                    <Typography color="secondary"> None </Typography>
-                                )} 
+                                ) : null } 
                             </Grid>
                         ) : null}
                         <Grid className={this.styles.gridContainer}>
