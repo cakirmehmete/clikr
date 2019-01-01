@@ -1,9 +1,10 @@
 #/src/views/ProfessorView
 
-from flask import request, Response, Blueprint, session, render_template, redirect
+from flask import request, Response, Blueprint, session, render_template, redirect, send_from_directory
 import uuid
 import datetime
-import random, string
+import random, string, os
+import csv
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
@@ -148,8 +149,6 @@ def add_professor(current_user, course_id):
         return custom_response({'error': 'course_id does not exist'}, 400)
 
     # check permissions
-    if not course:
-        return custom_response({'error': 'course_id does not exist'}, 400)
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
@@ -577,6 +576,66 @@ def get_answers(current_user, question_id):
     # retrieve answers and return
     answer_data = AnswerSchema().dump(question.answers, many=True).data
     return custom_response(answer_data, 200)
+
+@professor_api.route('/courses/<course_id>/grades', methods=['GET'])
+@Auth.professor_auth_required
+def get_grades(current_user, course_id):
+    """
+    returns a csv file with grades
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # build csv file
+    headers = ['netid']
+    score_dict = {}    # dictionary with student id's as keys, dictionaries as values (which in turn have question ids as keys and scores as values)
+
+    # process all questions in the course
+    lectures = course.lectures
+    for lecture in lectures:
+        questions = lecture.questions
+        for question in questions:
+            headers.append(question.id)
+            answers = question.answers
+            
+            # process each answer to this question
+            for answer in answers:
+                student_id = answer.student_id
+                score = 1 if question.is_correct(answer.answer) else 0
+
+                # add score to the student's list
+                if not student_id in score_dict:
+                    score_dict[student_id] = {}
+                score_dict[answer.student_id][question.id] = score
+
+    # note that heroku discards dynamically generated files on dyno restart!
+    filename = 'grades_' + course_id + '.csv'
+    with open('app/views/dynamic_content/grades/' + filename, 'w') as f:
+        csv.register_dialect('quote all', quoting=csv.QUOTE_ALL)
+        writer = csv.DictWriter(f, headers, restval='', dialect='quote all')
+        writer.writeheader()
+        for student_id, inner_dict in score_dict.items():
+            netId = StudentModel.get_student_by_uuid(student_id).netId
+            inner_dict['netid'] = netId
+            writer.writerow(inner_dict)
+
+    dirname = os.path.dirname(__file__)
+    path = os.path.join(dirname, "dynamic_content/grades/", filename)
+    print("======THE PATH IS: ", path)
+    if os.path.exists(path):
+        print("GOING TO SEND A FILE!")
+        try:
+            return send_from_directory('views/dynamic_content/grades', filename, as_attachment=True)
+        finally:
+            os.remove(path)
+    else:
+        return custom_response({'error': 'something is wrong'}, 500)
 
 @professor_api.route('/questions/<question_id>/statistics', methods=['GET'])
 @Auth.professor_auth_required
