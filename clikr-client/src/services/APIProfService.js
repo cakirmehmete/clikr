@@ -75,28 +75,18 @@ export default class APIProfService {
             })
     }
 
-    // Change course title
-    changeCourseTitle(course) {
-        patchUpdateCourseAPI(course)
-            .then(res => {
-                this.professorStore.updateCourse(course)
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
-    }
     // remove the course
     deleteCourse(course_id) {
         deleteCourseAPI(course_id)
-            .then(
+            .then(() => {
                 this.professorStore.removeCourse(course_id)
-            )
+            })
             .catch(error => {
                 console.log(error);
                 this._checkAuth(error);
             })
     }
+
     changeCourseTitle(courseId, courseTitle) {
         patchUpdateCourseAPI(courseId, courseTitle)
             // .then(res => {
