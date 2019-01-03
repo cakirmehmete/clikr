@@ -97,16 +97,16 @@ export default class APIProfService {
                 this._checkAuth(error);
             })
     }
-    changeCourseTitle(courseId, courseTitle) {
-        patchUpdateCourseAPI(courseId, courseTitle)
-            // .then(res => {
-            //     this.professorStore.updateCourse(course)
-            // })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
-    }
+    // changeCourseTitle(courseId, courseTitle) {
+    //     patchUpdateCourseAPI(courseId, courseTitle)
+    //         // .then(res => {
+    //         //     this.professorStore.updateCourse(course)
+    //         // })
+    //         .catch(error => {
+    //             console.log(error);
+    //             this._checkAuth(error);
+    //         })
+    // }
     // change lecture title
     changeLectureTitle(lectureId, lectureTitle) {
         patchUpdateLectureAPI(lectureId, lectureTitle)
