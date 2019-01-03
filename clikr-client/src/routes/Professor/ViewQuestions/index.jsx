@@ -57,6 +57,7 @@ class ProfessorViewQuestions extends React.Component {
         // Get the lecture
         this.props.apiService.loadData().then(() => {
             const { lectureId } = this.props.match.params
+            this.lectureId = lectureId
             this.setState({
                 parentLecture: this.props.profStore.getLectureWithId(lectureId)
             })
@@ -70,14 +71,14 @@ class ProfessorViewQuestions extends React.Component {
         switch (this.state.btnStatus) {
             case 0:
                 // Handle the "Open Question"
-                this.props.apiService.openQuestion(this.state.currentQuestionId)
+                this.props.apiService.openQuestion(this.state.currentQuestionId, this.lectureId)
                 socket.emit('subscribe professor', this.state.currentQuestionId)
                 this.setState({ btnStatus: 1, openQuestionId: this.state.currentQuestionId })
                 break;
 
             case 1:
                 // Handle the "Close Question"
-                this.props.apiService.closeQuestion(this.state.currentQuestionId)
+                this.props.apiService.closeQuestion(this.state.currentQuestionId, this.lectureId)
                 // Check if this is last question
                 if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length)
                     this.setState({ btnStatus: 3, openQuestionId: 0 })
@@ -87,7 +88,7 @@ class ProfessorViewQuestions extends React.Component {
 
             case 2:
                 // Handle the "Open Next Question"
-                this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1))
+                this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1), this.lectureId)
                 socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1))
 
                 // Update the index to the next question
