@@ -11,6 +11,9 @@ export default class ProfessorStore {
     }
 
     getLectureWithId(lecture_id) {
+        if (lecture_id === 0)
+            return { question: [] };
+
         const lectures = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
         return lectures.find(lecture => lecture.id === lecture_id)
     }

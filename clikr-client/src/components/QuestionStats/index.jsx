@@ -10,7 +10,9 @@ import CardContent from '@material-ui/core/CardContent';
 const socket = socketIOClient(socketioURL)
 
 const styles = theme => ({
-
+    card: {
+        marginBottom: 10
+    }
 });
 
 @inject("profStore")
@@ -29,28 +31,30 @@ class QuestionStats extends React.Component {
     }
 
     componentDidMount() {
-        socket.on('new results', (msg) => {
-            const values = []
+        socket.on('new results', () => {
+            this.props.apiService.loadAnswers(this.props.selectedQuestionId).then(msg => {
+                const values = []
 
-            // FIXME: Just a temporary fix for MC questions -- this should really depend on the question type!
-            const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
-            for (var i = 1; i <= question.number_of_options; i++) {
-                values[i - 1] = msg.answers[i]
-                if (msg.answers[i] === undefined)
-                    values[i - 1] = 0;
-            }
-
-            console.log("number of answers: " + msg.count);
-
-            this.setState({
-                data: {
-                    datasets: [{
-                        label: "Question Statistics",
-                        backgroundColor: '#E9C46A',
-                        borderColor: '#E9C46A',
-                        data: values,
-                    }]
+                // FIXME: Just a temporary fix for MC questions -- this should really depend on the question type!
+                const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
+                for (var j = 1; j <= question.number_of_options; j++) {
+                        values[j - 1] = 0;
                 }
+
+                for (var i = 0; i < msg.length; i++) {
+                    values[msg[i].answer - 1] = values[msg[i].answer - 1] + 1
+                }
+                
+                this.setState({
+                    data: {
+                        datasets: [{
+                            label: "Question Statistics",
+                            backgroundColor: '#E9C46A',
+                            borderColor: '#E9C46A',
+                            data: values,
+                        }]
+                    }
+                })
             })
         })
     }
@@ -96,12 +100,12 @@ class QuestionStats extends React.Component {
         }
 
         return (
-            <Card className={this.styles.card} hidden={this.state.question.id === 0}>
+            <Card className={this.styles.card} hidden={!this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open}>
                 <CardContent>
                     <Typography variant="h6" color="inherit">
                         Statistics for {this.state.question.question_title}
                     </Typography>
-                    <Bar data={this.state.data} options={options} />
+                    <Bar key={this.props.selectedQuestionId} data={this.state.data} options={options} />
                 </CardContent>
             </Card>
         );

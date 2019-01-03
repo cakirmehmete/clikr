@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import List from '@material-ui/core/List';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { observer, inject } from 'mobx-react';
@@ -118,7 +119,7 @@ class ProfessorViewQuestions extends React.Component {
         // Update the index to the next question
         if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length)
             this.setState({ btnStatus: 3, openQuestionId: 0 })
-        else 
+        else
             this.setState({
                 btnStatus: 2,
                 openQuestionId: 0
@@ -136,7 +137,7 @@ class ProfessorViewQuestions extends React.Component {
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.props.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
                     </Typography>
                     <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3}>
-                        {this.state.btnStatus === 0 ? "Open Question "  + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
+                        {this.state.btnStatus === 0 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                             this.state.btnStatus === 1 ? "Close Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                                 this.state.btnStatus === 2 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 2) :
                                     "No More Questions"}
@@ -147,7 +148,11 @@ class ProfessorViewQuestions extends React.Component {
                         <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
                     </Grid>
                     <Grid item xs={4}>
-                        <QuestionStats parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
+                        <List>
+                            {this.state.parentLecture.questions.map((questionObj, index) => {
+                                return (<QuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                            })}
+                        </List>
                     </Grid>
                 </Grid>
             </div>
