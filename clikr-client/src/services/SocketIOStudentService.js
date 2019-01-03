@@ -46,6 +46,7 @@ export default class SocketIOStudentService {
     getAllQuestions() {
         this.socket.on('all open questions', (data) => {
             this.store.updateAllQuestions(data.questions);
+            console.log(data)
         });
     }
 

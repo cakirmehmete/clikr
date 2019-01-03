@@ -84,7 +84,7 @@ class PrevFRQ extends Component {
         } else {
             backgroundStyle = this.styles.neutralAnswer;
         }
-
+    
         return (
             <div>
                 <Paper className={this.styles.paper}>

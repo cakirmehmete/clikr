@@ -34,12 +34,12 @@ export class MultipleChoiceQuestionObj extends QuestionObj {
 
 export class SliderQuestionObj extends QuestionObj {
 
-    constructor(id, lecture_id, question_type, question_title, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at, answer, upper_bound, lower_bound) {
+    constructor(id, lecture_id, question_type, question_title, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at, answer, lower_label, upper_label) {
 
         super(id, lecture_id, question_type, question_title, correct_answer, creator_id, is_open, opened_at, closed_at, created_at, modified_at, answer);
 
-        this.lower_label = lower_bound;
-        this.upper_label = upper_bound;
+        this.lower_label = lower_label;
+        this.upper_label = upper_label;
     }
 }
 
