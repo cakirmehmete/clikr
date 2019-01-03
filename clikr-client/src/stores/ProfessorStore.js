@@ -27,7 +27,8 @@ export default class ProfessorStore {
         if (lecture.questions.find(x => x.id === question_id) === undefined)
             return { questions: [] };
 
-        return lecture.questions.find(x => x.id === question_id)
+        return this.courses.find(course => course.lectures.find(lec => lec.id === lecture.id)).lectures
+            .find(lec => lec.id === lecture.id).questions.find(x => x.id === question_id)
     }
 
     @action
@@ -43,14 +44,14 @@ export default class ProfessorStore {
 
     @action
     updateCourse(course) {
-        const oldCourse = this.courses.find(x=> x.id === course.id);
+        const oldCourse = this.courses.find(x => x.id === course.id);
         oldCourse.title = course.title
     }
 
 
     @action
     deleteCourse(course_id) {
-        this.courses.remove(this.courses.find(x=> x.id === course_id));
+        this.courses.remove(this.courses.find(x => x.id === course_id));
     }
 
     @action
@@ -59,7 +60,7 @@ export default class ProfessorStore {
     }
     @action
     removeCourse(course_id) {
-        this.courses.remove(this.courses.find(x=> x.id === course_id));
+        this.courses.remove(this.courses.find(x => x.id === course_id));
     }
 
     @action
@@ -72,9 +73,22 @@ export default class ProfessorStore {
     removeQuestion(question_id) {
         this.questions.remove(this.course.find(x => x.id === question_id));
     }
+
     @action
     addQuestion(question) {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
             .find(lecture => lecture.id === question.lecture_id).questions.push(question);
+    }
+
+    @action
+    openQuestion(question_id, lecture_id) {
+        this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+            .find(lecture => lecture.id === lecture_id).questions.find(x => x.id === question_id).is_open = true;
+    }
+
+    @action
+    closeQuestion(question_id, lecture_id) {
+        this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+            .find(lecture => lecture.id === lecture_id).questions.find(x => x.id === question_id).is_open = false;
     }
 }
