@@ -1,4 +1,4 @@
-import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, deleteCourseAPI, getProfCoursesAPI } from '../utils/api-facade';
+import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI } from '../utils/api-facade';
 
 export default class APIProfService {
     constructor(professorStore) {
@@ -96,6 +96,40 @@ export default class APIProfService {
                 console.log(error);
                 this._checkAuth(error);
             })
+    }
+    changeCourseTitle(courseId, courseTitle) {
+        patchUpdateCourseAPI(courseId, courseTitle)
+            // .then(res => {
+            //     this.professorStore.updateCourse(course)
+            // })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+    // change lecture title
+    changeLectureTitle(lectureId, lectureTitle) {
+        patchUpdateLectureAPI(lectureId, lectureTitle)
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
+    // remove lectures- input is array of lecture ids
+    deleteLectures(lectures, courseId) {
+        lectures.map(id => {
+            return (
+                deleteLecturesAPI(id)
+                    .then(
+                        this.professorStore.removeLecture(id, courseId)
+                    )
+                    .catch(error => {
+                        console.log(error);
+                        this._checkAuth(error);
+                    })
+            )
+        })
     }
 
     addQuestion(question) {

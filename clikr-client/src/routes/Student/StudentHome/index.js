@@ -8,7 +8,7 @@ import { observer, inject } from 'mobx-react';
 import APIStudentService from '../../../services/APIStudentService';
 import { withStyles } from '@material-ui/core/styles'
 import AddCourseDialog from '../../../components/Student/AddCourseDialog';
-
+import SocketIOStudentService from '../../../services/SocketIOStudentService';
 
 const styles = theme => ({
     gridContainer: {
@@ -25,19 +25,23 @@ const styles = theme => ({
 @inject("store")
 @observer
 class StudentHome extends Component {
+    state = {
+        course_ids: []
+    }
+
     constructor(props) {
         super(props)
         this.store = props.store
         this.apiStudentService = new APIStudentService(this.store)
         this.styles = props.classes
+        this.socketIOStudentService = new SocketIOStudentService(this.store);
         
     }
-    state = {
-        course_ids: []
-    }
+    
     componentWillReceiveProps() {
         this.apiStudentService.loadAllCourses()
     }
+    
     render() {
         return (
            

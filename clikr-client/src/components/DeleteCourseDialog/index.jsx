@@ -45,12 +45,7 @@ class DeleteCourseDialog extends React.Component {
             courseTitle: this.courseTitle,
         });
     }
-    componentWillReceiveProps(nextProps) {
-        this.setState({
-            courseId: nextProps.course.id,
-            courseTitle: nextProps.course.title,
-        });
-    }
+
     handleOpen = () => {
         this.setState({ open: true });
     };

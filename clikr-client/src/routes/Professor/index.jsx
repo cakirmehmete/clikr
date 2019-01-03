@@ -5,13 +5,15 @@ import { inject } from 'mobx-react';
 import SideMenuBar from '../../components/SideMenuBar';
 import TopMenuBar from '../../components/TopMenuBar';
 import APIProfService from '../../services/APIProfService';
-import ProfessorHome from './Home';
+import ProfessorHome from './ProfessorHome';
 import ProfessorNewCourse from './NewCourse';
 import ProfessorViewLectures from './ViewLectures';
 import ProfessorViewQuestions from './ViewQuestions';
 import ProfessorAddMCQuestion from './AddMCQuestion';
 import ProfessorAddFreeTextQuestion from './AddFreeTextQuestion';
 import ProfessorAddLecture from './AddLecture';
+import Home from '../Home';
+import Login from '../Login';
 
 const drawerWidth = 240;
 
@@ -40,6 +42,8 @@ class ProfessorRoutes extends React.Component {
         return (
             <Router>
                 <div>
+                    <Route exact path='/' component={Home} />
+                    <Route exact path='/login-(prof|student)' component={Login} />
                     <Route path='/professor' component={TopMenuBar} />
                     <Route path='/professor' component={SideMenuBar} />
                     <main className={this.styles.content}>
@@ -50,6 +54,7 @@ class ProfessorRoutes extends React.Component {
                         <Route exact path='/professor/:lectureId/questions' component={ProfessorViewQuestions} />
                         <Route path='/professor/:lectureId/questions/new-mc' component={ProfessorAddMCQuestion} />
                         <Route path='/professor/:lectureId/questions/new-free-text' component={ProfessorAddFreeTextQuestion} />
+                        {/* <Route path='/professor/:lectureId/questions/new-slider' component={ProfessorAddSliderQuestion} /> */}
                     </main>
                 </div>
             </Router>

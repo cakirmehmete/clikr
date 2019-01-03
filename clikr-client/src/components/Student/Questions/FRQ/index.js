@@ -24,14 +24,6 @@ const styles = theme => ({
     buttonContainer: {
         padding: theme.spacing.unit*1.5,
     },
-    correctAnswer: {
-        backgroundColor: theme.palette.primary.light,
-    },
-    wrongAnswer: {
-        backgroundColor: theme.palette.primary.dark,
-    },
-    neutralAnswer: {
-    },
     paper: {
         padding: theme.spacing.unit,
     },
@@ -57,38 +49,17 @@ class FRQ extends Component {
     state = {
         answer: "",
         sent: "",
-        correct: undefined,
-        buttonText: "submit",
         disabled: false,
-        disabledInput: false,
-        helperText: "Enter Response",
         dialogue: false
     }
 
     componentWillReceiveProps(nextProps) {
         var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
 
-        if (a !== undefined) {
-            this.setState({
-                correct: a,
-                buttonText: "dismiss",
-                disabled: false,
-                disabledInput: true
-            });
-
-            if (a === "" || a === null) {
-                this.setState({
-                    helperText: "Your Answer"
-                });
-            } else if (this.state.answer === a) {
-                this.setState({
-                    helperText: "Correct"
-                });
-            } else {
-                this.setState({
-                    helperText: "Correct Answer: " + a
-                });
-            }
+        if (a !== undefined && this.store.lastQuestion !== this.question) {
+            // store this question and the answer into the last_question of the store
+            this.store.removeQuestionById(this.props.questionId);
+            this.store.updateLastAnswer(this.state.sent);
         }
     }
 
@@ -101,10 +72,7 @@ class FRQ extends Component {
     }
 
     handleClick = (e) => {
-        if (this.state.buttonText === "dismiss") {
-            this.store.removeQuestionById(this.props.questionId);
-        }
-        else if (this.state.sent === ""){
+        if (this.state.sent === ""){
             this.handleSubmit()
         }
         else if (this.state.sent !== this.state.answer) {
@@ -143,17 +111,6 @@ class FRQ extends Component {
     };
 
     render() {
-        var backgroundStyle;
-        if (this.state.correct && this.state.correct !== "") {
-            if (this.state.sent === this.state.correct) {
-                backgroundStyle = this.styles.correctAnswer;
-            } else {
-                backgroundStyle = this.styles.wrongAnswer;
-            }
-        } else {
-            backgroundStyle = this.styles.neutralAnswer;
-        }
-
         return (
             <div>
                 <Paper className={this.styles.paper}>
@@ -162,19 +119,17 @@ class FRQ extends Component {
                         <Grid item className={this.styles.gridItem}>
                             <TextField
                                 id="full-width"
-                                helperText={this.state.helperText}
+                                helperText="Enter Response"
                                 name = 'answer'
                                 value={this.state.answer}
                                 onChange={e => this.handleChange(e)}
                                 fullWidth
-                                disabled={this.state.disabledInput}
-                                className={backgroundStyle}
                             />
                         </Grid>
                     </Grid>
                     <Grid container direction='row' justify="flex-end" className={this.styles.buttonContainer}>
                         <Button onClick={this.handleClick} disabled={this.state.disabled} variant="contained" color="secondary">
-                        {this.state.buttonText}
+                            Submit
                         </Button>
                         <Dialog
                             open={this.state.dialogue}
