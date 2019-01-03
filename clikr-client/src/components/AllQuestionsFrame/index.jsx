@@ -52,7 +52,7 @@ class AllQuestionsFrame extends React.Component {
                     </Typography>
                     <List component="nav">
                         {this.props.parentLecture.questions.map((questionObj, index) => {
-                            return (<QuestionListItem parentLecture={this.props.parentLecture} questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId} />
+                            return (<QuestionListItem handleListClose={this.props.handleListClose} handleClick={this.props.handleClick} parentLecture={this.props.parentLecture} questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId} />
                             )
                         })}
                     </List>

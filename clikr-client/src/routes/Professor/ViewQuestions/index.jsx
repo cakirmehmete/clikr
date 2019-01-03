@@ -40,17 +40,16 @@ const styles = theme => ({
 @inject("apiService")
 @observer
 class ProfessorViewQuestions extends React.Component {
-    constructor(props) {
-        super(props)
-        this.styles = props.classes
-
-        this.state = {
-            currentQuestionIndex: 0,
+    state = {
+        currentQuestionIndex: 0,
             currentQuestionId: 0,
             openQuestionId: 0,
             btnStatus: 0,
             parentLecture: { questions: [] }
-        }
+    }
+    constructor(props) {
+        super(props)
+        this.styles = props.classes
     }
 
     componentDidMount() {
@@ -67,13 +66,27 @@ class ProfessorViewQuestions extends React.Component {
         })
     }
 
+    componentWillReceiveProps(nextProps) {
+        const newParentLecture = nextProps.profStore.getLectureWithId(this.lectureId)
+        console.log(newParentLecture)
+        this.setState({
+            parentLecture: newParentLecture,
+            currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+        })
+    
+    }
+
     handleBtnClick = () => {
         switch (this.state.btnStatus) {
             case 0:
-                // Handle the "Open Question"
-                this.props.apiService.openQuestion(this.state.currentQuestionId, this.lectureId)
-                socket.emit('subscribe professor', this.state.currentQuestionId)
-                this.setState({ btnStatus: 1, openQuestionId: this.state.currentQuestionId })
+                if (!this.props.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).is_open) {
+                    // Handle the "Open Question"
+                    console.log(this.state.currentQuestionId)
+                    console.log(this.lectureId)
+                    this.props.apiService.openQuestion(this.state.currentQuestionId, this.lectureId)
+                    socket.emit('subscribe professor', this.state.currentQuestionId)
+                    this.setState({ btnStatus: 1, openQuestionId: this.state.currentQuestionId })
+                }
                 break;
 
             case 1:
