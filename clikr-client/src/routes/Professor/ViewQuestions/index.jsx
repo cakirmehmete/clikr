@@ -70,14 +70,14 @@ class ProfessorViewQuestions extends React.Component {
         switch (this.state.btnStatus) {
             case 0:
                 // Handle the "Open Question"
-                this.props.apiService.openQuestion(this.state.currentQuestionId)
+                this.props.apiService.openQuestion(this.state.currentQuestionId, this.state.parentLecture.id)
                 socket.emit('subscribe professor', this.state.currentQuestionId)
                 this.setState({ btnStatus: 1, openQuestionId: this.state.currentQuestionId })
                 break;
 
             case 1:
                 // Handle the "Close Question"
-                this.props.apiService.closeQuestion(this.state.currentQuestionId)
+                this.props.apiService.closeQuestion(this.state.currentQuestionId, this.state.parentLecture.id)
                 // Check if this is last question
                 if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length)
                     this.setState({ btnStatus: 3, openQuestionId: 0 })
@@ -87,7 +87,7 @@ class ProfessorViewQuestions extends React.Component {
 
             case 2:
                 // Handle the "Open Next Question"
-                this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1))
+                this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1), this.state.parentLecture.id)
                 socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1))
 
                 // Update the index to the next question
@@ -104,6 +104,27 @@ class ProfessorViewQuestions extends React.Component {
         }
     }
 
+    handleListClick = (question_id) => {
+        // Update the index to the next question
+        this.setState({
+            btnStatus: 1,
+            currentQuestionIndex: this.convertQuestionIdToIndex(question_id),
+            currentQuestionId: question_id,
+            openQuestionId: question_id
+        })
+    }
+
+    handleListClickClose = (question_id) => {
+        // Update the index to the next question
+        if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length)
+            this.setState({ btnStatus: 3, openQuestionId: 0 })
+        else 
+            this.setState({
+                btnStatus: 2,
+                openQuestionId: 0
+            })
+    }
+
     render() {
         return (
             <div>
@@ -112,18 +133,18 @@ class ProfessorViewQuestions extends React.Component {
                         {this.state.parentLecture.title} Lecture on {this.state.parentLecture.date}
                     </Typography>
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
-                        Q{this.state.currentQuestionIndex + 1}: {this.props.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
+                        Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.props.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
                     </Typography>
                     <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3}>
-                        {this.state.btnStatus === 0 ? "Open Question" :
-                            this.state.btnStatus === 1 ? "Close Question" :
-                                this.state.btnStatus === 2 ? "Open Next Question" :
+                        {this.state.btnStatus === 0 ? "Open Question "  + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
+                            this.state.btnStatus === 1 ? "Close Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
+                                this.state.btnStatus === 2 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 2) :
                                     "No More Questions"}
                     </Button>
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={8}>
-                        <AllQuestionsFrame parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
+                        <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
                     </Grid>
                     <Grid item xs={4}>
                         <QuestionStats parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
@@ -138,6 +159,14 @@ class ProfessorViewQuestions extends React.Component {
             return this.state.parentLecture.questions[index].id
         else
             return 0
+    }
+
+    convertQuestionIdToIndex(question_id) {
+        for (var i = 0; i < this.state.parentLecture.questions.length; i++) {
+            if (this.state.parentLecture.questions[i].id === question_id)
+                return i;
+        }
+        return 0;
     }
 }
 
