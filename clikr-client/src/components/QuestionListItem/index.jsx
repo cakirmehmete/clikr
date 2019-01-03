@@ -2,8 +2,11 @@ import React from 'react';
 import OpenClosedButton from '../OpenClosedButton';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItem from '@material-ui/core/ListItem';
+import { observer, inject } from 'mobx-react';
 
-export default class QuestionListItem extends React.Component {
+@inject("profStore")
+@observer
+class QuestionListItem extends React.Component {
     state = {
         selected: false
     }
@@ -21,10 +24,12 @@ export default class QuestionListItem extends React.Component {
 
     render() {
         return (
-            <ListItem selected={this.props.questionObj.id === this.props.openQuestion || this.state.selected} divider >
+            <ListItem selected={this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionObj.id).is_open} divider >
                 <ListItemText primary={this.props.questionObj.question_title} />
-                <OpenClosedButton questionId={this.props.questionObj.id} handleToUpdate={this.handleToUpdate} />
+                <OpenClosedButton parentLecture={this.props.parentLecture} questionId={this.props.questionObj.id} handleToUpdate={this.handleToUpdate} />
             </ListItem>
         );
     }
 }
+
+export default QuestionListItem
