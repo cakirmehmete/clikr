@@ -40,16 +40,17 @@ const styles = theme => ({
 @inject("apiService")
 @observer
 class ProfessorViewQuestions extends React.Component {
-    state = {
-        currentQuestionIndex: 0,
+   
+    constructor(props) {
+        super(props)
+        this.styles = props.classes
+        this.state = {
+            currentQuestionIndex: 0,
             currentQuestionId: 0,
             openQuestionId: 0,
             btnStatus: 0,
             parentLecture: { questions: [] }
-    }
-    constructor(props) {
-        super(props)
-        this.styles = props.classes
+        }
     }
 
     componentDidMount() {
@@ -66,26 +67,15 @@ class ProfessorViewQuestions extends React.Component {
         })
     }
 
-    componentWillReceiveProps(nextProps) {
-        const newParentLecture = nextProps.profStore.getLectureWithId(this.lectureId)
-        console.log(newParentLecture)
-        this.setState({
-            parentLecture: newParentLecture,
-            currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
-        })
-    
-    }
-
     handleBtnClick = () => {
         switch (this.state.btnStatus) {
             case 0:
-                if (!this.props.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).is_open) {
+                if (!this.props.profStore.getQuestionWithId(this.state.parentLecture, this.convertQuestionIndexToId(this.state.currentQuestionIndex)).is_open) {
                     // Handle the "Open Question"
-                    console.log(this.state.currentQuestionId)
-                    console.log(this.lectureId)
-                    this.props.apiService.openQuestion(this.state.currentQuestionId, this.lectureId)
-                    socket.emit('subscribe professor', this.state.currentQuestionId)
-                    this.setState({ btnStatus: 1, openQuestionId: this.state.currentQuestionId })
+
+                    this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex), this.props.match.params)
+                    socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex))
+                    this.setState({ btnStatus: 1, openQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex), currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex) })
                 }
                 break;
 
@@ -148,10 +138,14 @@ class ProfessorViewQuestions extends React.Component {
     }
 
     convertQuestionIndexToId(index) {
-        if (index < this.state.parentLecture.questions.length)
-            return this.state.parentLecture.questions[index].id
-        else
-            return 0
+        if (index < this.state.parentLecture.questions.length) {
+            return this.state.parentLecture.questions[index].id;
+        }
+            
+        else {
+            return 0;
+        }
+            
     }
 }
 
