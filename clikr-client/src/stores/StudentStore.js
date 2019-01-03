@@ -181,4 +181,9 @@ export default class StudentStore {
       this.questions.remove(this.questions.find(x => x.id === question_id));
   }
 
+  // get number of open questions for course 
+  getNumberOfQuestions() {
+    return this.questions.length;  
+  }
+
 }

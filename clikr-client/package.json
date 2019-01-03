@@ -6,7 +6,11 @@
     "@date-io/date-fns": "0.0.2",
     "@material-ui/core": "^3.6.1",
     "@material-ui/icons": "^3.0.1",
+<<<<<<< HEAD
     "@material-ui/lab": "^3.0.0-alpha.26",
+=======
+    "@material-ui/lab": "^3.0.0-alpha.27",
+>>>>>>> origin/slider
     "@svgr/webpack": "2.4.1",
     "axios": "^0.18.0",
     "bfj": "6.1.1",

@@ -88,8 +88,8 @@ class QuestionPage extends Component {
                 <Header />
                 <Grid className={this.styles.gridContainer}>
                     <Paper className={this.styles.paper} style={{backgroundColor: "secondary"}}>
-                        <Typography variant="h5" color="secondary"> {this.socketIOStudentService.getNumberOfQuestions() !== 0 ? "Open Questions" : "No Open Questions..."} </Typography>
-                        {this.socketIOStudentService.getNumberOfQuestions() !== 0 ? (
+                        <Typography variant="h5" color="secondary"> {this.store.getNumberOfQuestions() !== 0 ? "Open Questions" : "No Open Questions..."} </Typography>
+                        {this.store.getNumberOfQuestions() !== 0 ? (
                             <Grid>
                                 {this.store.questions.map(q => {
                                     if (q.question_type === 'free_text') {
