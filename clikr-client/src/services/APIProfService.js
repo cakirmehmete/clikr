@@ -28,6 +28,7 @@ export default class APIProfService {
     }
 
     openQuestion(question_id, lecture_id) {
+        console.log(question_id, lecture_id)
         postOpenQuestionAPI(question_id)
             .then(res => {
                 console.log(res)
