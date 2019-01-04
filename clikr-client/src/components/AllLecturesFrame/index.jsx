@@ -10,6 +10,9 @@ import PropTypes from 'prop-types';
 import CourseObj from '../../models/LectureObj';
 import ListOfAllLectures from '../ListOfAllLectures';
 import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+import DoneIcon from '@material-ui/icons/Done';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteLecturesList from '../DeleteLecturesList';
@@ -165,9 +168,9 @@ class AllLecturesFrame extends React.Component {
                                 <Grid container direction="row" justify="flex-end">
                                     <Grid item>
                                         <Tooltip title={deleteAction} placement="top-start">
-                                            <Button variant="text" size="small" onClick={this.handleDelete.bind(this)}>
-                                                <Icon className={this.styles.icon} color="secondary">{deleteAction}</Icon>
-                                            </Button>
+                                            <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
+                                                {deleteAction === 'delete' ? <DeleteIcon /> : <DoneIcon />}
+                                            </IconButton>
                                         </Tooltip>
                                     </Grid>
                                     <Grid item>

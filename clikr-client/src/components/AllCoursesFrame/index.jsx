@@ -9,6 +9,9 @@ import { observer } from 'mobx-react';
 import ListOfAllCourses from '../ListOfAllCourses';
 import DeleteCoursesList from '../DeleteCoursesList';
 import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+import DoneIcon from '@material-ui/icons/Done';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import Dialog from '@material-ui/core/Dialog';
@@ -127,10 +130,10 @@ class AllCoursesFrame extends React.Component {
                             <Grid item>
                                 <Grid container direction="row" justify="flex-end">
                                     <Grid item>
-                                        <Tooltip title={deleteAction} placement="top-start">
-                                            <Button variant="text" size="small" onClick={this.handleDelete.bind(this)}>
-                                                <Icon className={this.styles.icon} color="secondary">{deleteAction}</Icon>
-                                            </Button>
+                                        <Tooltip title={deleteAction} placement="top">
+                                            <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
+                                                {deleteAction === 'delete' ? <DeleteIcon /> : <DoneIcon />}
+                                            </IconButton>
                                         </Tooltip>
                                     </Grid>
                                     <Grid item>
