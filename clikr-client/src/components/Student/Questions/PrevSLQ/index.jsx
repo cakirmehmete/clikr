@@ -106,10 +106,8 @@ class PrevSLQ extends Component {
             return this.operatorToComparison(Number(answer), expression[0], Number(expression[1]))
         }
         else {
-            console.log(expression);
             const exp1 = this.operatorToComparison(Number(answer), expression[0], Number(expression[1]))
             const exp2 = this.operatorToComparison(Number(answer), expression[3], Number(expression[4]))
-            
             if (expression[2] === "&&") return exp1 && exp2;
             return exp1 || exp2;
         }

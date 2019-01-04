@@ -306,9 +306,9 @@ class ProfessorAddSliderQuestion extends React.Component {
             val = Math.round(val);
         }
         
+    
         this.setState({ answer_bounds: answerBounds },
             () => { this.validateBoundsAndOperators() });
-    
 
     };
 
@@ -389,39 +389,47 @@ class ProfessorAddSliderQuestion extends React.Component {
     };
 
     // true will be && and false will be ||
-    getOperatorCondition() {
-        const lower_operator = this.state.equality_operators.lower;
-        const upper_operator = this.state.equality_operators.upper;
+    getOperatorCondition(lower_operator) {
+        
         let condition = true;
 
         switch (lower_operator) {
             case "<":
-                condition = (upper_operator === "<" || upper_operator === "<=");
+                condition = "||";
                 break;
             case "<=":
-                condition = (upper_operator === "<" || upper_operator === "<=");
+                condition = "||";
                 break;
             case ">":
-                condition = (upper_operator === ">" || upper_operator === ">=");
+                condition = "&&";
                 break;
             case ">=":
-                condition = (upper_operator === ">" || upper_operator === ">=");
+                condition = "&&";
                 break;
             default:
                 condition = true;
         }
-        if (condition) {
-            return "&&";
-        }
-        return "||";
+        return condition;
     }
 
     handleSubmit = () => {
         const { lectureId } = this.props.match.params;
         let correct_answer = "";
+        
         if (this.state.has_correct_answer) {
             if (this.state.range) {
-                correct_answer = this.state.equality_operators.lower + " " + this.state.answer_bounds.lower.toString() + " " +  this.getOperatorCondition() + " " + this.state.equality_operators.upper + " " + this.state.answer_bounds.upper.toString();
+                let answerBounds = this.state.answer_bounds;
+                let equalityOperators = this.state.equality_operators;
+                if (Number(answerBounds.lower) > Number(answerBounds.upper)) {
+                    const lower = answerBounds.lower;
+                    answerBounds.lower = answerBounds.upper;
+                    answerBounds.upper = lower;
+                    let equalityOperators = this.state.equality_operators;
+                    const lower_operator = this.state.equality_operators.lower;
+                    equalityOperators.lower = equalityOperators.upper;
+                    equalityOperators.upper = lower_operator;
+                }
+                correct_answer = equalityOperators.lower + " " + answerBounds.lower.toString() + " " +  this.getOperatorCondition(equalityOperators.lower) + " " + equalityOperators.upper + " " + answerBounds.upper.toString();
             }
             else {
                 correct_answer = this.state.equality_operators.lower + " " + this.state.answer_bounds.lower.toString();
