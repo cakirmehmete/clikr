@@ -95,7 +95,10 @@ class AddStudentsModal extends React.Component {
                     onClose={this.handleClose}
                 >
                     <div style={getModalStyle()} className={classes.paper}>
-                        <Typography variant="h6">
+                        <Typography variant="subtitle1">
+                            Share this code with your students:
+                        </Typography>
+                        <Typography variant="h5" gutterBottom>
                             {this.state.code}
                         </Typography>
                         <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Done</Button>
