@@ -73,7 +73,7 @@ class ProfessorViewQuestions extends React.Component {
                 if (!this.props.profStore.getQuestionWithId(this.state.parentLecture, this.convertQuestionIndexToId(this.state.currentQuestionIndex)).is_open) {
                     // Handle the "Open Question"
 
-                    this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex), this.props.match.params)
+                    this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex), this.state.parentLecture.id)
                     socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex))
                     this.setState({ btnStatus: 1, openQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex), currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex) })
                 }
@@ -81,7 +81,7 @@ class ProfessorViewQuestions extends React.Component {
 
             case 1:
                 // Handle the "Close Question"
-                this.props.apiService.closeQuestion(this.state.currentQuestionId, this.lectureId)
+                this.props.apiService.closeQuestion(this.state.currentQuestionId, this.state.parentLecture.id)
                 // Check if this is last question
                 if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length)
                     this.setState({ btnStatus: 3, openQuestionId: 0 })
@@ -91,7 +91,7 @@ class ProfessorViewQuestions extends React.Component {
 
             case 2:
                 // Handle the "Open Next Question"
-                this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1), this.lectureId)
+                this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1), this.state.parentLecture.id)
                 socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1))
 
                 // Update the index to the next question
