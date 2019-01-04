@@ -38,7 +38,6 @@ class AllCoursesFrame extends React.Component {
         deletions: [],
         delTitles: [], // only holds titles
         delIds: [],
-        heading: "Here are your courses",
         open: false
     }
 
@@ -65,7 +64,6 @@ class AllCoursesFrame extends React.Component {
         if (!this.state.deleteMode) {
             this.setState({
                 deleteMode: true,
-                heading: "Select courses to delete"
             })
         }
         else {
@@ -93,7 +91,6 @@ class AllCoursesFrame extends React.Component {
     handleClose = () => {
         this.setState({ 
             deleteMode: false,
-            heading: "Here are your courses",
             open: false,
             delIds: [],
             delTitles: [],
@@ -121,11 +118,6 @@ class AllCoursesFrame extends React.Component {
 
         return (
             <div>
-                 
-            <Typography variant="subtitle1" color="textPrimary">
-                    {this.state.heading}: 
-                </Typography>
-             
                 <Card className={this.props.classes.card}>
                     <CardContent>
                         <Grid container direction='row' justify='space-between' alignItems='stretch'>
@@ -144,7 +136,7 @@ class AllCoursesFrame extends React.Component {
                                     <Grid item>
                                         <Button onClick={this.handleNewCourseClick} color="primary">
                                             <Icon className={this.styles.icon} color="primary">add_circle</Icon>
-                                            Add Courses
+                                            Add Course
                                         </Button>
                                     </Grid>    
                                 </Grid>  
