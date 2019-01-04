@@ -111,6 +111,8 @@ export function postNewQuestionAPI(question) {
         option4: question.option4,
         option5: question.option5,
         number_of_options: question.number_of_options,
-        word_limit: question.word_limit
+        word_limit: question.word_limit,
+        lower_label: question.lower_label,
+        upper_label: question.upper_label,
     });
 }
