@@ -33,28 +33,56 @@ class QuestionStats extends React.Component {
     componentDidMount() {
         socket.on('new results', () => {
             this.props.apiService.loadAnswers(this.props.selectedQuestionId).then(msg => {
-                const values = []
 
                 // FIXME: Just a temporary fix for MC questions -- this should really depend on the question type!
                 const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
-                for (var j = 1; j <= question.number_of_options; j++) {
+                console.log(question.question_type)
+                if (question.question_type === "multiple_choice") {
+                    const values = []
+
+                    for (var j = 1; j <= question.number_of_options; j++) {
                         values[j - 1] = 0;
+                    }
+
+                    for (var i = 0; i < msg.length; i++) {
+                        values[msg[i].answer - 1] = values[msg[i].answer - 1] + 1
+                    }
+
+                    this.setState({
+                        data: {
+                            datasets: [{
+                                label: "Question Statistics",
+                                backgroundColor: '#E9C46A',
+                                borderColor: '#E9C46A',
+                                data: values,
+                            }]
+                        }
+                    })
+                } else if (question.question_type === "free_text") {
+                    const values = {}
+
+                    for (var a = 0; a < msg.length; a++) {
+                        values[msg[a].answer] = 0
+                    }
+
+                    for (var l = 0; l < msg.length; l++) {
+                        values[msg[l].answer] = values[msg[l].answer] + 1
+                    }
+
+                    console.log(values)
+                    this.setState({
+                        data: {
+                            datasets: [{
+                                label: "Question Statistics",
+                                labels: Object.keys(values),
+                                backgroundColor: '#E9C46A',
+                                borderColor: '#E9C46A',
+                                data: Object.values(values),
+                            }]
+                        }
+                    })
                 }
 
-                for (var i = 0; i < msg.length; i++) {
-                    values[msg[i].answer - 1] = values[msg[i].answer - 1] + 1
-                }
-                
-                this.setState({
-                    data: {
-                        datasets: [{
-                            label: "Question Statistics",
-                            backgroundColor: '#E9C46A',
-                            borderColor: '#E9C46A',
-                            data: values,
-                        }]
-                    }
-                })
             })
         })
     }
