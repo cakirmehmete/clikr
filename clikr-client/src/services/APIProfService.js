@@ -98,6 +98,7 @@ export default class APIProfService {
                 this._checkAuth(error);
             })
     }
+
     // change lecture title
     changeLectureTitle(lectureId, lectureTitle) {
         patchUpdateLectureAPI(lectureId, lectureTitle)

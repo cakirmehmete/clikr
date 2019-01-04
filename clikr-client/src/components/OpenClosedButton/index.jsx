@@ -31,12 +31,14 @@ class OpenClosedButton extends React.Component {
             // Handle the "Open Question"
             this.props.apiService.openQuestion(this.props.questionId, this.props.parentLecture.id)
             socket.emit('subscribe professor', this.props.questionId)
+            this.props.handleClick(this.props.questionId)
             this.props.handleToUpdate(true)
         }
         else {
             // Handle the "Close Question"
             this.props.apiService.closeQuestion(this.props.questionId, this.props.parentLecture.id)
             this.props.handleToUpdate(false)
+            this.props.handleListClose(this.props.questionId)
         }
     }
 
