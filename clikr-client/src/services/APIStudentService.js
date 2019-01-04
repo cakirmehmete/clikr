@@ -61,7 +61,6 @@ export default class APIStudentService {
     async postAnswer(answer, question_id) {
         postAnswerQuestionAPI(answer, question_id)
             .then(res => {
-                this.studentStore.updateLastAnswer(answer)
                 return res.data
             })
             .catch(error => {

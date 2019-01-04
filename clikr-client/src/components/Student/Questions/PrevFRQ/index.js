@@ -36,7 +36,7 @@ class PrevFRQ extends Component {
 
     constructor(props) {
         super(props);
-        this.store = this.props.store;
+        this.store = props.store;
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
         this.question = null;
