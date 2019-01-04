@@ -75,38 +75,29 @@ export default class APIProfService {
             })
     }
 
-    // Change course title
-    changeCourseTitle(course) {
-        patchUpdateCourseAPI(course)
-            .then(res => {
-                this.professorStore.updateCourse(course)
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
-    }
     // remove the course
     deleteCourse(course_id) {
         deleteCourseAPI(course_id)
-            .then(
+            .then(() => {
                 this.professorStore.removeCourse(course_id)
-            )
+                this.loadData()
+            })
             .catch(error => {
                 console.log(error);
                 this._checkAuth(error);
             })
     }
-    // changeCourseTitle(courseId, courseTitle) {
-    //     patchUpdateCourseAPI(courseId, courseTitle)
-    //         // .then(res => {
-    //         //     this.professorStore.updateCourse(course)
-    //         // })
-    //         .catch(error => {
-    //             console.log(error);
-    //             this._checkAuth(error);
-    //         })
-    // }
+
+    changeCourseTitle(courseId, courseTitle) {
+        patchUpdateCourseAPI(courseId, courseTitle)
+            // .then(res => {
+            //     this.professorStore.updateCourse(course)
+            // })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
     // change lecture title
     changeLectureTitle(lectureId, lectureTitle) {
         patchUpdateLectureAPI(lectureId, lectureTitle)
@@ -121,9 +112,9 @@ export default class APIProfService {
         lectures.map(id => {
             return (
                 deleteLecturesAPI(id)
-                    .then(
+                    .then(() => {
                         this.professorStore.removeLecture(id, courseId)
-                    )
+                    })
                     .catch(error => {
                         console.log(error);
                         this._checkAuth(error);

@@ -102,7 +102,7 @@ class AllCoursesFrame extends React.Component {
     };
 
     handleFinalDeletion = () => {
-        this.apiProfService.deleteCourses(this.state.delIds);
+        this.apiProfService.deleteCourse(this.state.delIds);
         this.handleClose()
     };
 

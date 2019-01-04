@@ -67,7 +67,7 @@ class PrevSLQ extends Component {
 
     state = {
         question: {question_title: "", upper_label: "", lower_label: "", correct_answer: " "}, 
-        answer: "",
+        answer: -1,
         correct: true, 
         helperText: ""
     }
@@ -87,7 +87,6 @@ class PrevSLQ extends Component {
 
         if (this.props.isLast) {
             question = this.store.lastQuestion;
-            console.log(this.store.lastAnswer)
             if (this.store.lastAnswer !== null) {
                 answer = Number(this.store.lastAnswer);
             } 
@@ -117,6 +116,38 @@ class PrevSLQ extends Component {
              helperText: helperText
          })
     }
+
+    componentWillReceiveProps(nextProps) {
+
+        if (this.props.isLast && nextProps.store.lastQuestion.id !== this.state.question.id) {
+            const question = nextProps.store.lastQuestion;
+            let answer = this.state.answer;
+            let correct = this.state.correct;
+            let helperText = "";
+
+            if (this.store.lastAnswer !== null) {
+                answer = Number(nextProps.store.lastAnswer);
+            } 
+            correct = this.checkAnswer(question.correct_answer, answer);
+        
+            if (question.correct_answer === "" || question.correct_answer === null) {
+                helperText = "Your Answer: " + answer.toString() + "%"
+            } else if (correct) {
+                helperText = "Correct"
+            } else {
+                helperText = "Correct Answer: " + this.getAnswerText(question.correct_answer) 
+            }
+
+            this.setState({
+                question: question,
+                answer: answer,
+                correct: correct,
+                helperText: helperText
+            })
+
+        }
+    }
+
 
     // helper method to see if answer is correct
     operatorToComparison(response, operator, answer) {
