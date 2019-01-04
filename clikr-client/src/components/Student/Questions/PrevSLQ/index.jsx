@@ -67,7 +67,7 @@ class PrevSLQ extends Component {
 
     state = {
         question: {question_title: "", upper_label: "", lower_label: "", correct_answer: " "}, 
-        answer: -1,
+        answer: "",
         correct: true, 
         helperText: ""
     }
@@ -87,6 +87,7 @@ class PrevSLQ extends Component {
 
         if (this.props.isLast) {
             question = this.store.lastQuestion;
+            console.log(this.store.lastAnswer)
             if (this.store.lastAnswer !== null) {
                 answer = Number(this.store.lastAnswer);
             } 
