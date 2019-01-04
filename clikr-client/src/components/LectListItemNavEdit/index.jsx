@@ -10,6 +10,8 @@ import Button from '@material-ui/core/Button';
 import InputBase from '@material-ui/core/InputBase';
 import ListItemText from '@material-ui/core/ListItemText';
 import FormControl from '@material-ui/core/FormControl';
+import Grid from '@material-ui/core/Grid';
+import { baseURL } from '../../constants/api';
 
 const styles = theme => ({
     iconDone: {
@@ -151,13 +153,24 @@ class LectListItemNavEdit extends React.Component {
             return (
                  <ListItem button divider onClick={this.handleToLecture}>
                    <ListItemText primary={this.state.lectureTitle} />
-                    <ListItemSecondaryAction>
-                        <Tooltip title="change title" placement="top-start">
-                            <Button variant="text" size="small" onClick={this.handleEditOpen}>
-                                <Icon color="secondary">edit</Icon>
-                            </Button>
-                        </Tooltip>
-                    </ListItemSecondaryAction>
+                        <ListItemSecondaryAction>  
+                            <Grid container direction="row" justify="flex-end">  
+                                <Grid item>
+                                    <Tooltip title="Export Grades" placement="top-start">
+                                        <Button variant="text" size="small" href={baseURL + "professor/lectures/" + this.lectureId + "/exportgrades"} target="_blank">
+                                            <Icon className={this.styles.icon} color="secondary">import_export</Icon>
+                                        </Button>
+                                    </Tooltip>
+                                </Grid>
+                                <Grid item>
+                                    <Tooltip title="change title" placement="top-start">
+                                        <Button variant="text" size="small" onClick={this.handleEditOpen}>
+                                            <Icon color="secondary">edit</Icon>
+                                        </Button>
+                                    </Tooltip>
+                                </Grid>
+                            </Grid>
+                        </ListItemSecondaryAction>
                 </ListItem>
             )
         }
