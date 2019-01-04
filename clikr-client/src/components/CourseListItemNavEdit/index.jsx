@@ -4,6 +4,8 @@ import { Redirect } from "react-router-dom";
 import ListItem from '@material-ui/core/ListItem';
 import { observer } from 'mobx-react';
 import Icon from '@material-ui/core/Icon';
+import EditIcon from '@material-ui/icons/Edit';
+import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Button from '@material-ui/core/Button';
@@ -166,9 +168,12 @@ class CourseListItemNavEdit extends React.Component {
                         <Grid container direction="row" justify="flex-end">
                             <Grid item>
                                 <Tooltip title="change title" placement="top-start">
-                                    <Button variant="text" size="small" onClick={this.handleEditOpen}>
+                                    <IconButton onClick={this.handleEditOpen}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    {/* <Button variant="text" size="small" onClick={this.handleEditOpen}>
                                         <Icon color="secondary">edit</Icon>
-                                    </Button>
+                                    </Button> */}
                                 </Tooltip>
                             </Grid>
                             <Grid item>
