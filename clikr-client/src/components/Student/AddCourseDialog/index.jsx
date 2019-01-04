@@ -34,9 +34,11 @@ class AddCourseDialog extends React.Component {
     }
 
     state = {
+        message: "Enter Course Enrollment Code:",
         open: false,
         code: "",
         disabled: true,
+        errorMsg: null,
     };
 
     handleChange = (e) => {
@@ -60,10 +62,31 @@ class AddCourseDialog extends React.Component {
     handleClose = () => {
         this.setState({ open: false });
     }
+
+    enroll() {
+        this.apiStudentService.enrollCourse(this.state.code).then((data) => {
+            if (data.error !== null) {
+                this.setState(() => {
+                    return {
+
+                        message: data.error,
+                        errorMsg: null,
+                        disabled: true,
+                        open: true,
+                    }
+                });
+            }
+            
+        });
+    }
     handleSubmit = () => {
-        this.apiStudentService.enrollCourse(this.state.code)
-        this.apiStudentService.loadAllCourses()
-        this.handleClose();
+        
+        this.enroll();
+        if (this.state.message !== "Enter Course Enrollment Code:") {
+            this.apiStudentService.loadAllCourses();
+            this.handleClose();
+        }
+
     };
 
     
@@ -79,7 +102,7 @@ class AddCourseDialog extends React.Component {
                         aria-labelledby="alert-dialog-title"
                         aria-describedby="alert-dialog-description"
                     >
-                        <DialogTitle id="alert-dialog-title">{"Enter Course Enrollment Code:"}</DialogTitle>
+                        <DialogTitle id="alert-dialog-title">{this.state.message}</DialogTitle>
                         <DialogContent>
                             <TextField
                                 id="title"

@@ -18,6 +18,7 @@ export default class StudentStore {
   @observable
   lastAnswer = null;  // the submitted answer to the most recently closed question
 
+
   /** Call this when the question is closed and the component about to unmount.
    *  DO NOT call it when the student submits an answer!
    */
