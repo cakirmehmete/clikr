@@ -48,7 +48,6 @@ export default class ProfessorStore {
         oldCourse.title = course.title
     }
 
-
     @action
     deleteCourse(course_id) {
         this.courses.remove(this.courses.find(x => x.id === course_id));

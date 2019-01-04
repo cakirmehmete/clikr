@@ -40,10 +40,10 @@ const styles = theme => ({
 @inject("apiService")
 @observer
 class ProfessorViewQuestions extends React.Component {
+   
     constructor(props) {
         super(props)
         this.styles = props.classes
-
         this.state = {
             currentQuestionIndex: 0,
             currentQuestionId: 0,
@@ -57,6 +57,7 @@ class ProfessorViewQuestions extends React.Component {
         // Get the lecture
         this.props.apiService.loadData().then(() => {
             const { lectureId } = this.props.match.params
+            this.lectureId = lectureId
             this.setState({
                 parentLecture: this.props.profStore.getLectureWithId(lectureId)
             })
@@ -69,10 +70,13 @@ class ProfessorViewQuestions extends React.Component {
     handleBtnClick = () => {
         switch (this.state.btnStatus) {
             case 0:
-                // Handle the "Open Question"
-                this.props.apiService.openQuestion(this.state.currentQuestionId, this.state.parentLecture.id)
-                socket.emit('subscribe professor', this.state.currentQuestionId)
-                this.setState({ btnStatus: 1, openQuestionId: this.state.currentQuestionId })
+                if (!this.props.profStore.getQuestionWithId(this.state.parentLecture, this.convertQuestionIndexToId(this.state.currentQuestionIndex)).is_open) {
+                    // Handle the "Open Question"
+
+                    this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex), this.state.parentLecture.id)
+                    socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex))
+                    this.setState({ btnStatus: 1, openQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex), currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex) })
+                }
                 break;
 
             case 1:
@@ -155,10 +159,14 @@ class ProfessorViewQuestions extends React.Component {
     }
 
     convertQuestionIndexToId(index) {
-        if (index < this.state.parentLecture.questions.length)
-            return this.state.parentLecture.questions[index].id
-        else
-            return 0
+        if (index < this.state.parentLecture.questions.length) {
+            return this.state.parentLecture.questions[index].id;
+        }
+            
+        else {
+            return 0;
+        }
+            
     }
 
     convertQuestionIdToIndex(question_id) {

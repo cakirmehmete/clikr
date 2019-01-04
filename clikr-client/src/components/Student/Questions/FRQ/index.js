@@ -53,14 +53,9 @@ class FRQ extends Component {
         dialogue: false
     }
 
-    componentWillReceiveProps(nextProps) {
-        var a =  this.store.getQuestionWithId(nextProps.questionId).correct_answer
-
-        if (a !== undefined && this.store.lastQuestion !== this.question) {
-            // store this question and the answer into the last_question of the store
-            this.store.removeQuestionById(this.props.questionId);
-            this.store.updateLastAnswer(this.state.sent);
-        }
+    componentWillUnmount() {
+        // question closed -> store answer into store.lastAnswer
+        this.store.updateLastAnswer(this.state.sent);
     }
 
     handleSubmit = () => {

@@ -78,9 +78,10 @@ export default class APIProfService {
     // remove the course
     deleteCourse(course_id) {
         deleteCourseAPI(course_id)
-            .then(
+            .then(() => {
                 this.professorStore.removeCourse(course_id)
-            )
+                this.loadData()
+            })
             .catch(error => {
                 console.log(error);
                 this._checkAuth(error);
@@ -112,9 +113,9 @@ export default class APIProfService {
         lectures.map(id => {
             return (
                 deleteLecturesAPI(id)
-                    .then(
+                    .then(() => {
                         this.professorStore.removeLecture(id, courseId)
-                    )
+                    })
                     .catch(error => {
                         console.log(error);
                         this._checkAuth(error);
