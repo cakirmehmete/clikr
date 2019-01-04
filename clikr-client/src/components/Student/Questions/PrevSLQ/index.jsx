@@ -199,46 +199,12 @@ class PrevSLQ extends Component {
 
     render() {
         
-        // if (this.props.isLast) {
-        //     this.question = this.store.lastQuestion;
-        //     if (this.store.lastAnswer !== null) {
-        //         this.answer = this.store.lastAnswer;
-        //     } 
-        // } else {
-        //     this.question = this.store.getPrevQuestionWithId(this.props.questionId);
-            
-        //     if (this.question.answer !== null) {
-        //         this.answer = this.question.answer;
-        //         console.log(this.answer)
-        //     }   
-        // }
-
-        
-        
-        // // correct answer
-        // var a =  Number(this.question.correct_answer)
-        // console.log(a)
-        // console.log(typeof a)
-        // console.log(this.answer)
-        // console.log(typeof this.answer)
-        // if (a !== undefined) {
-        //     this.correct = a;
-
-        //     if (a === "" || a === null) {
-        //         this.helperText = "Your Answer: "
-        //     } else if (this.answer === a) {
-        //         this.helperText = "Correct"
-        //     } else {
-        //         this.helperText = "Correct Answer: " + this.getAnswerText(a.toString())
-        //     }
-        // }
-        
         var backgroundStyle;
         if (this.state.correct) {
             if (this.state.question.correct_answer !== "" && this.state.question.correct_answer !== null) {
-                backgroundStyle = this.styles.neutralAnswer;
-            } else {
                 backgroundStyle = this.styles.correctAnswer;
+            } else {
+                backgroundStyle = this.styles.neutralAnswer;
             }
         } else {
             backgroundStyle = this.styles.wrongAnswer;
