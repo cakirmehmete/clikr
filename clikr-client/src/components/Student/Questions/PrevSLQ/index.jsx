@@ -65,17 +65,95 @@ const styles = theme => ({
 @observer
 class PrevSLQ extends Component {
 
+    state = {
+        question: {question_title: "", upper_label: "", lower_label: "", correct_answer: " "}, 
+        answer: -1,
+        correct: true, 
+        helperText: ""
+    }
     constructor(props) {
         super(props);
-        this.store = this.props.store;
+        this.store = props.store;
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
-        this.question = null;
-        this.answer = -1;
-        this.correct = null;
-        this.helperText = "";
+        
     }
 
+    componentDidMount() {
+        let question = this.state.question;
+        let answer = this.state.answer;
+        let correct = this.state.correct;
+        let helperText = "";
+
+        if (this.props.isLast) {
+            question = this.store.lastQuestion;
+            if (this.store.lastAnswer !== null) {
+                answer = Number(this.store.lastAnswer);
+            } 
+        } else {
+            question = this.store.getPrevQuestionWithId(this.props.questionId);
+            
+            if (question.answer !== null) {
+                answer = Number(question.answer);
+            }   
+        }
+        
+
+         correct = this.checkAnswer(question.correct_answer, answer);
+        
+         if (question.correct_answer === "" || question.correct_answer === null) {
+            helperText = "Your Answer: " + answer.toString() + "%"
+        } else if (correct) {
+            helperText = "Correct"
+        } else {
+            helperText = "Correct Answer: " + this.getAnswerText(question.correct_answer) 
+        }
+
+         this.setState({
+             question: question,
+             answer: answer,
+             correct: correct,
+             helperText: helperText
+         })
+    }
+
+    // helper method to see if answer is correct
+    operatorToComparison(response, operator, answer) {
+        let correct = false;
+        switch(operator) {
+            case "<":
+                correct = response < answer;
+                break;
+            case "<=":
+                correct = response <= answer;
+                break;
+            case ">":
+                correct = response > answer;
+                break;
+            case ">=":
+                correct = response >= answer;
+                break;
+            default:
+                correct = response === answer;
+        } 
+        return correct;
+    }
+    
+    // check ifanswer is correct
+    checkAnswer(correct_answer, answer) {
+        if (correct_answer === null) return true;
+        const expression = correct_answer.split(" ");
+        if (expression.length === 2) {
+            return this.operatorToComparison(Number(answer), expression[0], Number(expression[1]))
+        }
+        else {
+            const exp1 = this.operatorToComparison(Number(answer), expression[0], Number(expression[1]))
+            const exp2 = this.operatorToComparison(Number(answer), expression[3], Number(expression[4]))
+            
+            if (expression[2] === "&&") return exp1 && exp2;
+            return exp1 || exp2;
+        }
+    }
     // helper method for function that turns answer into a more readable form 
     operatorToWord(operator) {
         let string = "equals";
@@ -106,6 +184,9 @@ class PrevSLQ extends Component {
 
     // turn the answer into a more readable form
     getAnswerText(answer) {
+        if (answer === null) {
+            return "";
+        }
         const expression = answer.split(" ");
         if (expression.length === 2) {
             return "answer " + this.operatorToWord(expression[0]) + " " +  expression[1] + "%";
@@ -115,42 +196,52 @@ class PrevSLQ extends Component {
         }
     }
 
+
     render() {
-        if (this.props.isLast) {
-            this.question = this.store.lastQuestion;
-            if (this.store.lastAnswer !== null) {
-                this.answer = Number(this.store.lastAnswer);
-            } 
-        } else {
-            this.question = this.store.getPrevQuestionWithId(this.props.questionId);
-            if (this.question.answer !== null) {
-                this.answer = Number(this.question.answer);
-            }   
-        }
+        
+        // if (this.props.isLast) {
+        //     this.question = this.store.lastQuestion;
+        //     if (this.store.lastAnswer !== null) {
+        //         this.answer = this.store.lastAnswer;
+        //     } 
+        // } else {
+        //     this.question = this.store.getPrevQuestionWithId(this.props.questionId);
+            
+        //     if (this.question.answer !== null) {
+        //         this.answer = this.question.answer;
+        //         console.log(this.answer)
+        //     }   
+        // }
 
-        // correct answer
-        var a =  this.question.correct_answer
-        if (a !== undefined) {
-            this.correct = a;
+        
+        
+        // // correct answer
+        // var a =  Number(this.question.correct_answer)
+        // console.log(a)
+        // console.log(typeof a)
+        // console.log(this.answer)
+        // console.log(typeof this.answer)
+        // if (a !== undefined) {
+        //     this.correct = a;
 
-            if (a === "" || a === null) {
-                this.helperText = "Your Answer: "
-            } else if (this.answer === Number(a)) {
-                this.helperText = "Correct"
-            } else {
-                this.helperText = "Correct Answer: " + this.getAnswerText(a)
-            }
-        }
-
+        //     if (a === "" || a === null) {
+        //         this.helperText = "Your Answer: "
+        //     } else if (this.answer === a) {
+        //         this.helperText = "Correct"
+        //     } else {
+        //         this.helperText = "Correct Answer: " + this.getAnswerText(a.toString())
+        //     }
+        // }
+        
         var backgroundStyle;
-        if (this.correct && this.correct !== "") {
-            if (this.answer === this.correct) {
-                backgroundStyle = this.styles.correctAnswer;
+        if (this.state.correct) {
+            if (this.state.question.correct_answer !== "" && this.state.question.correct_answer !== null) {
+                backgroundStyle = this.styles.neutralAnswer;
             } else {
-                backgroundStyle = this.styles.wrongAnswer;
+                backgroundStyle = this.styles.correctAnswer;
             }
         } else {
-            backgroundStyle = this.styles.neutralAnswer;
+            backgroundStyle = this.styles.wrongAnswer;
         }
         return (
             <div>
@@ -159,13 +250,13 @@ class PrevSLQ extends Component {
                         <Grid item>
                             <Grid container direction="row" justify="space-between" alignItems="flex-start" spacing={16}>
                                 <Grid item xs>
-                                    <div className={this.styles.titleWrap}> {this.question.question_title} </div>
+                                    <div className={this.styles.titleWrap}> {this.state.question.question_title} </div>
                                 </Grid>
                                 <Grid item xs={4}>
                                     <Grid container justify="flex-end" direction="row" className={this.styles.percentContainer}>
                                         <Card className={this.styles.card}>
                                             <Typography align="center" className={this.styles.whiteTypography}>
-                                                {this.answer.toString() + " "}%
+                                                {this.state.answer.toString() + " "}%
                                             </Typography>
                                         </Card>
                                     </Grid>
@@ -177,13 +268,13 @@ class PrevSLQ extends Component {
                                 <Grid container direction="row" justify="center" alignItems="center" spacing={24}>
                                     <Grid item xs>
                                         <Grid container justify="center">
-                                            <div className={this.styles.labels}>{this.question.lower_label}</div>
+                                            <div className={this.styles.labels}>{this.state.question.lower_label}</div>
                                         </Grid>
                                     </Grid>
                                     <Grid item xs={8}>
                                         <Slider
                                             disabled
-                                            value={this.answer}
+                                            value={this.state.answer}
                                             min={0}
                                             max={100}
                                             step={1}
@@ -192,14 +283,14 @@ class PrevSLQ extends Component {
                                     </Grid>
                                     <Grid item xs>
                                         <Grid container justify="center">
-                                            <div className={this.styles.labels}>{this.question.upper_label}</div>
+                                            <div className={this.styles.labels}>{this.state.question.upper_label}</div>
                                         </Grid>
                                     </Grid>
                                 </Grid> 
                                 <Grid container direction="row" >
                                     <TextField
                                         id="correctAnswer"
-                                        helperText={this.helperText}
+                                        helperText={this.state.helperText}
                                         fullWidth
                                         disabled
                                     />
