@@ -26,4 +26,5 @@ def compute_question_statistics(question_id):
     results = {}
     results['answers'] = answers
     results['count'] = count
+    results['question_id'] = question_id
     return results
