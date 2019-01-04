@@ -162,7 +162,7 @@ class SLQ extends Component {
                         <Grid container direction="row" justify="center" alignItems="center" spacing={24} className={this.styles.gridItem}>
                             <Grid item xs>
                                 <Grid container justify="center">
-                                    <div className={this.styles.labels}>{this.question.upper_label}</div>
+                                    <div className={this.styles.labels}>{this.question.lower_label}</div>
                                 </Grid>
                             </Grid>
                             <Grid item xs={8}>
