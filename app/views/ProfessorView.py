@@ -623,7 +623,7 @@ def get_answers(current_user, question_id):
 
 @professor_api.route('/courses/<course_id>/exportgrades', methods=['GET'])
 @Auth.professor_auth_required
-def get_grades(current_user, course_id):
+def export_course_grades(current_user, course_id):
     """
     returns a csv file with grades
     """
@@ -636,12 +636,46 @@ def get_grades(current_user, course_id):
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
+    # call helper function to create the export file
+    return _export_grades(course=course)
+
+@professor_api.route('/lectures/<lecture_id>/exportgrades', methods=['GET'])
+@Auth.professor_auth_required
+def export_lecture_grades(current_user, lecture_id):
+    """
+    returns a csv file with grades
+    """
+    # retrieve lecture and check if valid
+    lecture = LectureModel.get_lecture_by_uuid(lecture_id)
+    if not lecture:
+        return custom_response({'error': 'lecture_id does not exist'}, 400)
+
+    # check permissions
+    if not current_user in lecture.course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # call helper function to create the export file
+    return _export_grades(lecture=lecture)
+
+def _export_grades(course=None, lecture=None):
+    """
+    helper function that creates a csv file with grades for either an entire course or a single lecture
+    """
+
     # build csv file
     headers = ['netid']
     score_dict = {}    # dictionary with student id's as keys, dictionaries as values (which in turn have question ids as keys and scores as values)
 
-    # process all questions in the course
-    lectures = course.lectures
+    if course:
+        lectures = course.lectures
+        file_id = course.id
+    elif lecture:
+        lectures = [lecture]
+        file_id = lecture.id
+    else:
+        raise Exception('must pass either course or lecture')
+    
+    # process all questions
     for lecture in lectures:
         questions = lecture.questions
         for question in questions:
@@ -659,7 +693,7 @@ def get_grades(current_user, course_id):
                 score_dict[answer.student_id][question.id] = score
 
     # note that heroku discards dynamically generated files on dyno restart!
-    filename = 'grades_' + course_id + '.csv'
+    filename = 'grades_' + file_id + '.csv'
     with open('app/views/dynamic_content/grades/' + filename, 'w') as f:
         csv.register_dialect('quote all', quoting=csv.QUOTE_ALL)
         writer = csv.DictWriter(f, headers, restval='', dialect='quote all')
