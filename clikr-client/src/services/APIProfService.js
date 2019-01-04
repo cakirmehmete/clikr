@@ -75,17 +75,21 @@ export default class APIProfService {
             })
     }
 
-    // remove the course
-    deleteCourse(course_id) {
-        deleteCourseAPI(course_id)
-            .then(() => {
-                this.professorStore.removeCourse(course_id)
-                this.loadData()
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
+    // remove courses
+    deleteCourses(courses) {
+        courses.map(id => {
+            return(
+                deleteCourseAPI(id)
+                .then(() => {
+                    this.professorStore.removeCourse(id)
+                    this.loadData()
+                })
+                .catch(error => {
+                    console.log(error);
+                    this._checkAuth(error);
+                })
+            )
+        })
     }
 
     changeCourseTitle(courseId, courseTitle) {

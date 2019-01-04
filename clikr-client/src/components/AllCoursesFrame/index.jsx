@@ -69,18 +69,18 @@ class AllCoursesFrame extends React.Component {
             })
         }
         else {
-            const lectArr = [];
+            const courseArr = [];
             const delTitles = []
             for (let i = 0; i < this.state.deletions.length; i++) {
                 if (this.state.deletions[i].checked) {
-                    lectArr.push(this.state.deletions[i].id);
+                    courseArr.push(this.state.deletions[i].id);
                     delTitles.push(this.state.deletions[i].title);
                 }
             }
-            if (lectArr.length > 0) {
+            if (courseArr.length > 0) {
                 this.setState({
                     delTitles: delTitles,
-                    delIds: lectArr,
+                    delIds: courseArr,
                     open: true
                 })
             }
@@ -102,7 +102,7 @@ class AllCoursesFrame extends React.Component {
     };
 
     handleFinalDeletion = () => {
-        this.apiProfService.deleteCourse(this.state.delIds);
+        this.apiProfService.deleteCourses(this.state.delIds);
         this.handleClose()
     };
 
