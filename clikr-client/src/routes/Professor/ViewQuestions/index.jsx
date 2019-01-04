@@ -44,6 +44,7 @@ class ProfessorViewQuestions extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
+        this.lectureId = null
         this.state = {
             currentQuestionIndex: 0,
             currentQuestionId: 0,
@@ -65,6 +66,11 @@ class ProfessorViewQuestions extends React.Component {
                 currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
             })
         })
+    }
+
+    componentWillUnmount() {
+        // close all questions in this lecture
+        this.props.apiService.closeAllQuestions(this.lectureId)
     }
 
     handleBtnClick = () => {

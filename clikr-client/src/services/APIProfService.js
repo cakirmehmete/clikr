@@ -1,4 +1,4 @@
-import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI } from '../utils/api-facade';
+import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, postCloseAllQuestionsAPI } from '../utils/api-facade';
 
 export default class APIProfService {
     constructor(professorStore) {
@@ -44,6 +44,18 @@ export default class APIProfService {
             .then(res => {
                 console.log(res)
                 this.professorStore.closeQuestion(question_id, lecture_id)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
+    closeAllQuestions(lecture_id) {
+        postCloseAllQuestionsAPI(lecture_id)
+            .then(res => {
+                console.log(res)
+                this.professorStore.closeAllQuestionsForLecture(lecture_id)
             })
             .catch(error => {
                 console.log(error);
