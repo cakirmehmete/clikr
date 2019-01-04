@@ -57,6 +57,13 @@ class QuestionModel(db.Model):
         self.created_at = timestamp
         self.modified_at = timestamp
 
+    def is_correct(self, answer_text):
+        """
+        returns true if the given answer_text string is a correct answer to this question or if no correct answer was specified for the question;
+        by default, compares answer_text to correct_answer; subclasses need to override this method if further processing is required
+        """
+        return self.correct_answer == None or self.correct_answer == '' or answer_text == self.correct_answer
+
     def save(self):
         db.session.add(self)
         db.session.commit()

@@ -8,6 +8,7 @@ export default class APIStudentService {
     loadAllCourses() {
         getStudentCoursesAPI()
             .then(res => {
+                console.log(res.data)
                 this.studentStore.updateAllCourses(res.data)
 
             })

@@ -14,6 +14,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import FormControl from '@material-ui/core/FormControl';
 import AddStudentsModal from '../AddStudentsModal';
 import Grid from '@material-ui/core/Grid';
+import { baseURL } from '../../constants/api';
 
 const styles = theme => ({
     iconDone: {
@@ -174,6 +175,13 @@ class CourseListItemNavEdit extends React.Component {
                                     {/* <Button variant="text" size="small" onClick={this.handleEditOpen}>
                                         <Icon color="secondary">edit</Icon>
                                     </Button> */}
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="Export Grades" placement="top-start">
+                                    <Button variant="text" size="small" href={baseURL + "professor/courses/" + this.courseId + "/exportgrades"} target="_blank">
+                                        <Icon className={this.styles.icon} color="secondary">import_export</Icon>
+                                    </Button>
                                 </Tooltip>
                             </Grid>
                             <Grid item>

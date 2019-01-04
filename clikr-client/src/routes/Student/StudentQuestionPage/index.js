@@ -9,8 +9,10 @@ import APIStudentService from '../../../services/APIStudentService';
 import { observer, inject } from 'mobx-react';
 import FRQ from '../../../components/Student/Questions/FRQ';
 import MCQ from '../../../components/Student/Questions/MCQ';
+import SLQ from '../../../components/Student/Questions/SLQ';
 import PrevMCQ from '../../../components/Student/Questions/PrevMCQ';
 import PrevFRQ from '../../../components/Student/Questions/PrevFRQ';
+import PrevSLQ from '../../../components/Student/Questions/PrevSLQ';
 import { withStyles } from '@material-ui/core/styles';
 import SocketIOStudentService from '../../../services/SocketIOStudentService';
 
@@ -100,11 +102,22 @@ class QuestionPage extends Component {
                                     }
                                     else {
                                         // TODO: handle slider and drag-and-drop questions!
-                                        return (
-                                            <Grid item className={this.styles.gridItem} key={q.id}>
-                                                <MCQ questionId={q.id} />
-                                            </Grid>
-                                        )
+                                        if (q.question_type === "slider") {
+                                            return (
+                                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                                    <SLQ questionId={q.id} />
+                                                </Grid>
+                                            )
+                                        }
+                                        else {
+                                            return (
+                                                <Grid item className={this.styles.gridItem} key={q.id}>
+                                                    <MCQ questionId={q.id} />
+                                                </Grid>
+                                            )
+
+                                        }
+                                       
                                     }
             
                                 })}
@@ -122,9 +135,9 @@ class QuestionPage extends Component {
                                 {this.store.lastQuestion !== null ? (
                                     this.store.lastQuestion.question_type === "multiple_choice" ? (
                                         <PrevMCQ isLast={true} />
-                                    ) : (
+                                    ) : this.store.lastQuestion.question_type === "free_text" ? (
                                         <PrevFRQ isLast={true} />
-                                    ) // TODO: handle new question types
+                                    ) : (<PrevSLQ isLast={true} />)
                                 ) : null } 
                             </Grid>
                         ) : null}
@@ -146,12 +159,21 @@ class QuestionPage extends Component {
                                             )
                                         }
                                         else {
-                                            // TODO: handle slider and drag-and-drop questions!
-                                            return (
-                                                <Grid item className={this.styles.gridItem} key={q.id}>
-                                                    <PrevMCQ questionId={q.id}/>
-                                                </Grid>
-                                            )
+                                            if (q.question_type === "multiple_choice") {
+                                                return (
+                                                    <Grid item className={this.styles.gridItem} key={q.id}>
+                                                        <PrevMCQ questionId={q.id}/>
+                                                    </Grid>
+                                                )
+                                            }
+                                            else {
+                                                return (
+                                                    <Grid item className={this.styles.gridItem} key={q.id}>
+                                                        <PrevSLQ questionId={q.id}/>
+                                                    </Grid>
+                                                )
+                                            }
+                                            
                                         }
             
                                     })) : 
