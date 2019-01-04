@@ -15,21 +15,11 @@ export default class APIProfService {
                 this._checkAuth(error);
             })
     }
+
     loadAllCourses() {
         return getProfCoursesAPI()
-        .then(res => {
-            this.professorStore.updateAllCourseData(res.data)
-        })
-        .catch(error => {
-            console.log(error);
-            this._checkAuth(error);
-        })
-    }
-    
-    openQuestion(question_id) {
-        postOpenQuestionAPI(question_id)
             .then(res => {
-                console.log(res)
+                this.professorStore.updateAllCourseData(res.data)
             })
             .catch(error => {
                 console.log(error);
@@ -37,17 +27,30 @@ export default class APIProfService {
             })
     }
 
-    closeQuestion(question_id) {
-        postCloseQuestionAPI(question_id)
+    openQuestion(question_id, lecture_id) {
+        postOpenQuestionAPI(question_id)
             .then(res => {
                 console.log(res)
+                this.professorStore.openQuestion(question_id, lecture_id)
             })
             .catch(error => {
                 console.log(error);
                 this._checkAuth(error);
             })
     }
-    
+
+    closeQuestion(question_id, lecture_id) {
+        postCloseQuestionAPI(question_id)
+            .then(res => {
+                console.log(res)
+                this.professorStore.closeQuestion(question_id, lecture_id)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
     addLecture(lecture) {
         postNewLectureAPI(lecture)
             .then(res => {
@@ -72,48 +75,47 @@ export default class APIProfService {
             })
     }
 
-    // Change course title
+    // remove the course
+    deleteCourse(course_id) {
+        deleteCourseAPI(course_id)
+            .then(() => {
+                this.professorStore.removeCourse(course_id)
+                this.loadData()
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
     changeCourseTitle(courseId, courseTitle) {
         patchUpdateCourseAPI(courseId, courseTitle)
-        // .then(res => {
-        //     this.professorStore.updateCourse(course)
-        // })
-        .catch(error => {
-            console.log(error);
-            this._checkAuth(error);
-        })
+            // .then(res => {
+            //     this.professorStore.updateCourse(course)
+            // })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
     }
+
     // change lecture title
     changeLectureTitle(lectureId, lectureTitle) {
         patchUpdateLectureAPI(lectureId, lectureTitle)
-        .catch(error => {
-            console.log(error);
-            this._checkAuth(error);
-        })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
     }
-    // remove the course
-    deleteCourses(courses) {
-        courses.map(id => {
-            return (
-                deleteCourseAPI(id)
-                    .then(
-                        this.professorStore.removeCourse(id)
-                    )
-                    .catch(error => {
-                        console.log(error);
-                        this._checkAuth(error);
-                    })
-            )
-        })
-    }
-     // remove lectures- input is array of lecture ids
-     deleteLectures(lectures, courseId) {
+
+    // remove lectures- input is array of lecture ids
+    deleteLectures(lectures, courseId) {
         lectures.map(id => {
             return (
                 deleteLecturesAPI(id)
-                    .then(
+                    .then(() => {
                         this.professorStore.removeLecture(id, courseId)
-                    )
+                    })
                     .catch(error => {
                         console.log(error);
                         this._checkAuth(error);
@@ -136,10 +138,10 @@ export default class APIProfService {
     }
     async getLogoutProf() {
         getLogoutProfAPI()
-        .catch(error => {
-            console.log(error);
-            this._checkAuth(error);
-        })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
     }
 
     _checkAuth(error) {

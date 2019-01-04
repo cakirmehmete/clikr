@@ -13,47 +13,40 @@ const styles = theme => ({
 });
 
 @inject("apiService")
+@inject("profStore")
 @observer
 class OpenClosedButton extends React.Component {
-    state = {
-        btnStatus: 0,
-    }
-
     constructor(props) {
         super(props)
         this.styles = props.classes
     }
 
+    componentDidMount() {
+        // Make sure the questions are updated
+        this.props.apiService.loadData()
+    }
+
     handleBtnClick() {
-        switch (this.state.btnStatus) {
-            case 0:
-                // Handle the "Open Question"
-                this.props.apiService.openQuestion(this.props.questionId)
-                socket.emit('subscribe professor', this.props.questionId)
-                this.setState({ btnStatus: 1 })
-                this.props.handleToUpdate(true)
-                break;
-
-            case 1:
-                // Handle the "Close Question"
-                this.props.apiService.closeQuestion(this.props.questionId)
-                this.setState({ btnStatus: 0 })
-                this.props.handleToUpdate(false)
-                break;
-
-            default:
-                break;
+        if (!this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionId).is_open) {
+            // Handle the "Open Question"
+            this.props.apiService.openQuestion(this.props.questionId, this.props.parentLecture.id)
+            socket.emit('subscribe professor', this.props.questionId)
+            this.props.handleClick(this.props.questionId)
+            this.props.handleToUpdate(true)
+        }
+        else {
+            // Handle the "Close Question"
+            this.props.apiService.closeQuestion(this.props.questionId, this.props.parentLecture.id)
+            this.props.handleToUpdate(false)
+            this.props.handleListClose(this.props.questionId)
         }
     }
 
     render() {
         return (
             <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()}
-                className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 2}>
-                {this.state.btnStatus === 0 ? "Open" :
-                    this.state.btnStatus === 1 ? "Close" :
-                        "Closed"
-                }
+                className={this.styles.startLectureBtn}>
+                {!this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionId).is_open ? "Open" : "Close"}
             </Button>
         );
     }
