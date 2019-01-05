@@ -62,7 +62,6 @@ class AddCourseDialog extends React.Component {
             open: true,
             code: "",
             disabled: true,
-            errorMsg: null,
         })
     };
     handleClose = () => {
@@ -76,9 +75,15 @@ class AddCourseDialog extends React.Component {
                     return {
 
                         message: data.error,
-                        errorMsg: null,
                         disabled: true,
                         open: true,
+                    }
+                });
+            }
+            else {
+                this.setState(() => {
+                    return {
+                        open: false,
                     }
                 });
             }
