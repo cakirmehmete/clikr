@@ -70,7 +70,7 @@ class TopMenuBar extends React.Component {
 
 
         return (
-            <AppBar position="static" color="inherit" className={this.styles.appBar}>
+            <AppBar position="sticky" color="inherit" className={this.styles.appBar}>
                 <Toolbar>
                     <IconButton className={classes.homeButton} onClick={this.handleHome} color="primary">
                         <SvgIcon>
