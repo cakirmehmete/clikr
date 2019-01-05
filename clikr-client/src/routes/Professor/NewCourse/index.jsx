@@ -8,6 +8,7 @@ import APIProfService from '../../../services/APIProfService';
 import { observer, inject } from 'mobx-react';
 import CourseObj from '../../../models/CourseObj';
 
+
 const styles = theme => ({
     paper: {
         position: 'absolute',
@@ -65,14 +66,16 @@ class ProfessorNewCourse extends React.Component {
         }, () => { this.handleValidation(value) });
     };
 
-    handleSubmit = () => {
+    handleSubmit = (event) => {
         // Send course to API
         this.apiProfService.addCourse(
             new CourseObj(this.state.name)
         )
         // Close modal
         this.setState({ toHome: true });
+        event.preventDefault();
     }
+
 
     // TODO: Make the year and term and Dept a drop down
     render() {
@@ -85,7 +88,7 @@ class ProfessorNewCourse extends React.Component {
                 <Typography variant="h6" color="textPrimary">
                     Add New Course:
                 </Typography>
-                <form className={this.styles.container} noValidate autoComplete="off">
+                <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
                     <TextField
                         id="standard-name"
                         label="Course Name"
@@ -95,11 +98,11 @@ class ProfessorNewCourse extends React.Component {
                         margin="normal"
                     />
                     <Button
+                        type="submit"
                         disabled={!this.state.nameValid}
                         variant="outlined"
                         color="primary"
-                        onClick={this.handleSubmit}>
-                            Submit
+                        > submit
                     </Button>
                 </form>
             </div>
