@@ -43,6 +43,12 @@ export function postCloseQuestionAPI(question_id) {
     });
 }
 
+export function postCloseAllQuestionsAPI(lecture_id) {
+    return axios.post(baseURL + 'professor/lectures/' + lecture_id, {
+        action: "close"
+    });
+}
+
 // course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {

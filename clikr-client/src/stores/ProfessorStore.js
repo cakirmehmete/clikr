@@ -93,4 +93,14 @@ export default class ProfessorStore {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
             .find(lecture => lecture.id === lecture_id).questions.find(x => x.id === question_id).is_open = false;
     }
+
+    @action
+    closeAllQuestionsForLecture(lecture_id) {
+        var questions = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+            .find(lecture => lecture.id === lecture_id).questions;
+        
+        for (var question of questions) {
+            question.is_open = false;
+        }
+    }
 }
