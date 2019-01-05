@@ -87,9 +87,10 @@ class QuestionStats extends React.Component {
         })
     }
 
-    componentDidUpdate() {
-        if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
-            const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
+    componentWillReceiveProps(nextProps) {
+
+        if (this.state.question.id !== nextProps.selectedQuestionId && nextProps.selectedQuestionId !== 0) {
+            const question = this.props.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.selectedQuestionId)
             socket.emit('subscribe professor', question.id)
             const labels = []
             for (var i = 0; i < question.number_of_options; i++)
@@ -102,7 +103,7 @@ class QuestionStats extends React.Component {
             })
         }
 
-        if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId === 0) {
+        if (this.state.question.id !== nextProps.selectedQuestionId && nextProps.selectedQuestionId === 0) {
             this.setState({
                 question: { id: 0, data: { labels: [] } }
             })
