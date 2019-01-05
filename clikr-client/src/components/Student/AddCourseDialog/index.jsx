@@ -57,15 +57,21 @@ class AddCourseDialog extends React.Component {
         
     }  
     handleOpen = () => {
-        this.setState({ open: true });
+        this.setState({
+            message: "Enter Course Enrollment Code:",
+            open: true,
+            code: "",
+            disabled: true,
+            errorMsg: null,
+        })
     };
     handleClose = () => {
-        this.setState({ open: false });
+        this.setState({ open: false })
     }
 
     enroll() {
         this.apiStudentService.enrollCourse(this.state.code).then((data) => {
-            if (data.error !== null) {
+            if (data !== null) {
                 this.setState(() => {
                     return {
 
@@ -82,7 +88,7 @@ class AddCourseDialog extends React.Component {
     handleSubmit = () => {
         
         this.enroll();
-        if (this.state.message !== "Enter Course Enrollment Code:") {
+        if (this.state.message === "Enter Course Enrollment Code:") {
             this.apiStudentService.loadAllCourses();
             this.handleClose();
         }
