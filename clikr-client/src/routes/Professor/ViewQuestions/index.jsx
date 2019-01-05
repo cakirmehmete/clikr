@@ -157,7 +157,7 @@ class ProfessorViewQuestions extends React.Component {
                     <Grid item xs={12} md={8}>
                         <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
                     </Grid>
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} sm={9} md={4}>
                         <List>
                             {this.state.parentLecture.questions.map((questionObj, index) => {
                                 return (<QuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
