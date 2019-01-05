@@ -11,6 +11,9 @@ export default class ProfessorStore {
     }
 
     getLectureWithId(lecture_id) {
+        if (lecture_id === 0)
+            return { question: [] };
+
         const lectures = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
         return lectures.find(lecture => lecture.id === lecture_id)
     }
@@ -89,5 +92,15 @@ export default class ProfessorStore {
     closeQuestion(question_id, lecture_id) {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
             .find(lecture => lecture.id === lecture_id).questions.find(x => x.id === question_id).is_open = false;
+    }
+
+    @action
+    closeAllQuestionsForLecture(lecture_id) {
+        var questions = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+            .find(lecture => lecture.id === lecture_id).questions;
+        
+        for (var question of questions) {
+            question.is_open = false;
+        }
     }
 }

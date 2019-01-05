@@ -1,9 +1,10 @@
 #/src/views/ProfessorView
 
-from flask import request, Response, Blueprint, session, render_template, redirect
+from flask import request, Response, Blueprint, session, render_template, redirect, send_from_directory
 import uuid
 import datetime
-import random, string
+import random, string, os
+import csv
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
 from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
@@ -148,8 +149,6 @@ def add_professor(current_user, course_id):
         return custom_response({'error': 'course_id does not exist'}, 400)
 
     # check permissions
-    if not course:
-        return custom_response({'error': 'course_id does not exist'}, 400)
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
@@ -243,6 +242,50 @@ def get_students(current_user, course_id):
     students_data = student_schema.dump(students, many=True).data
 
     return custom_response(students_data, 200)
+
+@professor_api.route('/courses/<course_id>/exportstudents', methods=['GET'])
+@Auth.professor_auth_required
+def export_students(current_user, course_id):
+    """
+    returns a csv file with grades
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # build csv file
+    headers = ['netid']
+    student_netIds = []
+
+    students = course.students
+    for student in students:
+        student_netIds.append(student.netId)
+
+    # note that heroku discards dynamically generated files on dyno restart!
+    filename = 'students_' + course_id + '.csv'
+    with open('app/views/dynamic_content/students/' + filename, 'w') as f:
+        csv.register_dialect('quote all', quoting=csv.QUOTE_ALL)
+        writer = csv.writer(f, dialect='quote all')
+        writer.writerow(headers)
+        for student_netId in student_netIds:
+            writer.writerow([student_netId])
+
+    dirname = os.path.dirname(__file__)
+    path = os.path.join(dirname, "dynamic_content/students/", filename)
+    print("======THE PATH IS: ", path)
+    if os.path.exists(path):
+        print("GOING TO SEND A FILE!")
+        try:
+            return send_from_directory('views/dynamic_content/students', filename, as_attachment=True)
+        finally:
+            os.remove(path)
+    else:
+        return custom_response({'error': 'something is wrong'}, 500)
 
 @professor_api.route('/courses/<course_id>/students', methods=['POST'])
 @Auth.professor_auth_required
@@ -577,6 +620,100 @@ def get_answers(current_user, question_id):
     # retrieve answers and return
     answer_data = AnswerSchema().dump(question.answers, many=True).data
     return custom_response(answer_data, 200)
+
+@professor_api.route('/courses/<course_id>/exportgrades', methods=['GET'])
+@Auth.professor_auth_required
+def export_course_grades(current_user, course_id):
+    """
+    returns a csv file with grades
+    """
+    # retrieve course and check if valid
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+
+    # check permissions
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # call helper function to create the export file
+    return _export_grades(course=course)
+
+@professor_api.route('/lectures/<lecture_id>/exportgrades', methods=['GET'])
+@Auth.professor_auth_required
+def export_lecture_grades(current_user, lecture_id):
+    """
+    returns a csv file with grades
+    """
+    # retrieve lecture and check if valid
+    lecture = LectureModel.get_lecture_by_uuid(lecture_id)
+    if not lecture:
+        return custom_response({'error': 'lecture_id does not exist'}, 400)
+
+    # check permissions
+    if not current_user in lecture.course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # call helper function to create the export file
+    return _export_grades(lecture=lecture)
+
+def _export_grades(course=None, lecture=None):
+    """
+    helper function that creates a csv file with grades for either an entire course or a single lecture
+    """
+
+    # build csv file
+    headers = ['netid']
+    score_dict = {}    # dictionary with student id's as keys, dictionaries as values (which in turn have question ids as keys and scores as values)
+
+    if course:
+        lectures = course.lectures
+        file_id = course.id
+    elif lecture:
+        lectures = [lecture]
+        file_id = lecture.id
+    else:
+        raise Exception('must pass either course or lecture')
+    
+    # process all questions
+    for lecture in lectures:
+        questions = lecture.questions
+        for question in questions:
+            headers.append(question.id)
+            answers = question.answers
+            
+            # process each answer to this question
+            for answer in answers:
+                student_id = answer.student_id
+                score = 1 if question.is_correct(answer.answer) else 0
+
+                # add score to the student's list
+                if not student_id in score_dict:
+                    score_dict[student_id] = {}
+                score_dict[answer.student_id][question.id] = score
+
+    # note that heroku discards dynamically generated files on dyno restart!
+    filename = 'grades_' + file_id + '.csv'
+    with open('app/views/dynamic_content/grades/' + filename, 'w') as f:
+        csv.register_dialect('quote all', quoting=csv.QUOTE_ALL)
+        writer = csv.DictWriter(f, headers, restval='', dialect='quote all')
+        writer.writeheader()
+        for student_id, inner_dict in score_dict.items():
+            netId = StudentModel.get_student_by_uuid(student_id).netId
+            inner_dict['netid'] = netId
+            writer.writerow(inner_dict)
+
+    dirname = os.path.dirname(__file__)
+    path = os.path.join(dirname, "dynamic_content/grades/", filename)
+    print("======THE PATH IS: ", path)
+    if os.path.exists(path):
+        print("GOING TO SEND A FILE!")
+        try:
+            return send_from_directory('views/dynamic_content/grades', filename, as_attachment=True)
+        finally:
+            os.remove(path)
+    else:
+        return custom_response({'error': 'something is wrong'}, 500)
 
 @professor_api.route('/questions/<question_id>/statistics', methods=['GET'])
 @Auth.professor_auth_required

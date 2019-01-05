@@ -9,6 +9,9 @@ import { observer } from 'mobx-react';
 import ListOfAllCourses from '../ListOfAllCourses';
 import DeleteCoursesList from '../DeleteCoursesList';
 import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+import DoneIcon from '@material-ui/icons/Done';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import Dialog from '@material-ui/core/Dialog';
@@ -38,7 +41,6 @@ class AllCoursesFrame extends React.Component {
         deletions: [],
         delTitles: [], // only holds titles
         delIds: [],
-        heading: "Here are your courses",
         open: false
     }
 
@@ -65,22 +67,21 @@ class AllCoursesFrame extends React.Component {
         if (!this.state.deleteMode) {
             this.setState({
                 deleteMode: true,
-                heading: "Select courses to delete"
             })
         }
         else {
-            const lectArr = [];
+            const courseArr = [];
             const delTitles = []
             for (let i = 0; i < this.state.deletions.length; i++) {
                 if (this.state.deletions[i].checked) {
-                    lectArr.push(this.state.deletions[i].id);
+                    courseArr.push(this.state.deletions[i].id);
                     delTitles.push(this.state.deletions[i].title);
                 }
             }
-            if (lectArr.length > 0) {
+            if (courseArr.length > 0) {
                 this.setState({
                     delTitles: delTitles,
-                    delIds: lectArr,
+                    delIds: courseArr,
                     open: true
                 })
             }
@@ -93,7 +94,6 @@ class AllCoursesFrame extends React.Component {
     handleClose = () => {
         this.setState({ 
             deleteMode: false,
-            heading: "Here are your courses",
             open: false,
             delIds: [],
             delTitles: [],
@@ -102,7 +102,7 @@ class AllCoursesFrame extends React.Component {
     };
 
     handleFinalDeletion = () => {
-        this.apiProfService.deleteCourse(this.state.delIds);
+        this.apiProfService.deleteCourses(this.state.delIds);
         this.handleClose()
     };
 
@@ -121,11 +121,6 @@ class AllCoursesFrame extends React.Component {
 
         return (
             <div>
-                 
-            <Typography variant="subtitle1" color="textPrimary">
-                    {this.state.heading}: 
-                </Typography>
-             
                 <Card className={this.props.classes.card}>
                     <CardContent>
                         <Grid container direction='row' justify='space-between' alignItems='stretch'>
@@ -135,16 +130,16 @@ class AllCoursesFrame extends React.Component {
                             <Grid item>
                                 <Grid container direction="row" justify="flex-end">
                                     <Grid item>
-                                        <Tooltip title={deleteAction} placement="top-start">
-                                            <Button variant="text" size="small" onClick={this.handleDelete.bind(this)}>
-                                                <Icon className={this.styles.icon} color="secondary">{deleteAction}</Icon>
-                                            </Button>
+                                        <Tooltip title={deleteAction} placement="top">
+                                            <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
+                                                {deleteAction === 'delete' ? <DeleteIcon /> : <DoneIcon />}
+                                            </IconButton>
                                         </Tooltip>
                                     </Grid>
                                     <Grid item>
                                         <Button onClick={this.handleNewCourseClick} color="primary">
                                             <Icon className={this.styles.icon} color="primary">add_circle</Icon>
-                                            Add Courses
+                                            Add Course
                                         </Button>
                                     </Grid>    
                                 </Grid>  
