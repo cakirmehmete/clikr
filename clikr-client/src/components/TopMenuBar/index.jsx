@@ -17,8 +17,10 @@ const drawerWidth = 240;
 
 const styles = theme => ({
     appBar: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: drawerWidth,
+        [theme.breakpoints.up('sm')]: {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+        },
     },
 
     homeButton: {

@@ -2,6 +2,8 @@ import React from 'react';
 import { Route, Switch } from "react-router-dom";
 import { Provider } from 'mobx-react';
 import { withStyles } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Hidden from '@material-ui/core/Hidden';
 import SideMenuBar from '../../components/SideMenuBar';
 import TopMenuBar from '../../components/TopMenuBar';
 import ProfessorStore from '../../stores/ProfessorStore';
@@ -21,7 +23,9 @@ const drawerWidth = 240;
 
 const styles = theme => ({
     content: {
-        marginLeft: drawerWidth,
+        [theme.breakpoints.up('sm')]: {
+            marginLeft: drawerWidth,
+        },
         flexGrow: 1,
         padding: theme.spacing.unit * 3,
     },
@@ -43,8 +47,14 @@ class ProfessorRoutes extends React.Component {
         return (
             <Provider profStore={this.profStore} apiService={this.apiProfService}>
                 <div>
+                    <CssBaseline />
                     <Route path='/professor' component={TopMenuBar} />
-                    <Route path='/professor' component={SideMenuBar} />
+                    <nav>
+                        <Hidden xsDown implementation="css">
+                            <Route path='/professor' component={SideMenuBar} />
+                        </Hidden>
+                    </nav>
+                    
                     <main className={this.styles.content}>
                         <Switch>
                             <Route exact path='/professor' component={ProfessorHome} />
