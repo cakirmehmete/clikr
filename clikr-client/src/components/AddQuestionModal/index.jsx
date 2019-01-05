@@ -49,7 +49,10 @@ const styles = theme => ({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center'
-    }
+    },
+    icon: {
+        margin: theme.spacing.unit,
+    },
 });
 
 class AddQuestionModal extends React.Component {
@@ -60,6 +63,11 @@ class AddQuestionModal extends React.Component {
         toNewSliderQuestion: false,
         lectureId: null
     };
+
+    constructor(props) {
+        super(props);
+        this.styles = props.classes;
+    }
 
     handleOpen = () => {
         this.setState({ open: true });
@@ -97,7 +105,10 @@ class AddQuestionModal extends React.Component {
 
         return (
             <div>
-                <Button variant="outlined" color="primary" onClick={this.handleOpen}>Add Question</Button>
+                <Button onClick={this.handleOpen} color="primary">
+                    <Icon className={this.styles.icon} color="primary">add_circle</Icon>
+                    Add Question
+                </Button>
                 <Modal
                     aria-labelledby="simple-modal-title"
                     aria-describedby="simple-modal-description"
