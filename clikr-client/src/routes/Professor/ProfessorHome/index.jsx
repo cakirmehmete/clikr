@@ -3,8 +3,6 @@ import { withStyles } from '@material-ui/core/styles';
 import APIProfService from '../../../services/APIProfService';
 import { observer, inject } from 'mobx-react';
 import AllCoursesFrame from '../../../components/AllCoursesFrame';
-import Grid from '@material-ui/core/Grid';
-import TopCoursesStatFrame from '../../../components/TopCoursesStatFrame';
 
 const styles = theme => ({
 
@@ -22,14 +20,7 @@ class ProfessorHome extends React.Component {
 
     render() {
         return (
-            <Grid container spacing={24}>
-                <Grid item xs={8}>
-                    <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
-                </Grid>
-                <Grid item xs={4}>
-                    <TopCoursesStatFrame profStore={this.profStore} apiProfService={this.apiProfService} />
-                </Grid>
-            </Grid>
+            <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
         );
     }
 }

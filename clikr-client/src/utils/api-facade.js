@@ -7,6 +7,10 @@ export function getProfDataAPI() {
     return axios.get(baseURL + 'professor/data');
 }
 
+export function getProfAnswers(question_id) {
+    return axios.get(baseURL + 'professor/questions/' + question_id + '/answers');
+}
+
 export function getStudentCoursesAPI() {
     return axios.get(baseURL + 'student/courses');
 }
@@ -117,6 +121,8 @@ export function postNewQuestionAPI(question) {
         option4: question.option4,
         option5: question.option5,
         number_of_options: question.number_of_options,
-        word_limit: question.word_limit
+        word_limit: question.word_limit,
+        lower_label: question.lower_label,
+        upper_label: question.upper_label,
     });
 }

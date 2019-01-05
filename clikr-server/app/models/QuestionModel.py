@@ -57,6 +57,13 @@ class QuestionModel(db.Model):
         self.created_at = timestamp
         self.modified_at = timestamp
 
+    def is_correct(self, answer_text):
+        """
+        returns true if the given answer_text string is a correct answer to this question or if no correct answer was specified for the question;
+        by default, compares answer_text to correct_answer; subclasses need to override this method if further processing is required
+        """
+        return self.correct_answer == None or self.correct_answer == '' or answer_text == self.correct_answer
+
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -131,6 +138,40 @@ class SliderModel(QuestionModel):
 
         self.lower_label = data.get('lower_label')
         self.upper_label = data.get('upper_label')
+    
+    def _check_expression(self, student_answer, operator, correct_answer):
+        
+        if operator == '<':
+            return student_answer < correct_answer
+        elif operator == '<=':
+            return student_answer <= correct_answer
+        elif operator == '>':
+            return student_answer > correct_answer
+        elif operator == '>=':
+            return student_answer >= correct_answer
+        else:
+            return student_answer == correct_answer
+
+    def is_correct(self, answer_text):
+        """
+        Method override for slider question
+        """
+        if self.correct_answer == None or self.correct_answer == '':
+            return True
+        
+        expression_parts = self.correct_answer.split(' ')
+
+        expr1 = self._check_expression(int(answer_text), expression_parts[0], int(expression_parts[1]))
+        if len(expression_parts) == 2:
+            return expr1
+        else:
+            expr2 = self._check_expression(int(answer_text), expression_parts[3], int(expression_parts[4]))
+            if (expression_parts[2] == '&&'):
+                return expr1 and expr2
+            else:
+                return expr1 or expr2
+
+
 
 class DragAndDropModel(QuestionModel):
     # answer1 is the correct match for opttion1, etc.

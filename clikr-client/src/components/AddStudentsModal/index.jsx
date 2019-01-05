@@ -5,7 +5,8 @@ import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { observer } from 'mobx-react';
-import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import Tooltip from '@material-ui/core/Tooltip';
 
 function getModalStyle() {
@@ -82,10 +83,10 @@ class AddStudentsModal extends React.Component {
 
         return (
             <Grid item>
-                <Tooltip title="add students" placement="top-start">
-                    <Button variant="text" size="small" onClick={this.handleOpen}>
-                        <Icon color="secondary">person_add</Icon>
-                    </Button>
+                <Tooltip title="add students" placement="top">
+                    <IconButton color="secondary" onClick={this.handleOpen}>
+                        <PersonAddIcon />
+                    </IconButton>
                 </Tooltip>
                 <Modal
                     aria-labelledby="simple-modal-title"
@@ -94,7 +95,10 @@ class AddStudentsModal extends React.Component {
                     onClose={this.handleClose}
                 >
                     <div style={getModalStyle()} className={classes.paper}>
-                        <Typography variant="h6">
+                        <Typography variant="subtitle1">
+                            Share this code with your students:
+                        </Typography>
+                        <Typography variant="h5" gutterBottom>
                             {this.state.code}
                         </Typography>
                         <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Done</Button>

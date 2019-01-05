@@ -1,4 +1,5 @@
-import { getProfDataAPI, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, postCloseAllQuestionsAPI } from '../utils/api-facade';
+import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, postCloseAllQuestionsAPI } from '../utils/api-facade';
+
 
 export default class APIProfService {
     constructor(professorStore) {
@@ -27,10 +28,21 @@ export default class APIProfService {
             })
     }
 
+    loadAnswers(question_id) {
+        return getProfAnswers(question_id)
+            .then(res => {
+                return res.data
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+                return [];
+            })
+    }
+
     openQuestion(question_id, lecture_id) {
         postOpenQuestionAPI(question_id)
             .then(res => {
-                console.log(res)
                 this.professorStore.openQuestion(question_id, lecture_id)
             })
             .catch(error => {
@@ -42,7 +54,6 @@ export default class APIProfService {
     closeQuestion(question_id, lecture_id) {
         postCloseQuestionAPI(question_id)
             .then(res => {
-                console.log(res)
                 this.professorStore.closeQuestion(question_id, lecture_id)
             })
             .catch(error => {
@@ -87,17 +98,21 @@ export default class APIProfService {
             })
     }
 
-    // remove the course
-    deleteCourse(course_id) {
-        deleteCourseAPI(course_id)
-            .then(() => {
-                this.professorStore.removeCourse(course_id)
-                this.loadData()
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
+    // remove courses
+    deleteCourses(courses) {
+        courses.map(id => {
+            return(
+                deleteCourseAPI(id)
+                .then(() => {
+                    this.professorStore.removeCourse(id)
+                    this.loadData()
+                })
+                .catch(error => {
+                    console.log(error);
+                    this._checkAuth(error);
+                })
+            )
+        })
     }
 
     changeCourseTitle(courseId, courseTitle) {
