@@ -10,6 +10,9 @@ import PropTypes from 'prop-types';
 import CourseObj from '../../models/LectureObj';
 import ListOfAllLectures from '../ListOfAllLectures';
 import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+import DoneIcon from '@material-ui/icons/Done';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteLecturesList from '../DeleteLecturesList';
@@ -42,7 +45,6 @@ class AllLecturesFrame extends React.Component {
         numLects: undefined,
         deletions: [],
         deleteMode: false,
-        heading: "Here are your lectures",
         delTitles: [], // only holds titles
         delIds: [],
         open: false
@@ -96,7 +98,6 @@ class AllLecturesFrame extends React.Component {
         if (!this.state.deleteMode) {
             this.setState({
                 deleteMode: true,
-                heading: "Select courses to delete"
             })
         }
         else {
@@ -124,7 +125,6 @@ class AllLecturesFrame extends React.Component {
     handleClose = () => {
         this.setState({ 
             deleteMode: false,
-            heading: "Here are your lectures",
             open: false,
             delIds: [],
             delTitles: [],
@@ -158,11 +158,6 @@ class AllLecturesFrame extends React.Component {
         
         return (
             <div>
-                
-                <Typography variant="subtitle1" color="textPrimary">
-                    {this.state.heading}: 
-                </Typography>
-             
                 <Card className={this.props.classes.card}>
                     <CardContent>
                         <Grid container direction='row' justify='space-between' alignItems='stretch'>
@@ -173,15 +168,15 @@ class AllLecturesFrame extends React.Component {
                                 <Grid container direction="row" justify="flex-end">
                                     <Grid item>
                                         <Tooltip title={deleteAction} placement="top-start">
-                                            <Button variant="text" size="small" onClick={this.handleDelete.bind(this)}>
-                                                <Icon className={this.styles.icon} color="secondary">{deleteAction}</Icon>
-                                            </Button>
+                                            <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
+                                                {deleteAction === 'delete' ? <DeleteIcon /> : <DoneIcon />}
+                                            </IconButton>
                                         </Tooltip>
                                     </Grid>
                                     <Grid item>
                                         <Button onClick={this.handleNewLectureClick} color="primary">
                                             <Icon className={this.styles.icon} color="primary">add_circle</Icon>
-                                            Add Lectures
+                                            Add Lecture
                                         </Button>
                                     </Grid>    
                                 </Grid>  

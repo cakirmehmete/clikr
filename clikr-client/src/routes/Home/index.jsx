@@ -73,7 +73,7 @@ class Home extends Component {
           <Grid item className={this.styles.clickGrid}>
             <Button onClick={this.handleLoginProf}>
               <Paper elevation={3} className={this.styles.profPaper}>
-                <Grid item container direction="column" spacing={12} >
+                <Grid item container direction="column" spacing={16} >
                   <Grid item xs={12}>
                     <img src={logoprof} alt="logo" width={100}></img>
                   </Grid>
@@ -89,7 +89,7 @@ class Home extends Component {
           <Grid item className={this.styles.clickGrid}>
             <Button onClick={this.handleLoginStudent}>
               <Paper elevation={3} className={this.styles.studentPaper}>
-                <Grid item container direction="column" spacing={12} >
+                <Grid item container direction="column" spacing={16} >
                   <Grid item xs={12}>
                     <img src={logostudent} alt="logo" width={100}></img>
                   </Grid>

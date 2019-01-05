@@ -3,10 +3,12 @@ import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
 import ListItem from '@material-ui/core/ListItem';
 import { observer } from 'mobx-react';
-import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
+import ImportExportIcon from '@material-ui/icons/ImportExport';
+import DoneIcon from '@material-ui/icons/Done';
 import Tooltip from '@material-ui/core/Tooltip';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Button from '@material-ui/core/Button';
 import InputBase from '@material-ui/core/InputBase';
 import ListItemText from '@material-ui/core/ListItemText';
 import FormControl from '@material-ui/core/FormControl';
@@ -140,11 +142,22 @@ class LectListItemNavEdit extends React.Component {
                         />
                     </FormControl>
                     <ListItemSecondaryAction>
-                        <Tooltip title="done editing" placement="top-start">
-                            <Button variant="text" size="small" onClick={this.handleEditClose}>
-                                <Icon className={this.styles.iconDone}>done</Icon>
-                            </Button>
-                        </Tooltip>
+                        <Grid container direction="row" justify="flex-end">  
+                            <Grid item>
+                                <Tooltip title="done editing" placement="top">
+                                    <IconButton color="secondary" onClick={this.handleEditClose}>
+                                        <DoneIcon className={this.styles.iconDone}/>
+                                    </IconButton>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="Export Grades" placement="top">
+                                    <IconButton color="secondary" href={baseURL + "professor/lectures/" + this.lectureId + "/exportgrades"} target="_blank">
+                                        <ImportExportIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </Grid>
+                        </Grid>
                     </ListItemSecondaryAction>
                 </ListItem>
             )
@@ -156,17 +169,17 @@ class LectListItemNavEdit extends React.Component {
                         <ListItemSecondaryAction>  
                             <Grid container direction="row" justify="flex-end">  
                                 <Grid item>
-                                    <Tooltip title="Export Grades" placement="top-start">
-                                        <Button variant="text" size="small" href={baseURL + "professor/lectures/" + this.lectureId + "/exportgrades"} target="_blank">
-                                            <Icon className={this.styles.icon} color="secondary">import_export</Icon>
-                                        </Button>
+                                    <Tooltip title="change title" placement="top">
+                                        <IconButton color="secondary" onClick={this.handleEditOpen}>
+                                            <EditIcon />
+                                        </IconButton>
                                     </Tooltip>
                                 </Grid>
                                 <Grid item>
-                                    <Tooltip title="change title" placement="top-start">
-                                        <Button variant="text" size="small" onClick={this.handleEditOpen}>
-                                            <Icon color="secondary">edit</Icon>
-                                        </Button>
+                                    <Tooltip title="Export Grades" placement="top">
+                                        <IconButton color="secondary" href={baseURL + "professor/lectures/" + this.lectureId + "/exportgrades"} target="_blank">
+                                            <ImportExportIcon />
+                                        </IconButton>
                                     </Tooltip>
                                 </Grid>
                             </Grid>
