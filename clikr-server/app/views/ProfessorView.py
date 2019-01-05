@@ -50,7 +50,7 @@ def on_join(question_id):
     # join room and broadcast previous statistics
     join_room(question_id)
     emit('server message', 'you joined the room (question) ' + question_id)
-    emit_question_statistics(question_id)
+    emit_question_statistics(question)
 
 @professor_api.route('/data', methods=['GET'])
 @Auth.professor_auth_required
@@ -730,7 +730,7 @@ def get_answer_statistics(current_user, question_id):
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
-    results = compute_question_statistics(question_id)
+    results = compute_question_statistics(question)
     return custom_response(results, 200)
 
 @professor_api.route('/lectures/<lecture_id>/statistics', methods=['GET'])
@@ -753,7 +753,7 @@ def get_answer_statistics_for_lecture(current_user, lecture_id):
     questions = lecture.questions
     for question in questions:
         question_id = question.id
-        result[question_id] = compute_question_statistics(question_id)
+        result[question_id] = compute_question_statistics(question)
 
     return custom_response(result, 200)
 

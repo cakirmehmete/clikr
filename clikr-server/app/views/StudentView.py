@@ -264,7 +264,7 @@ def submit_answer(current_user, question_id):
         message = 'answer created'
 
     # push updated results to professor using socketio
-    emit_question_statistics(question_id)
+    emit_question_statistics(question)
 
     # prepare response
     answer_data = answer_schema.dump(answer).data
