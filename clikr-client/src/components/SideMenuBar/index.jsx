@@ -10,6 +10,11 @@ import ListItem from '@material-ui/core/ListItem';
 import { observer, inject } from 'mobx-react';
 import logo from '../../assets/clikrlogo2.png';
 import Typography from '@material-ui/core/Typography';
+import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import IconButton from '@material-ui/core/IconButton';
 
 const drawerWidth = 240;
 
@@ -20,6 +25,10 @@ const styles = theme => ({
     },
     listtext: {
         color: theme.palette.primary.main
+    },
+    nestedListtext: {
+        color: theme.palette.primary.main,
+        paddingLeft: theme.spacing.unit*2,
     },
     drawerPaper: {
         width: drawerWidth,
@@ -42,8 +51,29 @@ class SideMenuBar extends React.Component {
         this.profStore = props.profStore
     }
 
-    handleClick(id) {
+    state = {
+        open: null,
+    }
+
+    handleCourseClick(id) {
         this.props.history.push('/professor/' + id + '/lectures');
+    }
+
+    handleLectureClick(id) {
+        this.props.history.push('/professor/' + id + '/questions');
+    }
+
+    handleExpand(id) {
+        var open = this.state.open;
+        if (open === id) {
+            open = null;
+        } else {
+            open = id;
+        }
+
+        this.setState({
+            open: open,
+        })
     }
 
     render() {
@@ -63,11 +93,29 @@ class SideMenuBar extends React.Component {
                 <Divider />
                 <List>
                     {this.profStore.courses.map((courseObj, index) => {
-                        return (<ListItem className={this.styles.hover} button key={index} onClick={() => this.handleClick(courseObj.id)}>
-                            <ListItemText
-                            disableTypography
-                            primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} />
-                        </ListItem>)
+                        return (
+                            <div key={"div" + index}>
+                                <ListItem className={this.styles.hover} button key={index} onClick={() => this.handleCourseClick(courseObj.id)}>
+                                    <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} />
+                                    <ListItemSecondaryAction>
+                                        <IconButton color="primary" onClick={() => this.handleExpand(courseObj.id)}>
+                                            {this.state.open === courseObj.id ? <ExpandLess /> : <ExpandMore />}
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                                <Collapse in={this.state.open === courseObj.id} timeout="auto" unmountOnExit>
+                                    <List component="div" disablePadding>
+                                        {this.profStore.getCourseLectures(courseObj.id).map((lectureObj, innerIndex) => {
+                                            return (
+                                                <ListItem button key={courseObj.id + "_lecture_" + innerIndex} onClick={() => this.handleLectureClick(lectureObj.id)}>
+                                                    <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.nestedListtext}> {lectureObj.title} </Typography>} />
+                                                </ListItem>
+                                            )
+                                        })}
+                                    </List>
+                                </Collapse>
+                            </div>
+                        )
                     })}
                 </List>
             </Drawer>
