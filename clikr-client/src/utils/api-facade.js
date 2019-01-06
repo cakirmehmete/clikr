@@ -8,7 +8,7 @@ export function getProfDataAPI() {
 }
 
 export function getProfAnswers(question_id) {
-    return axios.get(baseURL + 'professor/questions/' + question_id + '/answers');
+    return axios.get(baseURL + 'professor/questions/' + question_id + '/statistics');
 }
 
 export function getStudentCoursesAPI() {
