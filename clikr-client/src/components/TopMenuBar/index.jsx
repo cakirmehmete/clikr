@@ -51,9 +51,16 @@ class TopMenuBar extends React.Component {
     handleClose = () => {
       this.setState({
           anchorEl: null,
-          logout: true
+          logout: false
         });
     };
+
+    handleLogout = () => {
+        this.setState({
+            anchorEl: null,
+            logout: true
+          });
+    }
 
     handleHome = () => {
         this.props.history.push('/professor');
@@ -111,7 +118,7 @@ class TopMenuBar extends React.Component {
                         open={open}
                         onClose={this.handleClose}
                     >
-                        <MenuItem onClick={this.handleClose}>
+                        <MenuItem onClick={this.handleLogout}>
 
                             LOGOUT
 

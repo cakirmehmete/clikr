@@ -9,7 +9,10 @@ import { socketioURL } from '../../../constants/api';
 import socketIOClient from 'socket.io-client'
 import Typography from '@material-ui/core/Typography';
 import AllQuestionsFrame from '../../../components/AllQuestionsFrame';
-import QuestionStats from '../../../components/QuestionStats';
+import MCQuestionStats from '../../../components/MCQuestionStats';
+import FreeTextStats from '../../../components/FreeTextStats';
+import SliderStats from '../../../components/SliderStats';
+
 const socket = socketIOClient(socketioURL)
 
 const styles = theme => ({
@@ -41,7 +44,7 @@ const styles = theme => ({
 @inject("apiService")
 @observer
 class ProfessorViewQuestions extends React.Component {
-   
+
     constructor(props) {
         super(props)
         this.styles = props.classes
@@ -57,7 +60,18 @@ class ProfessorViewQuestions extends React.Component {
 
     componentDidMount() {
         // Get the lecture
-        this.props.apiService.loadData().then(() => {
+        if (!this.props.profStore.dataLoaded) {
+            this.props.apiService.loadData().then(() => {
+                const { lectureId } = this.props.match.params
+                this.lectureId = lectureId
+                this.setState({
+                    parentLecture: this.props.profStore.getLectureWithId(lectureId)
+                })
+                this.setState({
+                    currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+                })
+            })
+        } else {
             const { lectureId } = this.props.match.params
             this.lectureId = lectureId
             this.setState({
@@ -66,7 +80,7 @@ class ProfessorViewQuestions extends React.Component {
             this.setState({
                 currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
             })
-        })
+        }
     }
 
     componentWillUnmount() {
@@ -160,7 +174,15 @@ class ProfessorViewQuestions extends React.Component {
                     <Grid item xs={12} sm={9} md={4}>
                         <List>
                             {this.state.parentLecture.questions.map((questionObj, index) => {
-                                return (<QuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                if (questionObj.question_type === "multiple_choice")
+                                return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                else if (questionObj.question_type === "free_text")
+                                return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                else if (questionObj.question_type === "slider")
+                                return (<SliderStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                
+                                // Something went wrong
+                                return (null)
                             })}
                         </List>
                     </Grid>
@@ -168,25 +190,41 @@ class ProfessorViewQuestions extends React.Component {
             </div>
         );
     }
+    
+    getSortedQuestionsCopy() {
+        return this.state.parentLecture.questions.slice().sort(function (a, b) {
+            if (a.created_at < b.created_at) {
+                return -1;
+            }
+            if (a.created_at > b.created_at) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
+    }
 
     convertQuestionIndexToId(index) {
         if (index < this.state.parentLecture.questions.length) {
-            return this.state.parentLecture.questions[index].id;
+            var sortedQuestionsCopy = this.getSortedQuestionsCopy();
+            return sortedQuestionsCopy[index].id;
         }
-            
+
         else {
             return 0;
         }
-            
+
     }
 
     convertQuestionIdToIndex(question_id) {
-        for (var i = 0; i < this.state.parentLecture.questions.length; i++) {
-            if (this.state.parentLecture.questions[i].id === question_id)
+        var sortedQuestionsCopy = this.getSortedQuestionsCopy();
+        for (var i = 0; i < sortedQuestionsCopy.length; i++) {
+            if (sortedQuestionsCopy[i].id === question_id)
                 return i;
         }
         return 0;
     }
+
 }
 
 export default withStyles(styles)(ProfessorViewQuestions);

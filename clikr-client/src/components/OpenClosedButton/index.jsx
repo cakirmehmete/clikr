@@ -23,7 +23,11 @@ class OpenClosedButton extends React.Component {
 
     componentDidMount() {
         // Make sure the questions are updated
-        this.props.apiService.loadData()
+        if (!this.props.profStore.dataLoaded) {
+            this.props.apiService.loadData().then(() => {
+                this.props.profStore.dataLoaded = true
+            })
+        }
     }
 
     handleBtnClick() {

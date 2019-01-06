@@ -3,8 +3,21 @@ import { observable, action } from "mobx";
 export default class ProfessorStore {
     @observable
     courses = [];
+    dataLoaded = false;
 
-
+    set courses(value) {
+        value.sort(function (a, b) {
+            if (a.created_at < b.created_at) {
+                return -1;
+            }
+            if (a.created_at > b.created_at) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
+        this._courses = value;
+    }
 
     getCourseWithId(course_id) {
         return this.courses.find(x => x.id === course_id)
@@ -12,9 +25,12 @@ export default class ProfessorStore {
 
     getLectureWithId(lecture_id) {
         if (lecture_id === 0)
-            return { question: [] };
+            return { questions: [] };
+        const course = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id))
+        if (course === undefined)
+            return { questions: [] }
 
-        const lectures = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+        const lectures = course.lectures
         return lectures.find(lecture => lecture.id === lecture_id)
     }
 
@@ -24,7 +40,7 @@ export default class ProfessorStore {
     }
 
     getQuestionWithId(lecture, question_id) {
-        if (lecture.questions === undefined)
+        if (lecture.questions === [])
             return { questions: [] };
 
         if (lecture.questions.find(x => x.id === question_id) === undefined)
@@ -36,6 +52,7 @@ export default class ProfessorStore {
 
     @action
     updateData(data) {
+        this.dataLoaded = true;
         this.courses = data;
     }
 
@@ -43,12 +60,28 @@ export default class ProfessorStore {
     addCourse(courses, course) {
         course.enroll_code = courses.find(x => x.id === course.id).enroll_code
         this.courses.push(course);
+        this.courses.slice().sort(function (a, b) {
+            if (a.created_at < b.created_at) {
+                return -1;
+            }
+            if (a.created_at > b.created_at) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
     }
 
     @action
-    updateCourse(course) {
-        const oldCourse = this.courses.find(x => x.id === course.id);
-        oldCourse.title = course.title
+    updateCourse(courseId, title) {
+        const oldCourse = this.courses.find(x => x.id === courseId);
+        oldCourse.title = title
+    }
+
+    @action
+    updateLecture(lectureId, title) {
+        const oldLecture = this.getLectureWithId(lectureId)
+        oldLecture.title = title
     }
 
     @action
@@ -59,6 +92,16 @@ export default class ProfessorStore {
     @action
     addLecture(lecture) {
         this.courses.find(x => x.id === lecture.course_id).lectures.push(lecture)
+        this.courses.find(x => x.id === lecture.course_id).lectures.slice().sort(function (a, b) {
+            if (a.created_at < b.created_at) {
+                return -1;
+            }
+            if (a.created_at > b.created_at) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
     }
     @action
     removeCourse(course_id) {
@@ -80,6 +123,17 @@ export default class ProfessorStore {
     addQuestion(question) {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
             .find(lecture => lecture.id === question.lecture_id).questions.push(question);
+        this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
+            .find(lecture => lecture.id === question.lecture_id).questions.slice().sort(function (a, b) {
+                if (a.created_at < b.created_at) {
+                    return -1;
+                }
+                if (a.created_at > b.created_at) {
+                    return 1;
+                }
+                // a must be equal to b
+                return 0;
+            });
     }
 
     @action
