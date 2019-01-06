@@ -31,12 +31,10 @@ class QuestionStats extends React.Component {
     }
 
     componentDidMount() {
-        socket.on('new results', () => {
+        socket.on('new results', (socketio) => {
             this.props.apiService.loadAnswers(this.props.selectedQuestionId).then(msg => {
-
-                // FIXME: Just a temporary fix for MC questions -- this should really depend on the question type!
                 const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
-                console.log(question.question_type)
+
                 if (question.question_type === "multiple_choice") {
                     const values = []
 
@@ -69,7 +67,6 @@ class QuestionStats extends React.Component {
                         values[msg[l].answer] = values[msg[l].answer] + 1
                     }
 
-                    console.log(values)
                     this.setState({
                         data: {
                             datasets: [{

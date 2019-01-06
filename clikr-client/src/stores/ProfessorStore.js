@@ -4,7 +4,19 @@ export default class ProfessorStore {
     @observable
     courses = [];
 
-
+    set courses(value) {
+        value.sort(function (a, b) {
+            if (a.created_at < b.created_at) {
+                return -1;
+            }
+            if (a.created_at > b.created_at) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
+        this._courses = value;
+    }
 
     getCourseWithId(course_id) {
         return this.courses.find(x => x.id === course_id)
@@ -43,6 +55,16 @@ export default class ProfessorStore {
     addCourse(courses, course) {
         course.enroll_code = courses.find(x => x.id === course.id).enroll_code
         this.courses.push(course);
+        this.courses.sort(function (a, b) {
+            if (a.created_at < b.created_at) {
+                return -1;
+            }
+            if (a.created_at > b.created_at) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
     }
 
     @action
@@ -50,7 +72,6 @@ export default class ProfessorStore {
         const oldCourse = this.courses.find(x => x.id === course.id);
         oldCourse.title = course.title
     }
-
 
     @action
     deleteCourse(course_id) {
@@ -60,6 +81,16 @@ export default class ProfessorStore {
     @action
     addLecture(lecture) {
         this.courses.find(x => x.id === lecture.course_id).lectures.push(lecture)
+        this.courses.find(x => x.id === lecture.course_id).sort(function (a, b) {
+            if (a.created_at < b.created_at) {
+                return -1;
+            }
+            if (a.created_at > b.created_at) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
     }
     @action
     removeCourse(course_id) {
@@ -81,6 +112,17 @@ export default class ProfessorStore {
     addQuestion(question) {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
             .find(lecture => lecture.id === question.lecture_id).questions.push(question);
+        this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
+            .find(lecture => lecture.id === question.lecture_id).questions.sort(function (a, b) {
+                if (a.created_at < b.created_at) {
+                    return -1;
+                }
+                if (a.created_at > b.created_at) {
+                    return 1;
+                }
+                // a must be equal to b
+                return 0;
+            });
     }
 
     @action
