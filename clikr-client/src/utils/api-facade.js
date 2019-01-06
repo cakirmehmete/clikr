@@ -99,7 +99,17 @@ export function deleteCourseAPI(course_id) {
     return axios.delete(baseURL + 'professor/courses/' + course_id);
 }
 
-// delete all lectures in array by id
+// delete a question by id
+export function deleteQuestionsAPI(question_id) {
+    return axios.delete(baseURL + 'professor/questions/' + question_id);
+}
+
+// get questions for course by id
+export function getQuestionsForLectureAPI(lecture_id) {
+    return axios.get(baseURL + 'professor/lectures/' + lecture_id + '/questions');
+}
+
+// delete a lecture by id
 export function deleteLecturesAPI(lecture_id) {
     return axios.delete(baseURL + 'professor/lectures/' + lecture_id);
 }

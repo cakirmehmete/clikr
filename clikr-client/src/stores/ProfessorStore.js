@@ -51,6 +51,11 @@ export default class ProfessorStore {
     }
 
     @action
+    getLectureQuestions(lecture_id) {
+        return this.courses.find(course => course.lectures.find(lec => lec.id === lecture_id)).lectures;
+    }
+
+    @action
     updateData(data) {
         this.dataLoaded = true;
         this.courses = data;
@@ -115,8 +120,10 @@ export default class ProfessorStore {
     }
 
     @action
-    removeQuestion(question_id) {
-        this.questions.remove(this.course.find(x => x.id === question_id));
+    removeQuestion(question_id, parent_lecture_id) {
+        const questions = this.courses.find(course => course.lectures.find(lec => lec.id === parent_lecture_id)).lectures
+            .find(lec => lec.id === parent_lecture_id).questions;
+        questions.remove(questions.find(x => x.id === question_id));
     }
 
     @action
