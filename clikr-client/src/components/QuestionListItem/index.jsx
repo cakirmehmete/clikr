@@ -25,18 +25,10 @@ class QuestionListItem extends React.Component {
     render() {
         return (
             <ListItem selected={this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionObj.id).is_open} divider >
-                <ListItemText primary={(this.convertQuestionIdToIndex(this.props.questionObj.id) + 1) + ". " + this.props.questionObj.question_title} />
+                <ListItemText primary={(this.props.number + 1) + ". " + this.props.questionObj.question_title} />
                 <OpenClosedButton parentLecture={this.props.parentLecture} questionId={this.props.questionObj.id} handleListClose={this.props.handleListClose} handleClick={this.props.handleClick} handleToUpdate={this.handleToUpdate} />
             </ListItem>
         );
-    }
-
-    convertQuestionIdToIndex(question_id) {
-        for (var i = 0; i < this.props.parentLecture.questions.length; i++) {
-            if (this.props.parentLecture.questions[i].id === question_id)
-                return i;
-        }
-        return 0;
     }
 }
 

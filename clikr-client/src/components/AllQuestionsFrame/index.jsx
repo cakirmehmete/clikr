@@ -66,8 +66,17 @@ class AllQuestionsFrame extends React.Component {
                         </Grid>
                     </Grid>
                     <List component="nav">
-                        {this.props.parentLecture.questions.map((questionObj, index) => {
-                            return (<QuestionListItem handleListClose={this.props.handleListClose} handleClick={this.props.handleClick} parentLecture={this.props.parentLecture} questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId} />
+                        {this.props.parentLecture.questions.slice().sort(function (a, b) {
+                            if (a.created_at < b.created_at) {
+                                return -1;
+                            }
+                            if (a.created_at > b.created_at) {
+                                return 1;
+                            }
+                            // a must be equal to b
+                            return 0;
+                        }).map((questionObj, index) => {
+                            return (<QuestionListItem number={index} handleListClose={this.props.handleListClose} handleClick={this.props.handleClick} parentLecture={this.props.parentLecture} questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId} />
                             )
                         })}
                     </List>
