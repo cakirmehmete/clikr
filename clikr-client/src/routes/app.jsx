@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ProfessorRoutes from './Professor'
 import StudentRoutes from './Student'
+import NoMatch from '../components/NoMatch';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import { Provider } from 'mobx-react';
-import ProfessorStore from './../stores/ProfessorStore';
-import StudentStore from './../stores/StudentStore';
-import APIProfService from './../services/APIProfService';
 import Home from './Home';
 import Login from './Login'
 
@@ -31,24 +28,19 @@ const theme = createMuiTheme({
 });
 
 class App extends Component {
-    professorStore = new ProfessorStore()
-    profApiService = new APIProfService(this.professorStore)
-
-    studentStore = new StudentStore()
 
     render() {
         return (
             <MuiThemeProvider theme={theme}>
                 <Router>
                     <div>
-                        <Route exact path='/' component={Home} />
-                        <Route exact path='/login-(prof|student)' component={Login} />
-                        <Provider profStore={this.professorStore} apiService={this.profApiService}>
+                        <Switch>
+                            <Route exact path='/' component={Home} />
+                            <Route exact path='/login-(prof|student)' component={Login} />
                             <Route path="/professor" component={ProfessorRoutes} />
-                        </Provider>
-                        <Provider store={this.studentStore}>
                             <Route path="/student" component={StudentRoutes} />
-                        </Provider>
+                            <Route component={NoMatch} />
+                        </Switch>
                     </div>
                 </Router>
             </MuiThemeProvider>
@@ -56,5 +48,4 @@ class App extends Component {
     }
 }
 
-// <Route component={NotFound} />
 export default App;

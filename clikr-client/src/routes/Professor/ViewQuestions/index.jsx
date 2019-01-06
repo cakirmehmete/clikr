@@ -175,12 +175,12 @@ class ProfessorViewQuestions extends React.Component {
                         <List>
                             {this.state.parentLecture.questions.map((questionObj, index) => {
                                 if (questionObj.question_type === "multiple_choice")
-                                    return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
                                 else if (questionObj.question_type === "free_text")
-                                    return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
                                 else if (questionObj.question_type === "slider")
-                                    return (<SliderStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
-
+                                return (<SliderStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                
                                 // Something went wrong
                                 return (null)
                             })}
@@ -190,10 +190,24 @@ class ProfessorViewQuestions extends React.Component {
             </div>
         );
     }
+    
+    getSortedQuestionsCopy() {
+        return this.state.parentLecture.questions.slice().sort(function (a, b) {
+            if (a.created_at < b.created_at) {
+                return -1;
+            }
+            if (a.created_at > b.created_at) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
+    }
 
     convertQuestionIndexToId(index) {
         if (index < this.state.parentLecture.questions.length) {
-            return this.state.parentLecture.questions[index].id;
+            var sortedQuestionsCopy = this.getSortedQuestionsCopy();
+            return sortedQuestionsCopy[index].id;
         }
 
         else {
@@ -203,12 +217,14 @@ class ProfessorViewQuestions extends React.Component {
     }
 
     convertQuestionIdToIndex(question_id) {
-        for (var i = 0; i < this.state.parentLecture.questions.length; i++) {
-            if (this.state.parentLecture.questions[i].id === question_id)
+        var sortedQuestionsCopy = this.getSortedQuestionsCopy();
+        for (var i = 0; i < sortedQuestionsCopy.length; i++) {
+            if (sortedQuestionsCopy[i].id === question_id)
                 return i;
         }
         return 0;
     }
+
 }
 
 export default withStyles(styles)(ProfessorViewQuestions);
