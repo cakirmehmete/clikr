@@ -17,7 +17,7 @@ export default class APIProfService {
                     this._checkAuth(error);
                 })
         }
-        return new Promise(function() {
+        return new Promise(function () {
             return true
         })
     }
@@ -124,9 +124,9 @@ export default class APIProfService {
 
     changeCourseTitle(courseId, courseTitle) {
         patchUpdateCourseAPI(courseId, courseTitle)
-            // .then(res => {
-            //     this.professorStore.updateCourse(course)
-            // })
+            .then(res => {
+                this.professorStore.updateCourse(courseId, courseTitle)
+            })
             .catch(error => {
                 console.log(error);
                 this._checkAuth(error);
@@ -136,6 +136,9 @@ export default class APIProfService {
     // change lecture title
     changeLectureTitle(lectureId, lectureTitle) {
         patchUpdateLectureAPI(lectureId, lectureTitle)
+            .then(res => {
+                this.professorStore.updateLecture(lectureId, lectureTitle)
+            })
             .catch(error => {
                 console.log(error);
                 this._checkAuth(error);
