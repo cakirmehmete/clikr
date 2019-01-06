@@ -4,32 +4,20 @@ import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
 import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardContent from '@material-ui/core/CardContent';
 import logoprof from '../../assets/clikrlogo2.png';
 import logostudent from '../../assets/clikrlogo.png';
 
+
 const styles = theme => ({
-  profPaper: {
-    backgroundColor: theme.palette.secondary.main,
-    maxWidth: 500,
-  },
-  clickGrid: {
-    maxWidth: 500,
+  studentTypography: {
+    color: theme.palette.secondary.main,
   },
   profTypography: {
     color: theme.palette.primary.main,
-    padding: theme.spacing.unit*2,
-  },
-  studentPaper: {
-    backgroundColor: theme.palette.primary.main,
-    maxWidth:500,
-    minWidth: 400,
-  },
-  studentTypography: {
-    color: theme.palette.secondary.main,
-    padding: theme.spacing.unit*2,
   },
   root: {
     flexGrow: 1
@@ -37,6 +25,25 @@ const styles = theme => ({
   appBar: {
     top: 'auto',
     bottom: 0,
+  },
+  studentcard: {
+    backgroundColor: theme.palette.primary.main,
+    [theme.breakpoints.up('xs')]: {
+      maxWidth: 400,
+    },
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: 300,
+    },
+  },
+  profcard: {
+    backgroundColor: theme.palette.secondary.main,
+    [theme.breakpoints.up('xs')]: {
+      maxWidth: 400,
+    },
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: 300,
+    },
+    marginBottom: 16,
   },
 });
 
@@ -73,39 +80,45 @@ class Home extends Component {
       return <Redirect to={'/login-student'} push />
     }
     return (
+      
       <div className={this.styles.root}>
         <Grid container spacing={24} justify="center">
           <Grid item className={this.styles.clickGrid}>
-            <Button onClick={this.handleLoginStudent}>
-              <Paper elevation={3} className={this.styles.studentPaper}>
-                <Grid item container direction="column" spacing={16} >
-                  <Grid item xs={12}>
-                    <img src={logostudent} alt="logo" width={100}></img>
+            <Card className={this.styles.studentcard}>
+              <CardActionArea onClick={this.handleLoginStudent}>
+                <CardContent>
+                  <Grid item container direction="column" spacing={16} >
+                    <Grid item align="center">
+                      <img src={logostudent} alt="logo" width={100}></img>
+                    </Grid>
+                    <Grid item align="center">
+                      <Typography variant="h2" gutterBottom className={this.styles.studentTypography}>
+                        STUDENT LOGIN
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h2" gutterBottom className={this.styles.studentTypography}>
-                      Student Login
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Button>
+                </CardContent>
+              </CardActionArea>
+            </Card>
           </Grid>
-          <Grid item className={this.styles.clickGrid} style={{marginBottom: "16px"}}>
-            <Button onClick={this.handleLoginProf}>
-              <Paper elevation={3} className={this.styles.profPaper}>
-                <Grid item container direction="column" spacing={16} >
-                  <Grid item xs={12}>
-                    <img src={logoprof} alt="logo" width={100}></img>
+
+          <Grid item className={this.styles.clickGrid}>
+            <Card className={this.styles.profcard}>
+              <CardActionArea onClick={this.handleLoginProf}>
+                <CardContent>
+                  <Grid item container direction="column" spacing={16} >
+                    <Grid item align="center">
+                      <img src={logoprof} alt="logo" width={100}></img>
+                    </Grid>
+                    <Grid item align="center">
+                      <Typography variant="h2" gutterBottom className={this.styles.profTypography}>
+                        PROF LOGIN
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h2" gutterBottom className={this.styles.profTypography}>
-                      Instructor Login
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Button>
+                </CardContent>
+              </CardActionArea>
+            </Card>
           </Grid>
         </Grid>
         <AppBar position="fixed" color="primary" className={this.styles.appBar}>
