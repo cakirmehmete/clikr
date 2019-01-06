@@ -48,9 +48,9 @@ class SliderStats extends React.Component {
         } else {
             this.props.apiService.loadAnswers(this.props.selectedQuestionId).then((data) => {
                 this.setState({
-                    correctNumber: data.stats.answers.correct,
-                    wrongNumber: data.stats.answers.wrong,
-                    responsesNumber: data.stats.count
+                    correctNumber: data.answers.correct,
+                    wrongNumber: data.answers.wrong,
+                    responsesNumber: data.count
                 })
             })
         }

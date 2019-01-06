@@ -69,8 +69,7 @@ class MCQuestionStats extends React.Component {
                 }
             })
         } else {
-            this.props.apiService.loadAnswers(this.props.selectedQuestionId).then((data) => {
-                const msg = data.stats
+            this.props.apiService.loadAnswers(this.props.selectedQuestionId).then((msg) => {
                 if (msg.question_id === this.props.selectedQuestionId) {
                     const values = []
 
