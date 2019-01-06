@@ -122,7 +122,8 @@ class AllQuestionsFrame extends React.Component {
     handleFinalDeletion = () => {
 
         for (let i = 0; i < this.state.delIds.length; i++) {
-            if (this.props.parentLecture.questions.find(q => q.id === this.state.delIds[i])) {
+            var question = this.props.parentLecture.questions.find(q => q.id === this.state.delIds[i]);
+            if (question && question.is_open) {
                 this.props.apiService.closeQuestion(this.state.delIds[i], this.props.parentLecture.id);
                 this.props.handleListClose(this.state.delIds[i]);
             }
