@@ -9,7 +9,10 @@ import { socketioURL } from '../../../constants/api';
 import socketIOClient from 'socket.io-client'
 import Typography from '@material-ui/core/Typography';
 import AllQuestionsFrame from '../../../components/AllQuestionsFrame';
-import QuestionStats from '../../../components/QuestionStats';
+import MCQuestionStats from '../../../components/MCQuestionStats';
+import FreeTextStats from '../../../components/FreeTextStats';
+import SliderStats from '../../../components/SliderStats';
+
 const socket = socketIOClient(socketioURL)
 
 const styles = theme => ({
@@ -41,7 +44,7 @@ const styles = theme => ({
 @inject("apiService")
 @observer
 class ProfessorViewQuestions extends React.Component {
-   
+
     constructor(props) {
         super(props)
         this.styles = props.classes
@@ -57,7 +60,18 @@ class ProfessorViewQuestions extends React.Component {
 
     componentDidMount() {
         // Get the lecture
-        this.props.apiService.loadData().then(() => {
+        if (!this.props.profStore.dataLoaded) {
+            this.props.apiService.loadData().then(() => {
+                const { lectureId } = this.props.match.params
+                this.lectureId = lectureId
+                this.setState({
+                    parentLecture: this.props.profStore.getLectureWithId(lectureId)
+                })
+                this.setState({
+                    currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+                })
+            })
+        } else {
             const { lectureId } = this.props.match.params
             this.lectureId = lectureId
             this.setState({
@@ -66,7 +80,7 @@ class ProfessorViewQuestions extends React.Component {
             this.setState({
                 currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
             })
-        })
+        }
     }
 
     componentWillUnmount() {
@@ -160,7 +174,15 @@ class ProfessorViewQuestions extends React.Component {
                     <Grid item xs={12} sm={9} md={4}>
                         <List>
                             {this.state.parentLecture.questions.map((questionObj, index) => {
-                                return (<QuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                if (questionObj.question_type === "multiple_choice")
+                                    return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                else if (questionObj.question_type === "free_text")
+                                    return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                else if (questionObj.question_type === "slider")
+                                    return (<SliderStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+
+                                // Something went wrong
+                                return (null)
                             })}
                         </List>
                     </Grid>
@@ -173,11 +195,11 @@ class ProfessorViewQuestions extends React.Component {
         if (index < this.state.parentLecture.questions.length) {
             return this.state.parentLecture.questions[index].id;
         }
-            
+
         else {
             return 0;
         }
-            
+
     }
 
     convertQuestionIdToIndex(question_id) {

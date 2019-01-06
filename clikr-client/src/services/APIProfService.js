@@ -7,14 +7,19 @@ export default class APIProfService {
     }
 
     loadData() {
-        return getProfDataAPI()
-            .then(res => {
-                this.professorStore.updateData(res.data)
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
+        if (!this.professorStore.dataLoaded) {
+            return getProfDataAPI()
+                .then(res => {
+                    this.professorStore.updateData(res.data)
+                })
+                .catch(error => {
+                    console.log(error);
+                    this._checkAuth(error);
+                })
+        }
+        return new Promise(function() {
+            return true
+        })
     }
 
     loadAllCourses() {
@@ -65,7 +70,6 @@ export default class APIProfService {
     closeAllQuestions(lecture_id) {
         postCloseAllQuestionsAPI(lecture_id)
             .then(res => {
-                console.log(res)
                 this.professorStore.closeAllQuestionsForLecture(lecture_id)
             })
             .catch(error => {
@@ -77,8 +81,9 @@ export default class APIProfService {
     addLecture(lecture) {
         postNewLectureAPI(lecture)
             .then(res => {
-                lecture.id = res.data.id
-                this.professorStore.addLecture(lecture)
+                const newLec = res.data.lectures.find(lecture => lecture.id === res.data.id)
+                newLec.questions = []
+                this.professorStore.addLecture(newLec)
             })
             .catch(error => {
                 console.log(error);
@@ -90,7 +95,9 @@ export default class APIProfService {
         postNewCourseAPI(course)
             .then(res => {
                 course.id = res.data.id
-                this.professorStore.addCourse(res.data.courses, course)
+                const newCourse = res.data.courses.find(course => course.id === res.data.id)
+                newCourse.lectures = []
+                this.professorStore.addCourse(res.data.courses, newCourse)
             })
             .catch(error => {
                 console.log(error);
@@ -101,16 +108,16 @@ export default class APIProfService {
     // remove courses
     deleteCourses(courses) {
         courses.map(id => {
-            return(
+            return (
                 deleteCourseAPI(id)
-                .then(() => {
-                    this.professorStore.removeCourse(id)
-                    this.loadData()
-                })
-                .catch(error => {
-                    console.log(error);
-                    this._checkAuth(error);
-                })
+                    .then(() => {
+                        this.professorStore.removeCourse(id)
+                        this.loadData()
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this._checkAuth(error);
+                    })
             )
         })
     }
@@ -155,8 +162,9 @@ export default class APIProfService {
         // post new question
         postNewQuestionAPI(question)
             .then(res => {
-                question.id = res.data.id
-                this.professorStore.addQuestion(question)
+                const newQ = res.data.questions.find(q => q.id === res.data.id)
+                newQ.id = res.data.id
+                this.professorStore.addQuestion(newQ)
             })
             .catch(error => {
                 console.log(error);
