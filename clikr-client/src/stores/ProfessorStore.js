@@ -3,6 +3,7 @@ import { observable, action } from "mobx";
 export default class ProfessorStore {
     @observable
     courses = [];
+    dataLoaded = false;
 
     set courses(value) {
         value.sort(function (a, b) {
@@ -24,9 +25,10 @@ export default class ProfessorStore {
 
     getLectureWithId(lecture_id) {
         if (lecture_id === 0)
-            return { question: [] };
+            return { questions: [] };
+        const course = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id))
 
-        const lectures = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+        const lectures = course.lectures
         return lectures.find(lecture => lecture.id === lecture_id)
     }
 
@@ -48,6 +50,7 @@ export default class ProfessorStore {
 
     @action
     updateData(data) {
+        this.dataLoaded = true;
         this.courses = data;
     }
 

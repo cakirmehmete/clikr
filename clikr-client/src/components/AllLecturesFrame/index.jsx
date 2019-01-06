@@ -58,20 +58,34 @@ class AllLecturesFrame extends React.Component {
     }
 
     componentDidMount() {
-        this.apiProfService.loadData().then(() => {
-            this.setState({
-                parentCourse: this.profStore.getCourseWithId(this.courseId)
-            })
-        })
-    }
-
-    componentDidUpdate() {
-        if (this.state.parentCourse.id !== this.props.courseId) {
+        if (!this.profStore.dataLoaded) {
             this.apiProfService.loadData().then(() => {
+                this.profStore.dataLoaded = true
                 this.setState({
                     parentCourse: this.profStore.getCourseWithId(this.courseId)
                 })
             })
+        } else {
+            this.setState({
+                parentCourse: this.profStore.getCourseWithId(this.courseId)
+            })
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.state.parentCourse.id !== this.props.courseId) {
+            if (!this.props.profStore.dataLoaded) {
+                this.apiProfService.loadData().then(() => {
+                    this.props.profStore.dataLoaded = true
+                    this.setState({
+                        parentCourse: this.profStore.getCourseWithId(this.props.courseId)
+                    })
+                })
+            } else {
+                this.setState({
+                    parentCourse: this.profStore.getCourseWithId(this.props.courseId)
+                })
+            }
         }
     }
 
@@ -120,10 +134,10 @@ class AllLecturesFrame extends React.Component {
                 this.handleClose()
             }
         }
-        
+
     }
     handleClose = () => {
-        this.setState({ 
+        this.setState({
             deleteMode: false,
             open: false,
             delIds: [],
@@ -148,14 +162,14 @@ class AllLecturesFrame extends React.Component {
             return <Redirect to={'/professor/' + this.state.referrerLectureIndex + '/questions'} push />
         }
 
-        let list = <ListOfAllLectures courseId={this.state.parentCourse.id} profStore={this.profStore} apiProfService={this.apiProfService}/>
-        let deleteAction="delete"
-        
+        let list = <ListOfAllLectures courseId={this.state.parentCourse.id} profStore={this.profStore} apiProfService={this.apiProfService} />
+        let deleteAction = "delete"
+
         if (this.state.deleteMode) {
             list = <DeleteLecturesList courseId={this.state.parentCourse.id} profStore={this.profStore} getDeletions={this.getDeletions} />
-            deleteAction="done"
+            deleteAction = "done"
         }
-        
+
         return (
             <div>
                 <Card className={this.props.classes.card}>
@@ -178,10 +192,10 @@ class AllLecturesFrame extends React.Component {
                                             <Icon className={this.styles.icon} color="primary">add_circle</Icon>
                                             Add Lecture
                                         </Button>
-                                    </Grid>    
-                                </Grid>  
+                                    </Grid>
+                                </Grid>
                             </Grid>
-                        </Grid> 
+                        </Grid>
                         {list}
                     </CardContent>
                 </Card>
@@ -197,9 +211,9 @@ class AllLecturesFrame extends React.Component {
                             <DialogContentText key={index} id="alert-dialog-description">
                                 {title}
                             </DialogContentText>
-                                        
+
                         )}
-    
+
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.handleFinalDeletion} color="secondary">

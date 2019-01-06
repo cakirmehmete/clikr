@@ -7,14 +7,17 @@ export default class APIProfService {
     }
 
     loadData() {
-        return getProfDataAPI()
-            .then(res => {
-                this.professorStore.updateData(res.data)
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
+        if (!this.professorStore.dataLoaded) {
+            return getProfDataAPI()
+                .then(res => {
+                    this.professorStore.updateData(res.data)
+                })
+                .catch(error => {
+                    console.log(error);
+                    this._checkAuth(error);
+                })
+        }
+        return new Promise(true)
     }
 
     loadAllCourses() {
@@ -101,16 +104,16 @@ export default class APIProfService {
     // remove courses
     deleteCourses(courses) {
         courses.map(id => {
-            return(
+            return (
                 deleteCourseAPI(id)
-                .then(() => {
-                    this.professorStore.removeCourse(id)
-                    this.loadData()
-                })
-                .catch(error => {
-                    console.log(error);
-                    this._checkAuth(error);
-                })
+                    .then(() => {
+                        this.professorStore.removeCourse(id)
+                        this.loadData()
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this._checkAuth(error);
+                    })
             )
         })
     }

@@ -40,7 +40,11 @@ class ProfessorRoutes extends React.Component {
     }
 
     componentDidMount() {
-        this.apiProfService.loadData()
+        if (!this.props.profStore.dataLoaded) {
+            this.apiProfService.loadData().then(() => {
+                this.props.profStore.dataLoaded = true
+            })
+        }
     }
 
     render() {

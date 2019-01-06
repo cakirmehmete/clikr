@@ -23,6 +23,26 @@ class MCQuestionStats extends React.Component {
     }
 
     componentDidMount() {
+        if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
+            const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
+            socket.emit('subscribe professor', question.id)
+            const labels = []
+            for (var i = 0; i < question.number_of_options; i++)
+                labels.push(question["option" + (i + 1)])
+            this.setState({
+                question: question,
+                data: {
+                    labels: labels
+                }
+            })
+        }
+
+        if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId === 0) {
+            this.setState({
+                question: { id: 0, data: { labels: [] } }
+            })
+        }
+
         socket.on('new results', (msg) => {
 
             if (msg.question_id === this.props.selectedQuestionId) {
@@ -48,28 +68,6 @@ class MCQuestionStats extends React.Component {
                 })
             }
         })
-    }
-
-    componentDidUpdate() {
-        if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
-            const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
-            socket.emit('subscribe professor', question.id)
-            const labels = []
-            for (var i = 0; i < question.number_of_options; i++)
-                labels.push(question["option" + (i + 1)])
-            this.setState({
-                question: question,
-                data: {
-                    labels: labels
-                }
-            })
-        }
-
-        if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId === 0) {
-            this.setState({
-                question: { id: 0, data: { labels: [] } }
-            })
-        }
     }
 
     render() {

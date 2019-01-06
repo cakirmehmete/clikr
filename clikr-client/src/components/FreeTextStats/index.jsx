@@ -25,6 +25,14 @@ class MCQuestionStats extends React.Component {
     }
 
     componentDidMount() {
+        if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
+            const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
+            socket.emit('subscribe professor', question.id)
+            this.setState({
+                question: question,
+            })
+        }
+        
         socket.on('new results', (msg) => {
             if (msg.question_id === this.props.selectedQuestionId) {
                 this.setState({
@@ -33,16 +41,6 @@ class MCQuestionStats extends React.Component {
                 })
             }
         })
-    }
-
-    componentDidUpdate() {
-        if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
-            const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
-            socket.emit('subscribe professor', question.id)
-            this.setState({
-                question: question,
-            })
-        }
     }
 
     render() {

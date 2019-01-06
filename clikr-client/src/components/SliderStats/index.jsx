@@ -22,18 +22,6 @@ class SliderStats extends React.Component {
     }
 
     componentDidMount() {
-        socket.on('new results', (msg) => {
-            if (msg.question_id === this.props.selectedQuestionId) {
-                this.setState({
-                    responsesNumber: msg.count,
-                    correctNumber: msg.answers.correct,
-                    wrongNumber: msg.answers.wrong,
-                })
-            }
-        })
-    }
-
-    componentDidUpdate() {
         if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
             const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
             socket.emit('subscribe professor', question.id)
@@ -47,6 +35,16 @@ class SliderStats extends React.Component {
                 question: { id: 0 }
             })
         }
+        
+        socket.on('new results', (msg) => {
+            if (msg.question_id === this.props.selectedQuestionId) {
+                this.setState({
+                    responsesNumber: msg.count,
+                    correctNumber: msg.answers.correct,
+                    wrongNumber: msg.answers.wrong,
+                })
+            }
+        })
     }
 
     render() {
