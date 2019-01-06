@@ -34,9 +34,11 @@ class AddCourseDialog extends React.Component {
     }
 
     state = {
+        message: "Enter Course Enrollment Code:",
         open: false,
         code: "",
         disabled: true,
+        errorMsg: null,
     };
 
     handleChange = (e) => {
@@ -55,15 +57,47 @@ class AddCourseDialog extends React.Component {
         
     }  
     handleOpen = () => {
-        this.setState({ open: true });
+        this.setState({
+            message: "Enter Course Enrollment Code:",
+            open: true,
+            code: "",
+            disabled: true,
+        })
     };
     handleClose = () => {
-        this.setState({ open: false });
+        this.setState({ open: false })
+    }
+
+    enroll() {
+        this.apiStudentService.enrollCourse(this.state.code).then((data) => {
+            if (data !== null) {
+                this.setState(() => {
+                    return {
+
+                        message: data.error,
+                        disabled: true,
+                        open: true,
+                    }
+                });
+            }
+            else {
+                this.setState(() => {
+                    return {
+                        open: false,
+                    }
+                });
+            }
+            
+        });
     }
     handleSubmit = () => {
-        this.apiStudentService.enrollCourse(this.state.code)
-        this.apiStudentService.loadAllCourses()
-        this.handleClose();
+        
+        this.enroll();
+        if (this.state.message === "Enter Course Enrollment Code:") {
+            this.apiStudentService.loadAllCourses();
+            this.handleClose();
+        }
+
     };
 
     
@@ -79,7 +113,7 @@ class AddCourseDialog extends React.Component {
                         aria-labelledby="alert-dialog-title"
                         aria-describedby="alert-dialog-description"
                     >
-                        <DialogTitle id="alert-dialog-title">{"Enter Course Enrollment Code:"}</DialogTitle>
+                        <DialogTitle id="alert-dialog-title">{this.state.message}</DialogTitle>
                         <DialogContent>
                             <TextField
                                 id="title"

@@ -8,11 +8,12 @@ export default class APIStudentService {
     loadAllCourses() {
         getStudentCoursesAPI()
             .then(res => {
+                console.log(res.data)
                 this.studentStore.updateAllCourses(res.data)
 
             })
             .catch(error => {
-                console.log(error);
+                console.log(error.response);
                 this._checkAuth(error);
             })
         
@@ -26,7 +27,7 @@ export default class APIStudentService {
 
             })
             .catch(error => {
-                console.log(error);
+                console.log(error.response);
                 this._checkAuth(error);
             })
         
@@ -40,7 +41,7 @@ export default class APIStudentService {
 
             })
             .catch(error => {
-                console.log(error);
+                console.log(error.response);
                 this._checkAuth(error);
             })
     }
@@ -52,7 +53,7 @@ export default class APIStudentService {
             this.studentStore.dropCourse(course_id)
         )
         .catch(error => {
-            console.log(error);
+            console.log(error.response);
             this._checkAuth(error);
         })
     }
@@ -63,35 +64,46 @@ export default class APIStudentService {
                 return res.data
             })
             .catch(error => {
-                console.log(error);
+                console.log(error.response);
                 this._checkAuth(error);
             })
     }
 
     async enrollCourse(code) {
-        postEnrollStudentAPI(code)
+        return postEnrollStudentAPI(code)
             .then(res => {
-                return res.data;
+                getStudentCoursesAPI()
+                    .then(res => {
+                        console.log(res.data)
+                        this.studentStore.updateAllCourses(res.data)
+        
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        this._checkAuth(error);
+                    })
+                return null;
             })
             .catch(error => {
-                console.log(error);
+                console.log(error.response);
                 this._checkAuth(error);
+                return error.response.data;
             })
-        getStudentCoursesAPI()
-            .then(res => {
-                this.studentStore.updateAllCourses(res.data)
+        // getStudentCoursesAPI()
+        //     .then(res => {
+        //         this.studentStore.updateAllCourses(res.data)
 
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
+        //     })
+        //     .catch(error => {
+        //         console.log(error.response);
+        //         this._checkAuth(error);
+        //     })
     }
 
     async getLogoutStudent() {
         getLogoutStudentAPI()
         .catch(error => {
-            console.log(error);
+            console.log(error.response);
             this._checkAuth(error);
         })
     }

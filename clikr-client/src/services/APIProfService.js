@@ -1,4 +1,5 @@
-import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI } from '../utils/api-facade';
+import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, postCloseAllQuestionsAPI } from '../utils/api-facade';
+
 
 export default class APIProfService {
     constructor(professorStore) {
@@ -61,6 +62,18 @@ export default class APIProfService {
             })
     }
 
+    closeAllQuestions(lecture_id) {
+        postCloseAllQuestionsAPI(lecture_id)
+            .then(res => {
+                console.log(res)
+                this.professorStore.closeAllQuestionsForLecture(lecture_id)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
     addLecture(lecture) {
         postNewLectureAPI(lecture)
             .then(res => {
@@ -85,16 +98,21 @@ export default class APIProfService {
             })
     }
 
-    // remove the course
-    deleteCourse(course_id) {
-        deleteCourseAPI(course_id)
-            .then(
-                this.professorStore.removeCourse(course_id)
+    // remove courses
+    deleteCourses(courses) {
+        courses.map(id => {
+            return(
+                deleteCourseAPI(id)
+                .then(() => {
+                    this.professorStore.removeCourse(id)
+                    this.loadData()
+                })
+                .catch(error => {
+                    console.log(error);
+                    this._checkAuth(error);
+                })
             )
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
+        })
     }
 
     changeCourseTitle(courseId, courseTitle) {
@@ -122,9 +140,9 @@ export default class APIProfService {
         lectures.map(id => {
             return (
                 deleteLecturesAPI(id)
-                    .then(
+                    .then(() => {
                         this.professorStore.removeLecture(id, courseId)
-                    )
+                    })
                     .catch(error => {
                         console.log(error);
                         this._checkAuth(error);

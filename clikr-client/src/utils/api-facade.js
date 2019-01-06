@@ -43,6 +43,12 @@ export function postCloseQuestionAPI(question_id) {
     });
 }
 
+export function postCloseAllQuestionsAPI(lecture_id) {
+    return axios.post(baseURL + 'professor/lectures/' + lecture_id, {
+        action: "close"
+    });
+}
+
 // course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {
@@ -115,6 +121,8 @@ export function postNewQuestionAPI(question) {
         option4: question.option4,
         option5: question.option5,
         number_of_options: question.number_of_options,
-        word_limit: question.word_limit
+        word_limit: question.word_limit,
+        lower_label: question.lower_label,
+        upper_label: question.upper_label,
     });
 }

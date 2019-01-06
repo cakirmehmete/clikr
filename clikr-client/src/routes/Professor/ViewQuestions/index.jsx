@@ -41,10 +41,11 @@ const styles = theme => ({
 @inject("apiService")
 @observer
 class ProfessorViewQuestions extends React.Component {
+   
     constructor(props) {
         super(props)
         this.styles = props.classes
-
+        this.lectureId = null
         this.state = {
             currentQuestionIndex: 0,
             currentQuestionId: 0,
@@ -58,6 +59,7 @@ class ProfessorViewQuestions extends React.Component {
         // Get the lecture
         this.props.apiService.loadData().then(() => {
             const { lectureId } = this.props.match.params
+            this.lectureId = lectureId
             this.setState({
                 parentLecture: this.props.profStore.getLectureWithId(lectureId)
             })
@@ -67,13 +69,21 @@ class ProfessorViewQuestions extends React.Component {
         })
     }
 
+    componentWillUnmount() {
+        // close all questions in this lecture
+        this.props.apiService.closeAllQuestions(this.lectureId)
+    }
+
     handleBtnClick = () => {
         switch (this.state.btnStatus) {
             case 0:
-                // Handle the "Open Question"
-                this.props.apiService.openQuestion(this.state.currentQuestionId, this.state.parentLecture.id)
-                socket.emit('subscribe professor', this.state.currentQuestionId)
-                this.setState({ btnStatus: 1, openQuestionId: this.state.currentQuestionId })
+                if (!this.props.profStore.getQuestionWithId(this.state.parentLecture, this.convertQuestionIndexToId(this.state.currentQuestionIndex)).is_open) {
+                    // Handle the "Open Question"
+
+                    this.props.apiService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex), this.state.parentLecture.id)
+                    socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex))
+                    this.setState({ btnStatus: 1, openQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex), currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex) })
+                }
                 break;
 
             case 1:
@@ -144,10 +154,10 @@ class ProfessorViewQuestions extends React.Component {
                     </Button>
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
-                    <Grid item xs={8}>
+                    <Grid item xs={12} md={8}>
                         <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} parentLecture={this.state.parentLecture} selectedQuestionId={this.state.openQuestionId} />
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} sm={9} md={4}>
                         <List>
                             {this.state.parentLecture.questions.map((questionObj, index) => {
                                 return (<QuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
@@ -160,10 +170,14 @@ class ProfessorViewQuestions extends React.Component {
     }
 
     convertQuestionIndexToId(index) {
-        if (index < this.state.parentLecture.questions.length)
-            return this.state.parentLecture.questions[index].id
-        else
-            return 0
+        if (index < this.state.parentLecture.questions.length) {
+            return this.state.parentLecture.questions[index].id;
+        }
+            
+        else {
+            return 0;
+        }
+            
     }
 
     convertQuestionIdToIndex(question_id) {
