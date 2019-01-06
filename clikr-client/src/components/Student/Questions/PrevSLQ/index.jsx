@@ -21,6 +21,9 @@ const styles = theme => ({
         justifyContent:"center",
         color: "#424242"
     },
+    titleContainer: {
+        paddingBottom: theme.spacing.unit*0.25
+    },
     percentContainer: {
         paddingRight: theme.spacing.unit*3
     },
@@ -37,8 +40,6 @@ const styles = theme => ({
         width: 45
     },
     gridItem: {
-        paddingTop: theme.spacing.unit,
-        paddingBottom: theme.spacing.unit,
         width: "98%"
     },
     paper: {
@@ -195,20 +196,18 @@ class PrevSLQ extends Component {
         return (
             <div>
                 <Paper className={this.styles.paper}>
-                    <Grid container direction="column" justify="space-between" className={this.styles.gridContainer}>
-                        <Grid item>
-                            <Grid container direction="row" justify="space-between" alignItems="flex-start" spacing={16}>
-                                <Grid item xs>
-                                    <div className={this.styles.titleWrap}> {this.question.question_title} </div>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Grid container justify="flex-end" direction="row" className={this.styles.percentContainer}>
-                                        <Card className={this.styles.card}>
-                                            <Typography align="center" className={this.styles.whiteTypography}>
-                                                {this.answer.toString() + " "}%
-                                            </Typography>
-                                        </Card>
-                                    </Grid>
+                    <Grid container direction="column" justify="center" className={this.styles.gridContainer}>
+                        <Grid container direction="row" justify="space-between" alignItems="flex-start" spacing={16} className={this.styles.titleContainer}>
+                            <Grid item xs>
+                                <div className={this.styles.titleWrap}> {this.question.question_title} </div>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Grid container justify="flex-end" direction="row" className={this.styles.percentContainer}>
+                                    <Card className={this.styles.card}>
+                                        <Typography align="center" className={this.styles.whiteTypography}>
+                                            {this.answer.toString() + " "}%
+                                        </Typography>
+                                    </Card>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -220,7 +219,7 @@ class PrevSLQ extends Component {
                                             <div className={this.styles.labels}>{this.question.lower_label}</div>
                                         </Grid>
                                     </Grid>
-                                    <Grid item xs={8}>
+                                    <Grid item xs={6}>
                                         <Slider
                                             disabled
                                             value={this.answer}
