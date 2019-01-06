@@ -32,7 +32,7 @@ class MCQuestionStats extends React.Component {
                 question: question,
             })
         }
-        
+
         socket.on('new results', (msg) => {
             if (msg.question_id === this.props.selectedQuestionId) {
                 this.setState({
@@ -41,6 +41,10 @@ class MCQuestionStats extends React.Component {
                 })
             }
         })
+    }
+
+    componentWillUnmount() {
+        socket.removeAllListeners("new results");
     }
 
     render() {

@@ -35,9 +35,8 @@ class SliderStats extends React.Component {
                 question: { id: 0 }
             })
         }
-        
         socket.on('new results', (msg) => {
-            if (msg.question_id === this.props.selectedQuestionId) {
+            if (msg.question_id === this.props.selectedQuestionId && this.state.mounted) {
                 this.setState({
                     responsesNumber: msg.count,
                     correctNumber: msg.answers.correct,
@@ -45,6 +44,10 @@ class SliderStats extends React.Component {
                 })
             }
         })
+    }
+
+    componentWillUnmount() {
+        socket.removeAllListeners("new results");
     }
 
     render() {

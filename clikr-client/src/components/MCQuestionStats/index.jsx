@@ -70,6 +70,10 @@ class MCQuestionStats extends React.Component {
         })
     }
 
+    componentWillUnmount() {
+        socket.removeAllListeners("new results");
+    }
+
     render() {
         const options = {
             scales: {

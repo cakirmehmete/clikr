@@ -27,6 +27,8 @@ export default class ProfessorStore {
         if (lecture_id === 0)
             return { questions: [] };
         const course = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id))
+        if (course === undefined)
+            return { questions: [] }
 
         const lectures = course.lectures
         return lectures.find(lecture => lecture.id === lecture_id)
@@ -38,7 +40,7 @@ export default class ProfessorStore {
     }
 
     getQuestionWithId(lecture, question_id) {
-        if (lecture.questions === undefined)
+        if (lecture.questions === [])
             return { questions: [] };
 
         if (lecture.questions.find(x => x.id === question_id) === undefined)
@@ -58,7 +60,7 @@ export default class ProfessorStore {
     addCourse(courses, course) {
         course.enroll_code = courses.find(x => x.id === course.id).enroll_code
         this.courses.push(course);
-        this.courses.sort(function (a, b) {
+        this.courses.slice().sort(function (a, b) {
             if (a.created_at < b.created_at) {
                 return -1;
             }
@@ -84,7 +86,7 @@ export default class ProfessorStore {
     @action
     addLecture(lecture) {
         this.courses.find(x => x.id === lecture.course_id).lectures.push(lecture)
-        this.courses.find(x => x.id === lecture.course_id).sort(function (a, b) {
+        this.courses.find(x => x.id === lecture.course_id).lectures.slice().sort(function (a, b) {
             if (a.created_at < b.created_at) {
                 return -1;
             }
@@ -116,7 +118,7 @@ export default class ProfessorStore {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
             .find(lecture => lecture.id === question.lecture_id).questions.push(question);
         this.courses.find(course => course.lectures.find(lecture => lecture.id === question.lecture_id)).lectures
-            .find(lecture => lecture.id === question.lecture_id).questions.sort(function (a, b) {
+            .find(lecture => lecture.id === question.lecture_id).questions.slice().sort(function (a, b) {
                 if (a.created_at < b.created_at) {
                     return -1;
                 }

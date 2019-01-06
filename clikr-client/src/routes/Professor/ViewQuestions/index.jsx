@@ -54,9 +54,7 @@ class ProfessorViewQuestions extends React.Component {
             currentQuestionId: 0,
             openQuestionId: 0,
             btnStatus: 0,
-            parentLecture: { questions: [] },
-            mounted: true,
-            lectureId: 0
+            parentLecture: { questions: [] }
         }
     }
 
@@ -64,40 +62,30 @@ class ProfessorViewQuestions extends React.Component {
         // Get the lecture
         if (!this.props.profStore.dataLoaded) {
             this.props.apiService.loadData().then(() => {
-                this.props.profStore.dataLoaded = true
-                if (this.state.mounted) {
-                    const { lectureId } = this.props.match.params
-                    this.lectureId = lectureId
-                    this.setState({
-                        parentLecture: this.props.profStore.getLectureWithId(lectureId),
-                        lectureId
-                    })
-                    this.setState({
-                        currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
-                    })
-                }
-            })
-        } else {
-            if (this.state.mounted) {
                 const { lectureId } = this.props.match.params
                 this.lectureId = lectureId
                 this.setState({
-                    parentLecture: this.props.profStore.getLectureWithId(lectureId),
-                    lectureId: this.props.match.params.lectureId
+                    parentLecture: this.props.profStore.getLectureWithId(lectureId)
                 })
                 this.setState({
                     currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
                 })
-            }
+            })
+        } else {
+            const { lectureId } = this.props.match.params
+            this.lectureId = lectureId
+            this.setState({
+                parentLecture: this.props.profStore.getLectureWithId(lectureId)
+            })
+            this.setState({
+                currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+            })
         }
     }
 
     componentWillUnmount() {
         // close all questions in this lecture
         this.props.apiService.closeAllQuestions(this.lectureId)
-        this.setState({
-            mounted: false
-        })
     }
 
     handleBtnClick = () => {
@@ -185,7 +173,7 @@ class ProfessorViewQuestions extends React.Component {
                     </Grid>
                     <Grid item xs={12} sm={9} md={4}>
                         <List>
-                            {(this.props.profStore.getLectureWithId(this.state.lectureId).questions).map((questionObj, index) => {
+                            {this.state.parentLecture.questions.map((questionObj, index) => {
                                 if (questionObj.question_type === "multiple_choice")
                                     return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
                                 else if (questionObj.question_type === "free_text")
