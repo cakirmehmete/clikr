@@ -1,14 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
+import { Provider } from 'mobx-react';
 import { withStyles } from '@material-ui/core/styles';
-import { inject } from 'mobx-react';
+import StudentStore from '../../stores/StudentStore';
 import APIStudentService from '../../services/APIStudentService';
 import StudentHome from './StudentHome';
 import StudentEnroll from './StudentEnrollment';
 import QuestionPage from './StudentQuestionPage';
 import CheckQuestions from './CheckQuestions';
-import Home from '../Home';
-import Login from '../Login';
+import NoMatch from '../../components/NoMatch';
+
 
 const drawerWidth = 240;
 
@@ -24,12 +25,11 @@ const styles = theme => ({
     },
 });
 
-@inject('store')
 class StudentRoutes extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.store = props.store
+        this.store = new StudentStore()
         this.apiStudentService = new APIStudentService(this.store)
     }
 
@@ -40,16 +40,15 @@ class StudentRoutes extends React.Component {
     render() {
         return (
             <div>
-                <Router>
+                <Provider store={this.store}>
                     <Switch>
-                        <Route exact path='/' component={Home} />
-                        <Route exact path='/login-(prof|student)' component={Login} />
                         <Route exact path='/student' component={StudentHome} />
                         <Route exact path='/student/enroll' component={StudentEnroll} />
                         <Route path='/student/checkquestions' component={CheckQuestions} />
                         <Route path='/student/questions' component={QuestionPage}/>
+                        <Route component={NoMatch} />
                     </Switch>
-                </Router>
+                </Provider>
             </div>
         );
     }
