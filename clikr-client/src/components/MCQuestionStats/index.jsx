@@ -1,30 +1,22 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
 import { observer, inject } from 'mobx-react';
 import { socketioURL } from '../../constants/api';
 import socketIOClient from 'socket.io-client'
 import { Bar, defaults } from 'react-chartjs-2';
-import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
+import BaseStatsComponent from '../BaseStatsComponent';
 const socket = socketIOClient(socketioURL)
-
-const styles = theme => ({
-    card: {
-        marginBottom: 10
-    }
-});
 
 @inject("profStore")
 @inject("apiService")
 @observer
-class QuestionStats extends React.Component {
+class MCQuestionStats extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
         this.state = {
             question: { id: 0 },
-            data: {}
+            data: {},
+            responsesNumber: 0
         }
         defaults.global.legend.display = false;
         defaults.global.tooltips.enabled = false;
@@ -32,7 +24,7 @@ class QuestionStats extends React.Component {
 
     componentDidMount() {
         socket.on('new results', (msg) => {
-            console.log(msg)
+
             if (msg.question_id === this.props.selectedQuestionId) {
                 const values = []
 
@@ -51,7 +43,8 @@ class QuestionStats extends React.Component {
                             borderColor: '#E9C46A',
                             data: values,
                         }]
-                    }
+                    },
+                    responsesNumber: msg.count
                 })
             }
         })
@@ -98,16 +91,11 @@ class QuestionStats extends React.Component {
         }
 
         return (
-            <Card className={this.styles.card} hidden={!this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open}>
-                <CardContent>
-                    <Typography variant="h6" color="inherit">
-                        Statistics for {this.state.question.question_title}
-                    </Typography>
-                    <Bar key={this.props.selectedQuestionId} data={this.state.data} options={options} />
-                </CardContent>
-            </Card>
+            <BaseStatsComponent responsesNumber={this.state.responsesNumber} questionTitle={this.state.question.question_title} hidden={!this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open} >
+                <Bar key={this.props.selectedQuestionId} data={this.state.data} options={options} />
+            </BaseStatsComponent>
         );
     }
 }
 
-export default withStyles(styles)(QuestionStats);
+export default MCQuestionStats;
