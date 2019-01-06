@@ -619,11 +619,7 @@ def get_answers(current_user, question_id):
 
     # retrieve answers and return
     answer_data = AnswerSchema().dump(question.answers, many=True).data
-    return_data = {}
-    return_data["stats"] = compute_question_statistics(question)
-    return_data["answer_data"] = answer_data
-
-    return custom_response(return_data, 200)
+    return custom_response(answer_data, 200)
 
 @professor_api.route('/courses/<course_id>/exportgrades', methods=['GET'])
 @Auth.professor_auth_required
