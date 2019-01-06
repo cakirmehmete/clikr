@@ -36,7 +36,7 @@ class SliderStats extends React.Component {
             })
         }
         socket.on('new results', (msg) => {
-            if (msg.question_id === this.props.selectedQuestionId && this.state.mounted) {
+            if (msg.question_id === this.props.selectedQuestionId) {
                 this.setState({
                     responsesNumber: msg.count,
                     correctNumber: msg.answers.correct,

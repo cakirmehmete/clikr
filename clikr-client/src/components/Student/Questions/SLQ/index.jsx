@@ -160,7 +160,7 @@ class SLQ extends Component {
                                     <div className={this.styles.labels}>{this.question.lower_label}</div>
                                 </Grid>
                             </Grid>
-                            <Grid item xs={8}>
+                            <Grid item xs={6}>
                                 <Slider
                                     value={this.state.answer}
                                     min={0}

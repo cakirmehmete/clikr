@@ -1,11 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
+import { Provider } from 'mobx-react';
 import { withStyles } from '@material-ui/core/styles';
-import { inject } from 'mobx-react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
 import SideMenuBar from '../../components/SideMenuBar';
 import TopMenuBar from '../../components/TopMenuBar';
+import ProfessorStore from '../../stores/ProfessorStore';
 import APIProfService from '../../services/APIProfService';
 import ProfessorHome from './ProfessorHome';
 import ProfessorNewCourse from './NewCourse';
@@ -15,8 +16,8 @@ import ProfessorAddMCQuestion from './AddMCQuestion';
 import ProfessorAddFreeTextQuestion from './AddFreeTextQuestion';
 import ProfessorAddSliderQuestion from './AddSliderQuestion';
 import ProfessorAddLecture from './AddLecture';
-import Home from '../Home';
-import Login from '../Login';
+import NoMatch from '../../components/NoMatch';
+
 
 const drawerWidth = 240;
 
@@ -30,31 +31,27 @@ const styles = theme => ({
     },
 });
 
-@inject('profStore')
 class ProfessorRoutes extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
-        this.profStore = props.profStore
+        this.profStore = new ProfessorStore()
         this.apiProfService = new APIProfService(this.profStore)
     }
 
     componentDidMount() {
-        if (!this.props.profStore.dataLoaded) {
+        if (!this.profStore.dataLoaded) {
             this.apiProfService.loadData().then(() => {
-                this.props.profStore.dataLoaded = true
+                this.profStore.dataLoaded = true
             })
         }
     }
 
     render() {
         return (
-            <Router>
+            <Provider profStore={this.profStore} apiService={this.apiProfService}>
                 <div>
                     <CssBaseline />
-                    <Route exact path='/' component={Home} />
-                    <Route exact path='/login-(prof|student)' component={Login} />
-                    
                     <Route path='/professor' component={TopMenuBar} />
                     <nav>
                         <Hidden xsDown implementation="css">
@@ -63,17 +60,20 @@ class ProfessorRoutes extends React.Component {
                     </nav>
                     
                     <main className={this.styles.content}>
-                        <Route exact path='/professor' component={ProfessorHome} />
-                        <Route path='/professor/new' component={ProfessorNewCourse} />
-                        <Route path='/professor/:courseId/lectures' component={ProfessorViewLectures} />
-                        <Route path='/professor/:courseId/new' component={ProfessorAddLecture} />
-                        <Route exact path='/professor/:lectureId/questions' component={ProfessorViewQuestions} />
-                        <Route path='/professor/:lectureId/questions/new-mc' component={ProfessorAddMCQuestion} />
-                        <Route path='/professor/:lectureId/questions/new-free-text' component={ProfessorAddFreeTextQuestion} />
-                        <Route path='/professor/:lectureId/questions/new-slider' component={ProfessorAddSliderQuestion} />
+                        <Switch>
+                            <Route exact path='/professor' component={ProfessorHome} />
+                            <Route path='/professor/new' component={ProfessorNewCourse} />
+                            <Route path='/professor/:courseId/lectures' component={ProfessorViewLectures} />
+                            <Route path='/professor/:courseId/new' component={ProfessorAddLecture} />
+                            <Route exact path='/professor/:lectureId/questions' component={ProfessorViewQuestions} />
+                            <Route path='/professor/:lectureId/questions/new-mc' component={ProfessorAddMCQuestion} />
+                            <Route path='/professor/:lectureId/questions/new-free-text' component={ProfessorAddFreeTextQuestion} />
+                            <Route path='/professor/:lectureId/questions/new-slider' component={ProfessorAddSliderQuestion} />
+                            <Route component={NoMatch} />
+                        </Switch>
                     </main>
                 </div>
-            </Router>
+            </Provider>
         );
     }
 }

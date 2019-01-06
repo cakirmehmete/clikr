@@ -20,7 +20,6 @@ import FormControl from '@material-ui/core/FormControl';
 const styles = theme => ({
     gridItem: {
         padding: theme.spacing.unit,
-        width: 400
     },
     card: {
         backgroundColor: theme.palette.secondary.main,
@@ -44,16 +43,15 @@ const styles = theme => ({
         fontSize:"1.5em", 
         display:"flex", 
     },
+    entry: {
+        maxWidth: 500
+    },
     titleContainer: {
         paddingTop: theme.spacing.unit,
         paddingBottom: theme.spacing.unit*2
     },
-    slider: {
-        minWidth: 300
-    },
     slidercontainer: {
-        width: 400,
-        paddingTop: theme.spacing.unit
+        paddingRight: theme.spacing.unit*2
     },
     gridContainer: {
         margin: theme.spacing.unit,
@@ -452,13 +450,15 @@ class ProfessorAddSliderQuestion extends React.Component {
         }
 
         return (
-            <Grid container direction="row" justify="flex-start" className={this.styles.container} spacing={24} >
-                <Grid item className={this.styles.gridItem} xs={6}>
+            <Grid container justify="center" className={this.styles.container} spacing={24} >
+                <Grid item className={this.styles.gridItem} xs={12} sm={6}>
                     <Grid container direction="column" align-items="flex-start">
-                        <Typography variant="h6" color="textPrimary">
-                            Add New Question:
-                        </Typography>
-                        <Grid item className={this.styles.textGrid}>
+                        <Grid item>
+                            <Typography variant="h6" color="textPrimary">
+                                Add New Question:
+                            </Typography>
+                        </Grid>
+                        <Grid item className={this.styles.entry}>
                             <form noValidate autoComplete="off">
                                 <TextField
                                     required
@@ -474,7 +474,7 @@ class ProfessorAddSliderQuestion extends React.Component {
                             </form>
                         </Grid>  
                     </Grid>
-                    <Grid container direction="column" justify="flex-start" className={this.styles.textGrid}>
+                    <Grid container direction="column" justify="flex-start" >
                         <Grid item>
                             <FormControlLabel
                                 control={
@@ -489,41 +489,47 @@ class ProfessorAddSliderQuestion extends React.Component {
                         </Grid>
                         
                         {this.state.custom_labels && 
-                            <Grid container direction="row" justify="space-between" alignItems="center">
-                                <Grid item>
-                                    <TextField
-                                        id="standard-name"
-                                        label="lower label"
-                                        value={this.state.labels.lower}
-                                        onChange={this.handleLabelsChange('lower')}
-                                        margin="normal"
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <TextField
-                                        id="standard-name"
-                                        label="upper label"
-                                        value={this.state.labels.upper}
-                                        onChange={this.handleLabelsChange('upper')}
-                                        margin="normal"
-                                    />
+                            <Grid item>
+                                <Grid container direction="row" justify="flex-start" alignItems="center" spacing={24} className={this.styles.entry}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            id="standard-name"
+                                            label="lower label"
+                                            value={this.state.labels.lower}
+                                            onChange={this.handleLabelsChange('lower')}
+                                            margin="normal"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            id="standard-name"
+                                            label="upper label"
+                                            value={this.state.labels.upper}
+                                            onChange={this.handleLabelsChange('upper')}
+                                            margin="normal"
+                                        />
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         }
                     </Grid>                       
-                    <Grid container direction="column" justify="space-evenly" className={this.styles.textGrid}>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                checked={this.state.has_correct_answer}
-                                onChange={this.setCorrectAnswer('has_correct_answer')}
-                                value={this.state.has_correct_answer}
-                                />
-                            }
-                            label="set correct answer (optional)"
-                        />
+                    <Grid container direction="column" justify="space-evenly" >
+                        <Grid item>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                    checked={this.state.has_correct_answer}
+                                    onChange={this.setCorrectAnswer('has_correct_answer')}
+                                    value={this.state.has_correct_answer}
+                                    />
+                                }
+                                label="set correct answer (optional)"
+                            />
+                        </Grid>
                         {this.state.has_correct_answer && 
-                            <Grid item >
+                            <Grid item>
                                 <Grid container direction="row">
                                     <FormControl component="fieldset">
                                         <RadioGroup
@@ -538,9 +544,10 @@ class ProfessorAddSliderQuestion extends React.Component {
                                 </Grid>
                             </Grid>
                         }
+                        
                         {this.state.has_correct_answer && this.state.range ? ( <Grid item>
-                            <Grid container direction="row" justify="space-between" spacing={24}>
-                                <Grid item xs>
+                            <Grid container direction="row" justify="flex-start" className={this.styles.entry} spacing={16}> 
+                                <Grid item xs={6} sm={3}>
                                     <TextField
                                         select
                                         value={this.state.equality_operators.lower}
@@ -556,7 +563,7 @@ class ProfessorAddSliderQuestion extends React.Component {
                                         ))}
                                     </TextField>
                                 </Grid>
-                                <Grid item xs>
+                                <Grid item xs={6} sm={3}>
                                     <TextField
                                         id="correct answer lower bound"
                                         type="number"
@@ -571,16 +578,14 @@ class ProfessorAddSliderQuestion extends React.Component {
                                         }}
                                     />
                                 </Grid>
-                                <Grid item className={this.styles.andor} xs >
-                                    <Typography variant="caption" align="center">
-                                        and/or
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs>
+                                <Grid item xs={6} sm={3}>
                                     <TextField
                                         select
                                         value={this.state.equality_operators.upper}
                                         onChange={this.handleEqualityOperator('upper')}
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start">and/or</InputAdornment>,
+                                        }}
                                         >
                                         {answerBoundOptionsRange.map(option => (
                                             <MenuItem key={option.value} value={option.value}>
@@ -589,7 +594,7 @@ class ProfessorAddSliderQuestion extends React.Component {
                                         ))}
                                     </TextField>
                                 </Grid>
-                                <Grid item xs>
+                                <Grid item xs={6} sm={3}>
                                     <TextField
                                         id="correct answer upper bound"
                                         type="number"
@@ -602,103 +607,102 @@ class ProfessorAddSliderQuestion extends React.Component {
                                             </InputAdornment>
                                             ),
                                         }}
-                                    />       
-                                </Grid> 
-                            </Grid> </Grid>)
-                        : (this.state.has_correct_answer &&
-                            <Grid item xs>
-                                <Grid container direction="row" justify="flex-start">
-                                    <Grid item xs>
-                                        <TextField
-                                            select
-                                            value={this.state.equality_operators.lower}
-                                            onChange={this.handleEqualityOperator('lower')}
-                                            InputProps={{
-                                                startAdornment: <InputAdornment position="start">answer</InputAdornment>,
-                                            }}
-                                            >
-                                            {answerBoundOptions.map(option => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </TextField>
-                                    </Grid>
-                                
-                                    <Grid item xs>
-                                        <TextField
-                                            id="correct answer lower bound"
-                                            type="number"
-                                            value={this.state.answer_bounds.lower}
-                                            onChange={this.setCorrectBounds('lower')}
-                                            InputProps={{
-                                                endAdornment: (
-                                                <InputAdornment variant="filled" position="end">
-                                                    %
-                                                </InputAdornment>
-                                                ),
-                                            }}
-                                        />
+                                    /> 
+                                </Grid>
+                            </Grid>
+                        </Grid>)
+                        : (this.state.has_correct_answer && <Grid item>
+                            <Grid container direction="row" justify="flex-start" className={this.styles.entry}>
+                                <Grid item> 
+                                    <Grid container direction="row" justify="flex-start" spacing={24}>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                select
+                                                fullWidth
+                                                value={this.state.equality_operators.lower}
+                                                onChange={this.handleEqualityOperator('lower')}
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment position="start">answer</InputAdornment>,
+                                                }}
+                                                >
+                                                {answerBoundOptions.map(option => (
+                                                    <MenuItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                fullWidth
+                                                id="correct answer lower bound"
+                                                type="number"
+                                                value={this.state.answer_bounds.lower}
+                                                onChange={this.setCorrectBounds('lower')}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                    <InputAdornment variant="filled" position="end">
+                                                        %
+                                                    </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Grid>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        )
-                    }
-                        <Grid item className={this.styles.button}>
-                            <Button
-                                disabled={this.state.disabled}
-                                variant="outlined"
-                                color="primary"
-                                onClick={this.handleSubmit}>
-                                Submit
-                            </Button>
-                        </Grid>
+                        </Grid>)}
+                    </Grid>
+                    <Grid container className={this.styles.button}>
+                        <Button
+                            disabled={this.state.disabled}
+                            variant="outlined"
+                            color="primary"
+                            onClick={this.handleSubmit}>
+                            Submit
+                        </Button>
                     </Grid>
                 </Grid>
-                <Grid item className={this.styles.gridItem} xs={6}>
-                    <Typography variant="h6" color="textPrimary">
-                        Preview:
-                    </Typography>
-                    <Grid container direction="column" justify="center" className={this.styles.gridContainer}>
+                <Grid item className={this.styles.gridItem} xs={12} sm={6}>
+                    <Grid container direction="column" align-items="flex-start" spacing={24}>
+                        <Grid item><Typography variant="h6" color="textPrimary"> Preview: </Typography></Grid>
                         <Grid item>
-                            <Grid container direction="row" justify="space-between" spacing={24} className={this.styles.titleContainer}>
-                                <Grid item xs>
-                                   <div className={this.styles.titleWrap}> {this.state.title} </div>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Grid container direction="row" justify="flex-start">
-                                        <Card className={this.styles.card}>
-                                            <Typography align="center" className={this.styles.percentText}>
-                                                {this.state.slider_value.toString() + " "}%
-                                            </Typography>
-                                        </Card>
+                            <Grid container direction="column" justify="center" spacing={24}>
+                                <Grid item xs={12}>
+                                    <Grid container direction="row" justify="space-between" className={this.styles.titleContainer}>
+                                        <Grid item>
+                                            <div className={this.styles.titleWrap}> {this.state.title} </div>
+                                        </Grid>
+                                        <Grid item>
+                                            <Grid container direction="row" justify="flex-end">
+                                                <Card className={this.styles.card}>
+                                                    <Typography align="center" className={this.styles.percentText}>
+                                                        {this.state.slider_value.toString() + " "}%
+                                                    </Typography>
+                                                </Card>
+                                            </Grid>
+                                        </Grid>  
                                     </Grid>
                                 </Grid>
-                                
-                            </Grid>
-                        </Grid>
-                    
-                        <Grid container direction="row" justify="center" alignItems="center" className={this.styles.slidercontainer} spacing={24}>
-                            <Grid item xs>
-                                <div className={this.styles.labels}>{this.state.labels.lower}</div>
-                            </Grid>
-                            <Grid item xs={8}>
-                                <Slider
-                                    value={this.state.slider_value}
-                                    min={0}
-                                    max={100}
-                                    step={1}
-                                    aria-labelledby="label"
-                                    onChange={this.handleSliderChange}
-                                />
-                            </Grid>
-                            <Grid item xs>
-                                <div className={this.styles.labels}>{this.state.labels.upper}</div>
+                                <Grid container direction="row" justify="flex-start" alignItems="center" className={this.styles.slidercontainer} spacing={24}>
+                                    <Grid item xs><div className={this.styles.labels}>{this.state.labels.lower}</div></Grid>
+                                    <Grid item xs={8}>
+                                        <Slider
+                                            value={this.state.slider_value}
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            aria-labelledby="label"
+                                            onChange={this.handleSliderChange}
+                                        />
+                                    </Grid>
+                                    <Grid item xs><div className={this.styles.labels}>{this.state.labels.upper}</div></Grid>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
-                </Grid> 
-            </Grid>      
+                </Grid>  
+            </Grid>
         );
     }
 }
