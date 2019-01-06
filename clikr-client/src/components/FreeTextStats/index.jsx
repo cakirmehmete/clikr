@@ -32,24 +32,38 @@ class MCQuestionStats extends React.Component {
                 question: question,
             })
         }
-
-        socket.on('new results', (msg) => {
-            if (msg.question_id === this.props.selectedQuestionId) {
-                this.setState({
-                    responsesNumber: msg.count,
-                    responses: msg.answers
-                })
-            }
-        })
+        if (!this.props.override) {
+            socket.on('new results', (msg) => {
+                if (msg.question_id === this.props.selectedQuestionId) {
+                    this.setState({
+                        responsesNumber: msg.count,
+                        responses: msg.answers
+                    })
+                }
+            })
+        } else {
+            this.props.apiService.loadAnswers(this.props.selectedQuestionId).then((data) => {
+                const msg = data.stats
+                
+                if (msg.question_id === this.props.selectedQuestionId) {
+                    this.setState({
+                        responsesNumber: msg.count,
+                        responses: msg.answers
+                    })
+                }
+            })
+        }
     }
 
     componentWillUnmount() {
-        socket.removeAllListeners("new results");
+        if (!this.props.override) {
+            socket.removeAllListeners("new results");
+        }
     }
 
     render() {
         return (
-            <BaseStatsComponent responsesNumber={this.state.responsesNumber} questionTitle={this.state.question.question_title} hidden={!this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open} >
+            <BaseStatsComponent responsesNumber={this.state.responsesNumber} timer={!this.props.override} questionTitle={this.state.question.question_title} hidden={this.props.override ? false : !this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open}  >
                 <Table>
                     <TableHead>
                         <TableRow>

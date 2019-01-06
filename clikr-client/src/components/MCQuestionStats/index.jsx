@@ -42,36 +42,65 @@ class MCQuestionStats extends React.Component {
                 question: { id: 0, data: { labels: [] } }
             })
         }
+        if (!this.props.override) {
+            socket.on('new results', (msg) => {
 
-        socket.on('new results', (msg) => {
+                if (msg.question_id === this.props.selectedQuestionId) {
+                    const values = []
 
-            if (msg.question_id === this.props.selectedQuestionId) {
-                const values = []
+                    const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
+                    for (var i = 1; i <= question.number_of_options; i++) {
+                        values[i - 1] = msg.answers[i]
+                        if (msg.answers[i] === undefined)
+                            values[i - 1] = 0;
+                    }
 
-                const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
-                for (var i = 1; i <= question.number_of_options; i++) {
-                    values[i - 1] = msg.answers[i]
-                    if (msg.answers[i] === undefined)
-                        values[i - 1] = 0;
+                    this.setState({
+                        data: {
+                            datasets: [{
+                                label: "Question Statistics",
+                                backgroundColor: '#E9C46A',
+                                borderColor: '#E9C46A',
+                                data: values,
+                            }]
+                        },
+                        responsesNumber: msg.count
+                    })
                 }
+            })
+        } else {
+            this.props.apiService.loadAnswers(this.props.selectedQuestionId).then((data) => {
+                const msg = data.stats
+                if (msg.question_id === this.props.selectedQuestionId) {
+                    const values = []
 
-                this.setState({
-                    data: {
-                        datasets: [{
-                            label: "Question Statistics",
-                            backgroundColor: '#E9C46A',
-                            borderColor: '#E9C46A',
-                            data: values,
-                        }]
-                    },
-                    responsesNumber: msg.count
-                })
-            }
-        })
+                    const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
+                    for (var i = 1; i <= question.number_of_options; i++) {
+                        values[i - 1] = msg.answers[i]
+                        if (msg.answers[i] === undefined)
+                            values[i - 1] = 0;
+                    }
+
+                    this.setState({
+                        data: {
+                            datasets: [{
+                                label: "Question Statistics",
+                                backgroundColor: '#E9C46A',
+                                borderColor: '#E9C46A',
+                                data: values,
+                            }]
+                        },
+                        responsesNumber: msg.count
+                    })
+                }
+            })
+        }
     }
 
     componentWillUnmount() {
-        socket.removeAllListeners("new results");
+        if (!this.props.override) {
+            socket.removeAllListeners("new results");
+        }
     }
 
     render() {
@@ -93,7 +122,7 @@ class MCQuestionStats extends React.Component {
         }
 
         return (
-            <BaseStatsComponent responsesNumber={this.state.responsesNumber} questionTitle={this.state.question.question_title} hidden={!this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open} >
+            <BaseStatsComponent responsesNumber={this.state.responsesNumber} timer={!this.props.override} questionTitle={this.state.question.question_title} hidden={this.props.override ? false : !this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open} >
                 <Bar key={this.props.selectedQuestionId} data={this.state.data} options={options} />
             </BaseStatsComponent>
         );
