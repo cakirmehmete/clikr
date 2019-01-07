@@ -10,7 +10,7 @@ import { observer, inject } from 'mobx-react';
 import AddQuestionModalWrapped from '../AddQuestionModal';
 import QuestionListItem from '../QuestionListItem';
 import PropTypes from 'prop-types';
-import EditIcon from '@material-ui/icons/Edit';
+// import EditIcon from '@material-ui/icons/Edit';
 import Button from '@material-ui/core/Button';
 import DoneIcon from '@material-ui/icons/Done';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -150,7 +150,7 @@ class AllQuestionsFrame extends React.Component {
                         </Grid>
                         <Grid item>
                             <Grid container direction="row" justify="flex-end">
-                                <Grid item>
+                                {/* <Grid item>
                                     {this.state.editMode ? (
                                     <Tooltip title={"done editing"} placement="top-start">
                                         <IconButton color="secondary" onClick={this.handleRestoreMode}>
@@ -164,7 +164,7 @@ class AllQuestionsFrame extends React.Component {
                                         </IconButton>
                                     </Tooltip>
                                     )}    
-                                </Grid>
+                                </Grid> */}
                                 <Grid item>
                                 {this.state.deleteMode ? (
                                     <Tooltip title={"done deleting"} placement="top-start">
