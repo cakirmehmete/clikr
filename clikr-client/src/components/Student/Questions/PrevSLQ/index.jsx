@@ -119,16 +119,16 @@ class PrevSLQ extends Component {
         let string = "equals";
         switch(operator) {
             case "<":
-                string = "is less than";
+                string = "<";
                 break;
             case "<=":
-                string = "is less than or equal to";
+                string = "\u2264";
                 break;
             case ">":
-                string = "is greater than";
+                string = ">";
                 break;
             case ">=":
-                string = "is greater than or equal to";
+                string = "\u2265";
                 break;
             case "||":
                 string = "or";
@@ -137,7 +137,7 @@ class PrevSLQ extends Component {
                 string = "and";
                 break;
             default:
-                string = "equals";
+                string = "=";
         } 
         return string;
     }
@@ -187,8 +187,6 @@ class PrevSLQ extends Component {
         // helper text
         if (this.question.correct_answer === "" || this.question.correct_answer === null) {
             this.helperText = "Your Answer: " + this.answer.toString() + "%"
-        } else if (correct) {
-            this.helperText = "Correct"
         } else {
             this.helperText = "Correct Answer: " + this.getAnswerText(this.question.correct_answer) 
         }
