@@ -38,31 +38,13 @@ class SliderStats extends React.Component {
         if (!this.props.override) {
             socket.on('new results', (msg) => {
                 if (msg.question_id === this.props.selectedQuestionId) {
-                    const values = []
-                    console.log(msg)
-                    const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
-                    for (var i = 1; i <= question.number_of_options; i++) {
-                        values[i - 1] = msg.answers[i]
-                        if (msg.answers[i] === undefined)
-                            values[i - 1] = 0;
-                    }
-
-                    this.updateChartData(values)
+                    this.updateChartData(msg.answers, msg.count)
                 }
             })
         } else {
             this.props.apiService.loadAnswers(this.props.selectedQuestionId).then((msg) => {
                 if (msg.question_id === this.props.selectedQuestionId) {
-                    const values = []
-                    const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
-                    
-                    for (var i = 1; i <= question.number_of_options; i++) {
-                        values[i - 1] = msg.answers[i]
-                        if (msg.answers[i] === undefined)
-                            values[i - 1] = 0;
-                    }
-
-                    this.updateChartData(values)
+                    this.updateChartData(msg.answers, msg.count)
                 }
             })
         }
@@ -71,7 +53,7 @@ class SliderStats extends React.Component {
     updateChartLabels(question) {
         const labels = []
         for (var i = 0; i <= 100; i++) {
-            if (i % 20 === 0)
+            if (i % 10 === 0)
                 labels.push(i)
             else 
                 labels.push('')
@@ -85,7 +67,7 @@ class SliderStats extends React.Component {
         })
     }
 
-    updateChartData(values) {
+    updateChartData(values, count) {
         this.setState({
             data: {
                 datasets: [{
@@ -95,7 +77,7 @@ class SliderStats extends React.Component {
                     data: values,
                 }]
             },
-            responsesNumber: values.length
+            responsesNumber: count
         })
     }
 
