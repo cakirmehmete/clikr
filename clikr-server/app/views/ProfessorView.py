@@ -111,7 +111,7 @@ def create_course(current_user):
     course = CourseModel(data)
 
     # generate enrollment code and save to database
-    enroll_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    enroll_code = _generate_enroll_code()
     course.enroll_code = enroll_code
     course.save()
 
@@ -217,11 +217,23 @@ def get_enrollment_code(current_user, course_id):
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
-    enroll_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    enroll_code = _generate_enroll_code()
     updated_data = {'enroll_code' : enroll_code}
     course.update(updated_data)
 
     return custom_response({'message': 'code created', 'enroll_code': enroll_code}, 200)
+
+def _generate_enroll_code():
+    """
+    generate an enrollment code and check that it isn't a duplicate
+    """
+    enroll_code = ''.join(random.choices("ABCDEFGHIJKLMNPQRSTUVWXYZ123456789", k=6))
+    course = CourseModel.get_course_by_code(enroll_code)
+
+    while course:
+        enroll_code = ''.join(random.choices("ABCDEFGHIJKLMNPQRSTUVWXYZ123456789", k=6))
+        course = CourseModel.get_course_by_code(enroll_code)
+    return enroll_code
 
 @professor_api.route('/courses/<course_id>/students', methods=['GET'])
 @Auth.professor_auth_required
@@ -454,7 +466,7 @@ def handle_question_action_for_lecture(current_user, lecture_id):
     req_data = request.get_json()
 
     # open or close all questions
-    questions = lecture.questions 
+    questions = lecture.questions
     try:
         action = req_data['action']
     except:
@@ -674,14 +686,14 @@ def _export_grades(course=None, lecture=None):
         file_id = lecture.id
     else:
         raise Exception('must pass either course or lecture')
-    
+
     # process all questions
     for lecture in lectures:
         questions = lecture.questions
         for question in questions:
             headers.append(question.id)
             answers = question.answers
-            
+
             # process each answer to this question
             for answer in answers:
                 student_id = answer.student_id
