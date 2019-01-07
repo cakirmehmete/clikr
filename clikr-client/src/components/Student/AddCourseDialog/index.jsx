@@ -44,14 +44,14 @@ class AddCourseDialog extends React.Component {
     handleChange = (e) => {
         if (e.target.value.length > 0) {
             this.setState({
-                [e.target.name]: e.target.value,
+                [e.target.name]: e.target.value.toUpperCase(),
                 disabled: false,
             })
         }
         else {
             this.setState({
                 disabled: true,
-                [e.target.name]: e.target.value,
+                [e.target.name]: e.target.value.toUpperCase(),
             })
         }
         
