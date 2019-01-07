@@ -148,7 +148,7 @@ class QuestionPage extends Component {
                         </Grid>
                         <Grid >
                             {this.state.show_previous_questions ? (
-                                this.store.prevQuestions.length > 1 ? (
+                                this.store.prevQuestions.length > 0 ? (
                                     this.store.prevQuestions.map(q => {
                                         if (q.question_type === 'free_text') {
                                             return (
