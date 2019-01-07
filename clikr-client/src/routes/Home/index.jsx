@@ -112,7 +112,7 @@ class Home extends Component {
                     </Grid>
                     <Grid item align="center">
                       <Typography variant="h2" gutterBottom className={this.styles.profTypography}>
-                        PROF LOGIN
+                        TEACHER LOGIN
                       </Typography>
                     </Grid>
                   </Grid>
