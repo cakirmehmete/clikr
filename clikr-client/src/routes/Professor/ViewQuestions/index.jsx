@@ -83,6 +83,19 @@ class ProfessorViewQuestions extends React.Component {
         }
     }
 
+    componentDidUpdate() {
+        if (this.props.match.params.lectureId !== this.state.parentLecture.id) {
+            const { lectureId } = this.props.match.params
+            this.lectureId = lectureId
+            this.setState({
+                parentLecture: this.props.profStore.getLectureWithId(lectureId)
+            })
+            this.setState({
+                currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+            })
+        }
+    }
+
     componentWillUnmount() {
         // close all questions in this lecture
         this.props.apiService.closeAllQuestions(this.lectureId)
