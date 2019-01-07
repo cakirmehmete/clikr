@@ -133,20 +133,33 @@ class ProfessorAddMCQuestion extends React.Component {
 
         for (const k of Object.keys(this.state.should_delete)) {
             if (this.state.should_delete[k]) {
-                answer_choices[k] = "";
+                // answer_choices[k] = "";
                 number_of_options--;
             }
         }
 
+        // abort if less than two options remain
+        if (number_of_options < 2) {
+            this.setState({
+                should_delete: { option1:false, option2:false, option3:false, option4:false, option5:false },
+                delete_mode: false,
+            })
+            return;
+        }
+
         let index = 1;
         for (const k of Object.keys(answer_choices)) {
-            if (answer_choices[k] !== "") {
+            if (!this.state.should_delete[k]) {
                 let option_string = "option" + index.toString();
                 options.push({ [option_string]: answer_choices[k] });
                 if (k === this.state.correct_answer) correct_answer = option_string;
                 index++;
+                if (index > number_of_options) {
+                    break;
+                }
             }
         }
+
         answer_choices = {option1: "", option2: "", option3: "", option4: "", option5: ""};
         // this is not the nicest way to do this, but it's functional, and I couldn't find my bug in my nicer code
         options.map(option => answer_choices[Object.keys(option)[0]] = Object.values(option)[0]);
@@ -346,7 +359,7 @@ class ProfessorAddMCQuestion extends React.Component {
                                 id: 'number-options',
                                 }}
                             >
-                                <MenuItem value={1}>1</MenuItem>
+                                {/* <MenuItem value={1}>1</MenuItem> */}
                                 <MenuItem value={2}>2</MenuItem>
                                 <MenuItem value={3}>3</MenuItem>
                                 <MenuItem value={4}>4</MenuItem>
