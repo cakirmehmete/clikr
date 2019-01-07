@@ -16,6 +16,7 @@ gunicorn = "*"
 flask-cors = "*"
 flask-socketio = "*"
 eventlet = "*"
+flask-sslify = "*"
 
 [dev-packages]
 

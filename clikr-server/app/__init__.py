@@ -4,6 +4,7 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
+from flask_sslify import SSLify
 
 from .config import app_config
 from .shared.CASClient import CASClient
@@ -34,6 +35,7 @@ def create_app(env_name):
     # initialize flask extensions
     db.init_app(app)
     socketio.init_app(app)
+    sslify = SSLify(app, permanent=True)
 
     # register blueprints
     from .views.StudentView import student_api as student_blueprint
