@@ -27,8 +27,13 @@ class MCQuestionStats extends React.Component {
             const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
             socket.emit('subscribe professor', question.id)
             const labels = []
-            for (var i = 0; i < question.number_of_options; i++)
-                labels.push(question["option" + (i + 1)])
+            for (var i = 0; i < question.number_of_options; i++) {
+                let currLabel = question["option" + (i + 1)]
+                if (currLabel.length > 10)
+                    currLabel = "Option " + (i + 1)
+                labels.push(currLabel)
+            }
+
             this.setState({
                 question: question,
                 data: {
