@@ -21,16 +21,12 @@ def compute_question_statistics(question):
     count = 0
 
     if question.question_type == 'slider':
-        # group by correct/wrong
-        answers['correct'] = 0
-        answers['wrong'] = 0
-
+        # return an array with 101 elements
+        answers = [0] * 101
         for one_answer in results_raw:
-            if question.is_correct(one_answer[0]):
-                answers['correct'] += one_answer[1]
-            else:
-                answers['wrong'] += one_answer[1]
+            answers[int(one_answer[0])] = one_answer[1]
             count += one_answer[1]
+        
     else:
         # group by actual answers
         for one_answer in results_raw:
