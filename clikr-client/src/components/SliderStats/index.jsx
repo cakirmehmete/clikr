@@ -39,7 +39,7 @@ class SliderStats extends React.Component {
             socket.on('new results', (msg) => {
                 if (msg.question_id === this.props.selectedQuestionId) {
                     const values = []
-
+                    console.log(msg)
                     const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
                     for (var i = 1; i <= question.number_of_options; i++) {
                         values[i - 1] = msg.answers[i]
