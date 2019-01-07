@@ -37,6 +37,7 @@ class BaseStatsComponent extends React.Component {
             time: this.state.time,
             start: Date.now() - this.state.time
         })
+
         this.timer = setInterval(() => this.setState({
             time: Date.now() - this.state.start
         }), 1);
@@ -76,7 +77,8 @@ class BaseStatsComponent extends React.Component {
                     </Typography>
                     {this.props.timer ? (
                         <Typography variant="subtitle1" color="inherit" hidden={!this.props.timer} >
-                            <Timer className={this.styles.icon} /> Open for {prettyMs(this.state.time)}
+                            <Timer className={this.styles.icon} /> Open for {this.state.time < 1000 ?
+                                '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}
                         </Typography>
                     ) : null
                     }
