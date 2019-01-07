@@ -192,7 +192,7 @@ class ProfessorViewQuestions extends React.Component {
     }
     
     getSortedQuestionsCopy() {
-        return this.state.parentLecture.questions.slice().sort(function (a, b) {
+        return this.props.profStore.getLectureWithId(this.props.match.params.lectureId).questions.slice().sort(function (a, b) {
             if (a.created_at < b.created_at) {
                 return -1;
             }
@@ -205,7 +205,7 @@ class ProfessorViewQuestions extends React.Component {
     }
 
     convertQuestionIndexToId(index) {
-        if (index < this.state.parentLecture.questions.length) {
+        if (index < this.props.profStore.getLectureWithId(this.props.match.params.lectureId).questions.length) {
             var sortedQuestionsCopy = this.getSortedQuestionsCopy();
             return sortedQuestionsCopy[index].id;
         }

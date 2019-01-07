@@ -1,4 +1,4 @@
-import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, postCloseAllQuestionsAPI } from '../utils/api-facade';
+import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI } from '../utils/api-facade';
 
 
 export default class APIProfService {
@@ -43,6 +43,18 @@ export default class APIProfService {
                 this._checkAuth(error);
                 return [];
             })
+    }
+
+    loadQuestions(lecture_id) {
+        return getQuestionsForLectureAPI(lecture_id)
+        .then(res => {
+            return res.data
+        })
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+            return [];
+        })
     }
 
     openQuestion(question_id, lecture_id) {
@@ -152,6 +164,22 @@ export default class APIProfService {
                 deleteLecturesAPI(id)
                     .then(() => {
                         this.professorStore.removeLecture(id, courseId)
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this._checkAuth(error);
+                    })
+            )
+        })
+    }
+
+    // remove lectures- input is array of lecture ids
+    deleteQuestions(questions, parentLectureId) {
+        questions.map(id => {
+            return (
+                deleteQuestionsAPI(id)
+                    .then(() => {
+                        this.professorStore.removeQuestion(id, parentLectureId)
                     })
                     .catch(error => {
                         console.log(error);

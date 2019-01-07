@@ -410,7 +410,14 @@ class ProfessorAddSliderQuestion extends React.Component {
         return condition;
     }
 
-    handleSubmit = () => {
+    handleSubmit = (e) => {
+        e.preventDefault();
+
+        // need this check for submitting with enter key
+        if (this.state.disabled) {
+            return;
+        }
+
         const { lectureId } = this.props.match.params;
         let correct_answer = "";
         
@@ -459,7 +466,7 @@ class ProfessorAddSliderQuestion extends React.Component {
                             </Typography>
                         </Grid>
                         <Grid item className={this.styles.entry}>
-                            <form noValidate autoComplete="off">
+                            <form noValidate autoComplete="off" onSubmit={this.handleSubmit}>
                                 <TextField
                                     required
                                     fullWidth
@@ -658,6 +665,7 @@ class ProfessorAddSliderQuestion extends React.Component {
                             disabled={this.state.disabled}
                             variant="outlined"
                             color="primary"
+                            type="submit"
                             onClick={this.handleSubmit}>
                             Submit
                         </Button>
