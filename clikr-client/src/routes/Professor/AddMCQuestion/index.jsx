@@ -100,6 +100,8 @@ class ProfessorAddMCQuestion extends React.Component {
         hasAnswers: false,
         optionsValid: false,
         delete_mode: false,
+        deleteDisabled: false,
+        deleteConfirmDisabled: false,
     };
 
     constructor(props) {
@@ -133,12 +135,11 @@ class ProfessorAddMCQuestion extends React.Component {
 
         for (const k of Object.keys(this.state.should_delete)) {
             if (this.state.should_delete[k]) {
-                // answer_choices[k] = "";
                 number_of_options--;
             }
         }
 
-        // abort if less than two options remain
+        // abort if less than two options remain, but button disabling should prevent this anyway
         if (number_of_options < 2) {
             this.setState({
                 should_delete: { option1:false, option2:false, option3:false, option4:false, option5:false },
@@ -174,6 +175,7 @@ class ProfessorAddMCQuestion extends React.Component {
             number_of_options: number_of_options,
             delete_mode: false,
             options: options,
+            deleteDisabled: number_of_options <= 2,
         }, () => { this.validateFields('answer_choices', options) });
        
     }
@@ -239,6 +241,7 @@ class ProfessorAddMCQuestion extends React.Component {
     handleSetNumberOfOptions = name => event => {
         let options = [];
         let answer_choices = this.state.answer_choices;
+        let deleteDisabled = event.target.value <= 2;
 
         for (let i = 1; i <= event.target.value; i++) {
             let option_string = "option" + i.toString();
@@ -250,10 +253,12 @@ class ProfessorAddMCQuestion extends React.Component {
                 answer_choices[option_string] = "";
             }
         }
+
         this.setState({
             answer_choices: answer_choices,
             number_of_options: event.target.value,
             options: options,
+            deleteDisabled: deleteDisabled,
         }, () => { this.validateFields(name, options)});
 
     }
@@ -266,8 +271,21 @@ class ProfessorAddMCQuestion extends React.Component {
         else {
             should_delete[name] = false;
         }
+
+        // compute if confirm button should be disabled
+        let numRemainingOptions = 0;
+        for (const k of Object.keys(should_delete)) {
+            if (!should_delete[k]) {
+                numRemainingOptions++;
+            }
+        }
+        
+        // adjust for the "invisible" options which have been counted as well
+        numRemainingOptions -= (5 - this.state.number_of_options);
+
         this.setState({
             should_delete: should_delete,
+            deleteConfirmDisabled: numRemainingOptions < 2,
         })
     }
 
@@ -359,7 +377,6 @@ class ProfessorAddMCQuestion extends React.Component {
                                 id: 'number-options',
                                 }}
                             >
-                                {/* <MenuItem value={1}>1</MenuItem> */}
                                 <MenuItem value={2}>2</MenuItem>
                                 <MenuItem value={3}>3</MenuItem>
                                 <MenuItem value={4}>4</MenuItem>
@@ -432,13 +449,13 @@ class ProfessorAddMCQuestion extends React.Component {
                         <Grid container direction="row" justify="flex-end">
                                 {!this.state.delete_mode ? 
 
-                                <IconButton onClick={this.setDeleteMode.bind(this)} color="secondary">
+                                <IconButton onClick={this.setDeleteMode.bind(this)} color="secondary" disabled={this.state.deleteDisabled}>
                                     <DeleteIcon />
                                 </IconButton>
 
                                 :
                                 
-                                <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
+                                <IconButton color="secondary" onClick={this.handleDelete.bind(this)} disabled={this.state.deleteConfirmDisabled}>
                                         <DoneIcon className={this.styles.iconDone}/>
                                 </IconButton>
                          
