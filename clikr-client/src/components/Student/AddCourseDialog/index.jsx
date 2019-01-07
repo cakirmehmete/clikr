@@ -125,11 +125,11 @@ class AddCourseDialog extends React.Component {
                             />
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={this.handleSubmit} disabled={this.state.disabled} color="secondary">
-                                enroll
-                            </Button>
                             <Button onClick={this.handleClose} color="secondary">
                                 cancel
+                            </Button>
+                            <Button onClick={this.handleSubmit} disabled={this.state.disabled} color="secondary">
+                                enroll
                             </Button>
                     </DialogActions>
                 </Dialog>   
