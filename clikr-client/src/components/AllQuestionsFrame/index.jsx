@@ -66,17 +66,23 @@ class AllQuestionsFrame extends React.Component {
                  console.log("loading data")
                  this.profStore.dataLoaded = true
                  const lecture = this.profStore.getLectureWithId(this.parentLectureId);
+                 if (lecture !== undefined) {
                     this.setState({
                         parentLecture: lecture,
-                        questions: lecture.questions
+                        questions: lecture.questions,
+                        lectureTitle: lecture.title
                     })
+                 }
                 })
             } else {
             const lecture = this.profStore.getLectureWithId(this.parentLectureId);
-            this.setState({
-                parentLecture: lecture,
-                questions: lecture.questions
-            })
+            if (lecture !== undefined) {
+                this.setState({
+                    parentLecture: lecture,
+                    questions: lecture.questions,
+                    lectureTitle: lecture.title
+                })
+             }
          }
     }
 
@@ -176,7 +182,7 @@ class AllQuestionsFrame extends React.Component {
                     <Grid container direction='row' justify='space-between' alignItems='stretch'>
                         <Grid item>
                             <Typography className={this.styles.title} variant="h6" color="inherit">
-                                Questions for {this.state.parentLecture.title + " Lecture"}
+                                Questions for {this.state.lectureTitle + " Lecture"}
                             </Typography>
                         </Grid>
                         <Grid item>
@@ -231,7 +237,7 @@ class AllQuestionsFrame extends React.Component {
                             // a must be equal to b
                             return 0;
                         }).map((questionObj, index) => {
-                            return (<QuestionListItem number={index} mode={this.state.mode} handleListClose={this.props.handleListClose} profStore={this.profStore} handleClick={this.props.handleClick} parentLectureId={this.state.parentLecture.id} parentLecture={this.state.parentLecture} questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId} />
+                            return (<QuestionListItem number={index} mode={this.state.mode} handleListClose={this.props.handleListClose} recentlyOpenedId={this.props.recentlyOpenedId} profStore={this.profStore} handleClick={this.props.handleClick} parentLectureId={this.state.parentLecture.id} parentLecture={this.state.parentLecture} questionObj={questionObj} key={index} recentlyClosedId={this.props.recentlyClosedId} openQuestion={this.props.selectedQuestionId} />
                             )
                         })}
                     </List>)

@@ -26,11 +26,11 @@ export default class ProfessorStore {
     }
 
     getLectureById(lecture_id) {
-        console.log(lecture_id)
+        
         if (lecture_id === 0)
         return { questions: [] };
         const course = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id))
-        console.log(course)
+        
         if (course === undefined)
             return new LectureObj();
 
@@ -69,9 +69,7 @@ export default class ProfessorStore {
     //         .find(lec => lec.id === lecture.id).questions.find(x => x.id === question_id)
     // }
     getQuestionWithId(lecture, question_id) {
-        console.log("get question with id")
-        console.log(lecture)
-        console.log(question_id)
+
         if (lecture.questions === [])
             return new QuestionObj();
 
