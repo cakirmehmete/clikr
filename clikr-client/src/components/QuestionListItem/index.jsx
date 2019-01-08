@@ -14,16 +14,22 @@ const styles = theme => ({
         marginTop: 5
     }
 });
-@inject("profStore")
+
 @observer
 class QuestionListItem extends React.Component {
     state = {
-        selected: false
+        selected: false,
     }
 
     constructor(props) {
         super(props)
         this.styles = props.classes
+    }
+
+    componentDidMOunt() {
+        if (this.props.parentLecture !== undefined && this.props.questionObj.id !== undefined) {
+            this.setState({ selected: this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionObj.id.is_open )})
+        }
     }
 
     handleToUpdate = (selected) => {
@@ -32,9 +38,10 @@ class QuestionListItem extends React.Component {
         })
     }
 
+
     render() {
         return (
-            <ListItem selected={this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionObj.id).is_open} divider >
+            <ListItem selected={this.state.selected} divider > 
                 <ListItemText primary={(this.props.number + 1) + ". " + this.props.questionObj.question_title} />
                 <ListItemSecondaryAction>
                     <Grid container direction="row" justify="flex-end">
