@@ -222,11 +222,11 @@ class AllQuestionsFrame extends React.Component {
                         )}
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleFinalDeletion} color="secondary">
-                            yes
-                        </Button>
                         <Button onClick={this.handleClose} autoFocus color="secondary">
                             no
+                        </Button>
+                        <Button onClick={this.handleFinalDeletion} color="secondary">
+                            yes
                         </Button>
                     </DialogActions>
                 </Dialog>
