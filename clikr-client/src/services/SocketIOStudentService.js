@@ -6,6 +6,12 @@ export default class SocketIOStudentService {
     constructor(store) {
         this.store = store;
         this.socket = socketIOClient(socketioURL);
+        this.timeout = null;
+        
+        store.setSocketIOStatus(true);  // optimistic approach: assume we're connected, verify later
+        setTimeout(() => {
+            this.checkConnection();
+        }, 1000)
     }
 
     reset() {
@@ -48,6 +54,27 @@ export default class SocketIOStudentService {
             this.store.updateAllQuestions(data.questions);
             console.log(data)
         });
+    }
+
+    // detect broken connection
+    startCheckingConnection() {
+        this.timeout = setInterval(() => {
+            this.checkConnection();
+        }, 1000);
+    }
+
+    // clear the timeout
+    stopCheckingConnection() {
+        clearTimeout(this.timeout);
+    }
+
+    // check if connected
+    checkConnection() {
+        if (this.socket.connected) {
+            this.store.setSocketIOStatus(true);
+        } else {
+            this.store.setSocketIOStatus(false);
+        }
     }
 
 }
