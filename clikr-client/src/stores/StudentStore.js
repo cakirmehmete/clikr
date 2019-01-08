@@ -100,7 +100,6 @@ export default class StudentStore {
     this.prevQuestions = [];
 
     questions.forEach(element => {
-      console.log(element.question_title)
       if (element.question_type === 'multiple_choice') {
         this.prevQuestions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title,

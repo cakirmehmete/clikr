@@ -37,7 +37,6 @@ class DeleteQuestionsList extends React.Component {
     }
     componentDidMount() {
         let shouldDelete = []
-        console.log(this.questions)
         this.questions.slice().sort(function (a, b) {
             if (a.created_at < b.created_at) {
                 return -1;

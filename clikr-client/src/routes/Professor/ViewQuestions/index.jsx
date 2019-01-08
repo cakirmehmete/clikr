@@ -87,7 +87,6 @@ class ProfessorViewQuestions extends React.Component {
 
     componentDidUpdate() {
         if (this.props.match.params.lectureId !== this.state.parentLecture.id) {
-            console.log("update")
             const { lectureId } = this.props.match.params
             this.lectureId = lectureId
             this.setState({

@@ -60,10 +60,8 @@ class AllQuestionsFrame extends React.Component {
     }
 
     componentDidMount() {
-        console.log("mounting")
          if (!this.profStore.dataLoaded) {
              this.apiProfService.loadData().then(() => {
-                 console.log("loading data")
                  this.profStore.dataLoaded = true
                  const lecture = this.profStore.getLectureWithId(this.parentLectureId);
                     this.setState({
@@ -172,7 +170,6 @@ class AllQuestionsFrame extends React.Component {
         return (
             <Card className={this.styles.card}>
                 <CardContent>
-                    {console.log(this.state.parentLecture)}
                     <Grid container direction='row' justify='space-between' alignItems='stretch'>
                         <Grid item>
                             <Typography className={this.styles.title} variant="h6" color="inherit">
