@@ -62,20 +62,16 @@ class MCQ extends Component {
         dialogue: false,
         disabled: false,
         time: 0,
-        isOn: false,
-        start: 0
+        isOn: false
     }
 
     startTimer() {
         this.setState({
-            isOn: true,
-            time: this.state.time,
-            start: Date.now() - new Date(this.question.opened_at)
+            isOn: true
         })
-        console.log(Date.now())
-        console.log(new Date(this.question.opened_at))
+
         this.timer = setInterval(() => this.setState({
-            time: Date.now() - this.state.start
+            time: moment() - new Date(this.question.opened_at)
         }), 1);
     }
     stopTimer() {
@@ -83,7 +79,7 @@ class MCQ extends Component {
         clearInterval(this.timer)
     }
     resetTimer() {
-        this.setState({ time: Date.now() - new Date(this.question.opened_at), isOn: false })
+        this.setState({ isOn: false })
     }
 
     componentDidMount() {
