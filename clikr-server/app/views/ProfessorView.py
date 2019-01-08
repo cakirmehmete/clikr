@@ -202,7 +202,7 @@ def delete_course(current_user, course_id):
 
 @professor_api.route('/courses/<course_id>/code', methods=['POST'])
 @Auth.professor_auth_required
-def get_enrollment_code(current_user, course_id):
+def reset_enrollment_code(current_user, course_id):
     """
     get a (new) enrollment code for the course
     """
