@@ -137,6 +137,7 @@ class MCQ extends Component {
                     <Grid container direction="column" className={this.styles.gridContainer}>
 
                         <Typography variant="h5" color="secondary"> {this.question.question_title} </Typography>
+                        <Typography variant="subtitle" color="secondary"> Timer </Typography>
                         <FormControl component="fieldset">
                             <RadioGroup
                                 name="answers"
