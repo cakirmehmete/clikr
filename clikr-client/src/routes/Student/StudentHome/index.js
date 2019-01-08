@@ -50,10 +50,10 @@ class StudentHome extends Component {
                 <Grid item className={this.styles.gridItem}>
                     <Paper className={this.styles.paper}>
                         <Grid container direction="row" alignItems="flex-start" justify="space-between" className={this.styles.gridContainer}>
-                            <Grid container xs={12} sm={10}>
+                            <Grid item xs={12} sm={10}>
                                 <Typography variant="h2" color="secondary" className={this.styles.typeography}> My Classes </Typography>
                             </Grid>
-                            <Grid container justify="flex-end" xs={12} sm={2}>
+                            <Grid item container justify="flex-end" xs={12} sm={2}>
                                 <AddCourseDialog />      
                             </Grid>
                         </Grid>
