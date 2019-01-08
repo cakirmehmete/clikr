@@ -36,6 +36,7 @@ class QuestionPage extends Component {
     state = {
         show_previous_questions: false,
         show_last_question: true,
+        dots: '',
     }
     
     constructor(props) {
@@ -43,7 +44,8 @@ class QuestionPage extends Component {
         this.styles = props.classes
         this.store = this.props.store
         this.apiStudentService = new APIStudentService(this.store)
-        this.socketIOStudentService = new SocketIOStudentService(this.store)  
+        this.socketIOStudentService = new SocketIOStudentService(this.store)
+        this.timeout = null;  
     }
 
     componentDidMount() {
@@ -61,9 +63,30 @@ class QuestionPage extends Component {
 
         this.socketIOStudentService.listen();
 
+        this.socketIOStudentService.startCheckingConnection();
+
+        // timeout for the status dots
+        this.timeout = setInterval(() => {
+            var dots = this.state.dots;
+            if (dots === '...') {
+                dots = '';
+            } else {
+                dots += '.';
+            }
+            this.setState({
+                dots: dots,
+            })
+        }, 1000);
+
     }
 
-    
+    componentWillUnmount() {
+        // cancel the timeout
+        clearTimeout(this.timeout);
+
+        // stop checking connection
+        this.socketIOStudentService.stopCheckingConnection();
+    }
 
     handleClick = () => {
         const { course_id } = this.props.location.state;
@@ -88,7 +111,7 @@ class QuestionPage extends Component {
                 <Header />
                 <Grid className={this.styles.gridContainer}>
                     <Paper className={this.styles.paper} style={{backgroundColor: "secondary"}}>
-                        <Typography variant="h5" color="secondary"> {this.store.getNumberOfQuestions() !== 0 ? "Open Questions" : "No Open Questions..."} </Typography>
+                        <Typography variant="h5" color="secondary"> {this.store.socketIOStatus ? ((this.store.getNumberOfQuestions() !== 0 ? "Open Questions" : "No Open Questions") + this.state.dots) : "Connection lost!"} </Typography>
                         {this.store.getNumberOfQuestions() !== 0 ? (
                             <Grid>
                                 {this.store.questions.map(q => {

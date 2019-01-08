@@ -18,6 +18,14 @@ export default class StudentStore {
   @observable
   lastAnswer = null;  // the submitted answer to the most recently closed question
 
+  @observable
+  socketIOStatus = false;
+
+
+  @action
+  setSocketIOStatus(status) {
+    this.socketIOStatus = status;
+  }
 
   /** Call this when the question is closed and the component about to unmount.
    *  DO NOT call it when the student submits an answer!
