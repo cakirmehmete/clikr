@@ -126,7 +126,11 @@ class MCQuestionStats extends React.Component {
         }
 
         return (
-            <BaseStatsComponent responsesNumber={this.state.responsesNumber} timer={!this.props.override} questionTitle={this.state.question.question_title} hidden={this.props.override ? false : !this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open} >
+            <BaseStatsComponent question={this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)}
+                responsesNumber={this.state.responsesNumber}
+                timer={!this.props.override} questionTitle={this.state.question.question_title}
+                hidden={this.props.override ? false : !this.props.profStore.getQuestionWithId(this.props.parentLecture,
+                    this.props.selectedQuestionId).is_open} >
                 <Bar key={this.props.selectedQuestionId} data={this.state.data} options={options} />
             </BaseStatsComponent>
         );

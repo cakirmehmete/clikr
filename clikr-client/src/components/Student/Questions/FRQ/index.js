@@ -12,7 +12,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import Timer from '@material-ui/icons/Timer';
 import { withStyles } from '@material-ui/core/styles';
+
+const prettyMs = require('pretty-ms')
 
 const styles = theme => ({
     gridContainer: {
@@ -27,6 +30,9 @@ const styles = theme => ({
     paper: {
         padding: theme.spacing.unit,
     },
+    icon: {
+        fontSize: 12
+    }
 });
 
 // for sliding up motion
@@ -44,18 +50,54 @@ class FRQ extends Component {
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
         this.question = this.store.getQuestionWithId(this.props.questionId);
+        this.startTimer = this.startTimer.bind(this)
+        this.stopTimer = this.stopTimer.bind(this)
+        this.resetTimer = this.resetTimer.bind(this)
     }
 
     state = {
         answer: "",
         sent: "",
         disabled: false,
-        dialogue: false
+        dialogue: false,
+        time: 0,
+        isOn: false,
+    }
+
+    startTimer() {
+        this.setState({
+            isOn: true
+        })
+
+        this.timer = setInterval(() => this.setState({
+            time: Date.now() - new Date(this.question.opened_at)
+        }), 1);
+    }
+
+    stopTimer() {
+        this.setState({ isOn: false })
+        clearInterval(this.timer)
+    }
+
+    resetTimer() {
+        this.setState({ isOn: false })
+    }
+
+    componentDidMount() {
+        if (!this.state.isOn) {
+            this.startTimer()
+        }
+        else if (this.state.time !== 0 && this.state.isOn) {
+            this.stopTimer()
+            this.resetTimer()
+        }
     }
 
     componentWillUnmount() {
         // question closed -> store answer into store.lastAnswer
         this.store.updateLastAnswer(this.state.sent);
+        this.stopTimer()
+        this.resetTimer()
     }
 
     handleSubmit = () => {
@@ -111,6 +153,10 @@ class FRQ extends Component {
                 <Paper className={this.styles.paper}>
                     <Grid container direction="column" className={this.styles.gridContainer}>
                         <Typography variant="h5" color="secondary"> {this.question.question_title} </Typography>
+                        <Typography variant="subtitle2" color="secondary"> 
+                            <Timer className={this.styles.icon} /> Open for {this.state.time < 1000 ?
+                                '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}
+                        </Typography>
                         <Grid item className={this.styles.gridItem}>
                             <TextField
                                 id="full-width"

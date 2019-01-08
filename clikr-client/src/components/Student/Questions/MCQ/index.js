@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -16,8 +15,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import Timer from '@material-ui/icons/Timer';
 import { withStyles } from '@material-ui/core/styles';
-
+const prettyMs = require('pretty-ms')
 
 // for sliding up motion
 function Transition(props) {
@@ -29,15 +29,17 @@ const styles = theme => ({
         margin: theme.spacing.unit,
     },
     buttonContainer: {
-        padding: theme.spacing.unit*1.5,
+        padding: theme.spacing.unit * 1.5,
     },
     answerOption: {
-        marginLeft: theme.spacing.unit*0.3,
+        marginLeft: theme.spacing.unit * 0.3,
     },
     paper: {
         padding: theme.spacing.unit,
     },
-
+    icon: {
+        fontSize: 12
+    }
 });
 
 @inject("store")
@@ -50,17 +52,39 @@ class MCQ extends Component {
         this.styles = props.classes;
         this.apiStudentService = new APIStudentService(this.store);
         this.question = this.store.getQuestionWithId(this.props.questionId);
+        this.startTimer = this.startTimer.bind(this)
+        this.stopTimer = this.stopTimer.bind(this)
+        this.resetTimer = this.resetTimer.bind(this)
     }
-    
+
     state = {
         answerchoices: [],
         answer: "",
         sent: "",
         dialogue: false,
         disabled: false,
+        time: 0,
+        isOn: false,
     }
-    
-    componentDidMount () {
+
+    startTimer() {
+        this.setState({
+            isOn: true
+        })
+
+        this.timer = setInterval(() => this.setState({
+            time: Date.now() - new Date(this.question.opened_at)
+        }), 1);
+    }
+    stopTimer() {
+        this.setState({ isOn: false })
+        clearInterval(this.timer)
+    }
+    resetTimer() {
+        this.setState({ isOn: false })
+    }
+
+    componentDidMount() {
 
         var answers = []
 
@@ -72,11 +96,21 @@ class MCQ extends Component {
         this.setState({
             answerchoices: answers
         })
+
+        if (!this.state.isOn) {
+            this.startTimer()
+        }
+        else if (this.state.time !== 0 && this.state.isOn) {
+            this.stopTimer()
+            this.resetTimer()
+        }
     }
 
     componentWillUnmount() {
         // question closed -> store answer into store.lastAnswer
         this.store.updateLastAnswer(this.state.answerchoices.indexOf(this.state.sent) + 1);
+        this.stopTimer()
+        this.resetTimer()
     }
 
     handleChange = (e) => {
@@ -88,7 +122,7 @@ class MCQ extends Component {
                 disabled: true
             })
         }
-        else{
+        else {
             this.setState({
                 disabled: false
             })
@@ -104,7 +138,7 @@ class MCQ extends Component {
     };
 
     handleClick = () => {
-        if (this.state.sent === ""){
+        if (this.state.sent === "") {
             this.handleSubmit()
         }
         else if (this.state.sent !== this.state.answer) {
@@ -120,14 +154,14 @@ class MCQ extends Component {
             dialogue: false,
             answer: this.state.sent,
             disabled: true
-         });
-      };
+        });
+    };
 
     // close dialogue box and resubmit
     handleCloseSubmit = () => {
         this.setState({ dialogue: false });
         this.handleSubmit()
-      };
+    };
 
 
     render() {
@@ -137,6 +171,10 @@ class MCQ extends Component {
                     <Grid container direction="column" className={this.styles.gridContainer}>
 
                         <Typography variant="h5" color="secondary"> {this.question.question_title} </Typography>
+                        <Typography variant="subtitle2" color="secondary"> 
+                            <Timer className={this.styles.icon} /> Open for {this.state.time < 1000 ?
+                                '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}
+                        </Typography>
                         <FormControl component="fieldset">
                             <RadioGroup
                                 name="answers"
@@ -145,8 +183,9 @@ class MCQ extends Component {
                             >
                                 {this.state.answerchoices.map((a, index) => {
                                     return (
-                                        <FormControlLabel value={a} key={a} control={<Radio />} label={a} className={this.styles.answerOption}/>
-                                    )})
+                                        <FormControlLabel value={a} key={a} control={<Radio />} label={a} className={this.styles.answerOption} />
+                                    )
+                                })
                                 }
                             </RadioGroup>
                         </FormControl>
@@ -165,21 +204,21 @@ class MCQ extends Component {
                             onClose={this.handleClose}
                             aria-labelledby="alert-dialog-slide-title"
                             aria-describedby="alert-dialog-slide-description"
-                            >
+                        >
                             <DialogTitle id="alert-dialog-slide-title">
                                 {"Answer changed- "}
                             </DialogTitle>
                             <DialogContent>
                                 <DialogContentText id="alert-dialog-slide-description">
-                                "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
+                                    "Are you sure you want to change your answer from {this.state.sent} to {this.state.answer}?"
                                 </DialogContentText>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={this.handleClose} color="primary">
-                                no
+                                    no
                                 </Button>
                                 <Button onClick={this.handleCloseSubmit} color="primary">
-                                yes
+                                    yes
                                 </Button>
                             </DialogActions>
                         </Dialog>

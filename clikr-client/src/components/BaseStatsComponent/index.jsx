@@ -12,7 +12,7 @@ const styles = theme => ({
         marginBottom: 10
     },
     icon: {
-        fontSize: 20
+        fontSize: 12
     }
 });
 
@@ -24,7 +24,6 @@ class BaseStatsComponent extends React.Component {
         this.state = {
             time: 0,
             isOn: false,
-            start: 0
         }
         this.startTimer = this.startTimer.bind(this)
         this.stopTimer = this.stopTimer.bind(this)
@@ -33,13 +32,10 @@ class BaseStatsComponent extends React.Component {
 
     startTimer() {
         this.setState({
-            isOn: true,
-            time: this.state.time,
-            start: Date.now() - this.state.time
+            isOn: true
         })
-
         this.timer = setInterval(() => this.setState({
-            time: Date.now() - this.state.start
+            time: Date.now() - new Date(this.props.question.opened_at)
         }), 1);
     }
     stopTimer() {
@@ -47,7 +43,7 @@ class BaseStatsComponent extends React.Component {
         clearInterval(this.timer)
     }
     resetTimer() {
-        this.setState({ time: 0, isOn: false })
+        this.setState({ isOn: false })
     }
 
     componentDidUpdate() {
@@ -76,7 +72,7 @@ class BaseStatsComponent extends React.Component {
                         Statistics for {this.props.questionTitle}
                     </Typography>
                     {this.props.timer ? (
-                        <Typography variant="subtitle1" color="inherit" hidden={!this.props.timer} >
+                        <Typography variant="subtitle2" color="inherit" hidden={!this.props.timer} >
                             <Timer className={this.styles.icon} /> Open for {this.state.time < 1000 ?
                                 '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}
                         </Typography>
