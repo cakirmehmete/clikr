@@ -8,7 +8,6 @@ export default class APIStudentService {
     loadAllCourses() {
         getStudentCoursesAPI()
             .then(res => {
-                console.log(res.data)
                 this.studentStore.updateAllCourses(res.data)
 
             })
@@ -22,7 +21,6 @@ export default class APIStudentService {
     loadAllQuestions(course_id) {
         getStudentQuestionsByCourseAPI(course_id)
             .then(res => {
-                console.log(res.data)
                 this.studentStore.updateAllQuestions(res.data)
 
             })
@@ -36,7 +34,6 @@ export default class APIStudentService {
     loadAllPrevQuestions(course_id) {
         getStudentPrevQuestionsByCourseAPI(course_id)
             .then(res => {
-                console.log(res.data)
                 this.studentStore.updateAllPrevQuestions(res.data)
 
             })
@@ -74,7 +71,6 @@ export default class APIStudentService {
             .then(res => {
                 getStudentCoursesAPI()
                     .then(res => {
-                        console.log(res.data)
                         this.studentStore.updateAllCourses(res.data)
         
                     })
@@ -103,7 +99,6 @@ export default class APIStudentService {
     async getLogoutStudent() {
         getLogoutStudentAPI()
         .catch(error => {
-            console.log(error.response);
             this._checkAuth(error);
         })
     }
