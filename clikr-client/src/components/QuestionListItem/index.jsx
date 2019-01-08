@@ -6,7 +6,7 @@ import ListItem from '@material-ui/core/ListItem';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import ViewStatsModalWrapped from '../ViewStatsModal';
 
 const styles = theme => ({

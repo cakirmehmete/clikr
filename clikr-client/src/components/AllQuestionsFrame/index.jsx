@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import AddQuestionModalWrapped from '../AddQuestionModal';
 import QuestionListItem from '../QuestionListItem';
 import PropTypes from 'prop-types';
