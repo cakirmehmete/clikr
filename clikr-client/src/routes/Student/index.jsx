@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import StudentStore from '../../stores/StudentStore';
 import APIStudentService from '../../services/APIStudentService';
 import StudentHome from './StudentHome';
-import StudentEnroll from './StudentEnrollment';
 import QuestionPage from './StudentQuestionPage';
 import CheckQuestions from './CheckQuestions';
 import NoMatch from '../../components/NoMatch';
@@ -43,7 +42,6 @@ class StudentRoutes extends React.Component {
                 <Provider store={this.store}>
                     <Switch>
                         <Route exact path='/student' component={StudentHome} />
-                        <Route exact path='/student/enroll' component={StudentEnroll} />
                         <Route path='/student/checkquestions' component={CheckQuestions} />
                         <Route path='/student/questions' component={QuestionPage}/>
                         <Route component={NoMatch} />
