@@ -16,7 +16,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import { withStyles } from '@material-ui/core/styles';
-import moment from 'moment';
 const prettyMs = require('pretty-ms')
 
 // for sliding up motion
@@ -71,7 +70,7 @@ class MCQ extends Component {
         })
 
         this.timer = setInterval(() => this.setState({
-            time: moment() - new Date(this.question.opened_at)
+            time: Date.now() - new Date(this.question.opened_at)
         }), 1);
     }
     stopTimer() {
