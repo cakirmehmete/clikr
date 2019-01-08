@@ -15,6 +15,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import Timer from '@material-ui/icons/Timer';
 import { withStyles } from '@material-ui/core/styles';
 const prettyMs = require('pretty-ms')
 
@@ -36,7 +37,9 @@ const styles = theme => ({
     paper: {
         padding: theme.spacing.unit,
     },
-
+    icon: {
+        fontSize: 12
+    }
 });
 
 @inject("store")
@@ -61,7 +64,7 @@ class MCQ extends Component {
         dialogue: false,
         disabled: false,
         time: 0,
-        isOn: false
+        isOn: false,
     }
 
     startTimer() {
@@ -168,8 +171,9 @@ class MCQ extends Component {
                     <Grid container direction="column" className={this.styles.gridContainer}>
 
                         <Typography variant="h5" color="secondary"> {this.question.question_title} </Typography>
-                        <Typography variant="subtitle1" color="secondary"> Open for {this.state.time < 1000 ?
-                            '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}
+                        <Typography variant="subtitle2" color="secondary"> 
+                            <Timer className={this.styles.icon} /> Open for {this.state.time < 1000 ?
+                                '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}
                         </Typography>
                         <FormControl component="fieldset">
                             <RadioGroup
