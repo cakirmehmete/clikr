@@ -90,10 +90,11 @@ class ProfessorViewQuestions extends React.Component {
             this.setState({
                 parentLecture: this.props.profStore.getLectureWithId(lectureId)
             })
+        }
+        if (this.state.currentQuestionId !== this.convertQuestionIndexToId(this.state.currentQuestionIndex))
             this.setState({
                 currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
             })
-        }
     }
 
     componentWillUnmount() {
@@ -173,7 +174,7 @@ class ProfessorViewQuestions extends React.Component {
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.props.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
                     </Typography>
-                    <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3}>
+                    <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3 || this.state.parentLecture.questions.length === 0}>
                         {this.state.btnStatus === 0 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                             this.state.btnStatus === 1 ? "Close Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                                 this.state.btnStatus === 2 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 2) :
@@ -188,12 +189,12 @@ class ProfessorViewQuestions extends React.Component {
                         <List>
                             {this.state.parentLecture.questions.map((questionObj, index) => {
                                 if (questionObj.question_type === "multiple_choice")
-                                return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                    return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
                                 else if (questionObj.question_type === "free_text")
-                                return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                    return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
                                 else if (questionObj.question_type === "slider")
-                                return (<SliderStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
-                                
+                                    return (<SliderStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+
                                 // Something went wrong
                                 return (null)
                             })}
@@ -203,7 +204,7 @@ class ProfessorViewQuestions extends React.Component {
             </div>
         );
     }
-    
+
     getSortedQuestionsCopy() {
         return this.props.profStore.getLectureWithId(this.props.match.params.lectureId).questions.slice().sort(function (a, b) {
             if (a.created_at < b.created_at) {
