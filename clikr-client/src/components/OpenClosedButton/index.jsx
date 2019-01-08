@@ -16,10 +16,6 @@ const styles = theme => ({
 @inject("profStore")
 @observer
 class OpenClosedButton extends React.Component {
-
-    state = {
-        isOpen: false
-    }
     constructor(props) {
         super(props)
         this.styles = props.classes
@@ -31,17 +27,6 @@ class OpenClosedButton extends React.Component {
             this.props.apiService.loadData().then(() => {
                 this.props.profStore.dataLoaded = true
             })
-        }
-        if (this.props.parentLecture !== undefined && this.props.questionId.is_open) {
-            this.setState({
-                isOpen: this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionId).is_open
-            })
-        }
-        
-    }
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.questionId).isOpen !== this.state.isOpen) {
-            this.setState({ isOpen: nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.questionId).isOpen })
         }
     }
 
@@ -65,7 +50,7 @@ class OpenClosedButton extends React.Component {
         return (
             <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()}
                 className={this.styles.startLectureBtn}>
-                {!this.state.isOpen ? "Open" : "Close"}
+                {!this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionId).is_open ? "Open" : "Close"}
             </Button>
         );
     }
