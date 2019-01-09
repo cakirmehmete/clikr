@@ -217,7 +217,7 @@ class ProfessorViewQuestions extends React.Component {
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.state.parentLecture.title}
                     </Typography>
-                    <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3}>
+                    <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3 || this.state.parentLecture.questions.length === 0}>
                         {this.state.btnStatus === 0 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                             this.state.btnStatus === 1 ? "Close Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                                 this.state.btnStatus === 2 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 2) :
