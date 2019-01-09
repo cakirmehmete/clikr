@@ -88,7 +88,7 @@ class AllQuestionsFrame extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         const nextLecture = nextProps.profStore.getLectureWithId(nextProps.parentLectureId);
-        if (nextLecture.questions.length === this.state.questions.length) {
+        if (nextLecture.questions.length === this.state.questions.length || nextLecture.id !== this.state.parentLecture.id) {
             this.setState({
                 parentLecture: nextLecture,
                 questions: nextLecture.questions,
@@ -96,6 +96,7 @@ class AllQuestionsFrame extends React.Component {
             })
         }
     }
+
     
     
 

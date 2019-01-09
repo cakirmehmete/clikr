@@ -35,16 +35,21 @@ class OpenClosedButton extends React.Component {
     // this is to detect if the scrolling question button has opened or closed a question
     componentWillReceiveProps(nextProps) {
         
-        if (nextProps.recentlyOpenedId !== undefined) {
-            if (nextProps.recentlyOpenedId === this.state.questionId && !this.state.isOpen) {
-                this.props.handleToUpdate(true);
-                this.setState({ isOpen: true })
-            }
+        if (nextProps.parentLecture.id !== this.props.parentLecture.id) {
+            this.setState({ isOpen: nextProps.open, questionId: nextProps.questionId })
         }
-        if (nextProps.recentlyClosedId !== undefined) {
-            if (nextProps.recentlyClosedId === this.state.questionId && this.state.isOpen) {
-                this.props.handleToUpdate(false);
-                this.setState({ isOpen: false })
+        else {
+            if (nextProps.recentlyOpenedId !== undefined) {
+                if (nextProps.recentlyOpenedId === this.state.questionId && !this.state.isOpen) {
+                    this.props.handleToUpdate(true);
+                    this.setState({ isOpen: true })
+                }
+            }
+            if (nextProps.recentlyClosedId !== undefined) {
+                if (nextProps.recentlyClosedId === this.state.questionId && this.state.isOpen) {
+                    this.props.handleToUpdate(false);
+                    this.setState({ isOpen: false })
+                }
             }
         }
     }

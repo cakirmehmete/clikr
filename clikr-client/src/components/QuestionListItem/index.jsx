@@ -36,6 +36,11 @@ class QuestionListItem extends React.Component {
             this.setState({ selected: this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionObj.id).is_open })
         }
     }
+    componentDidUpdate(prevProps) {
+        if(prevProps.parentLecture.id !== this.props.parentLecture.id) {
+            this.setState({ selected: this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionObj.id).is_open })
+        }
+    }
 
     handleToUpdate = (selected) => {
         this.setState({
@@ -58,7 +63,7 @@ class QuestionListItem extends React.Component {
                         <Grid item className={this.styles.open}>
                             <OpenClosedButton className={this.styles.open} parentLecture={this.props.parentLecture}
                                 questionId={this.props.questionObj.id} handleListClose={this.props.handleListClose}
-                                handleClick={this.props.handleClick} handleToUpdate={this.handleToUpdate} open={this.state.selected} recentlyClosedId={this.props.recentlyClosedId} recentlyOpenedId={this.props.recentlyOpenedId} />
+                                handleClick={this.props.handleClick} handleToUpdate={this.handleToUpdate} open={this.props.questionObj.is_open} recentlyClosedId={this.props.recentlyClosedId} recentlyOpenedId={this.props.recentlyOpenedId} />
                         </Grid>
                     </Grid>
                 </ListItemSecondaryAction>

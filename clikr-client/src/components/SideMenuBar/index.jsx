@@ -60,7 +60,7 @@ class SideMenuBar extends React.Component {
     }
 
     handleLectureClick(id) {
-        this.props.history.push('/professor/' + id + '/questions');
+        this.props.history.replace('/professor/' + id + '/questions');
     }
 
     handleExpand(id) {
