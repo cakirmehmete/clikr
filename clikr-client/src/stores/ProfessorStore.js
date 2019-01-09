@@ -172,6 +172,15 @@ export default class ProfessorStore {
                 return 0;
             });
     }
+    @action 
+    updateQuestion(questionObj) {
+        const lecture = this.courses.find(course => course.lectures.find(lecture => lecture.id === questionObj.lecture_id)).lectures
+        .find(lecture => lecture.id === questionObj.lecture_id);
+        const question = lecture.questions.find(q => q.id === questionObj.id);
+       
+        const keys = Object.keys(questionObj);
+        for (const key of keys) question[key] = questionObj[key];
+    }
 
     @action
     openQuestion(question_id, lecture_id) {

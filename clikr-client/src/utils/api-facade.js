@@ -118,6 +118,26 @@ export function deleteDropCourseAPI(course_id) {
     return axios.delete(baseURL + 'student/courses/' + course_id);
 }
 
+// update a question:
+export function patchUpdateQuestionAPI(question) {
+    return axios.patch(baseURL + 'professor/questions/' + question.id, {
+        id: question.id,
+        lecture_id: question.lecture_id,
+        question_type: question.question_type,
+        question_title: question.question_title,
+        correct_answer: question.correct_answer,
+        option1: question.option1,
+        option2: question.option2,
+        option3: question.option3,
+        option4: question.option4,
+        option5: question.option5,
+        number_of_options: question.number_of_options,
+        word_limit: question.word_limit,
+        lower_label: question.lower_label,
+        upper_label: question.upper_label,
+    });
+}
+
 export function postNewQuestionAPI(question) {
     return axios.post(baseURL + 'professor/lectures/' + question.lecture_id + '/questions', {
         lecture_id: question.lecture_id,

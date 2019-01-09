@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import DoneIcon from '@material-ui/icons/Done';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteQuestionsList from '../DeleteQuestionsList';
@@ -42,7 +43,7 @@ class AllQuestionsFrame extends React.Component {
         toNewQuestion: false,
         deleteMode: false,
         editMode: false,
-        mode: "viewing",
+        mode: "viewingMode",
         deletions: [],
         delTitles: [],
         open: false,
@@ -118,6 +119,19 @@ class AllQuestionsFrame extends React.Component {
         this.setState({ mode: "viewingMode", deleteMode: false, editMode: false });
     }
 
+    // gets course edits from child
+    getEdits = (question) => {
+        if (question.is_open) {
+            this.props.apiProfService.closeQuestion(question.id, question.lecture_id);
+            this.props.apiProfService.editQuestion(question);
+            this.apiProfService.openQuestion(question.id, question.lecture_id);
+        }
+        else {
+            this.props.apiProfService.editQuestion(question);
+        } 
+        this.handleRestoreMode();
+    }
+
      // gets questions to be deleted from child component
      getDeletions = (delQuestions) => {
         this.setState({
@@ -189,7 +203,7 @@ class AllQuestionsFrame extends React.Component {
                         </Grid>
                         <Grid item>
                             <Grid container direction="row" justify="flex-end">
-                                {/* <Grid item>
+                                <Grid item>
                                     {this.state.editMode ? (
                                     <Tooltip title={"done editing"} placement="top-start">
                                         <IconButton color="secondary" onClick={this.handleRestoreMode}>
@@ -203,7 +217,7 @@ class AllQuestionsFrame extends React.Component {
                                         </IconButton>
                                     </Tooltip>
                                     )}    
-                                </Grid> */}
+                                </Grid>
                                 <Grid item>
                                 {this.state.deleteMode ? (
                                     <Tooltip title={"done deleting"} placement="top-start">
@@ -239,7 +253,7 @@ class AllQuestionsFrame extends React.Component {
                             // a must be equal to b
                             return 0;
                         }).map((questionObj, index) => {
-                            return (<QuestionListItem number={index} mode={this.state.mode} handleListClose={this.props.handleListClose} recentlyOpenedId={this.props.recentlyOpenedId} profStore={this.profStore} handleClick={this.props.handleClick} parentLectureId={this.state.parentLecture.id} parentLecture={this.state.parentLecture} questionObj={questionObj} key={index} recentlyClosedId={this.props.recentlyClosedId} />
+                            return (<QuestionListItem number={index} mode={this.state.mode} getEdits={this.getEdits} handleListClose={this.props.handleListClose} recentlyOpenedId={this.props.recentlyOpenedId} profStore={this.profStore} handleClick={this.props.handleClick} parentLectureId={this.state.parentLecture.id} parentLecture={this.state.parentLecture} questionObj={questionObj} key={index} recentlyClosedId={this.props.recentlyClosedId} />
                             )
                         })}
                     </List>)

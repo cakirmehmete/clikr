@@ -8,6 +8,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { observer } from 'mobx-react';
 import ViewStatsModalWrapped from '../ViewStatsModal';
+import EditFRQDialog from '../EditFRQDialog';
+import EditMCQDialog from '../EditMCQDialog';
+import EditSLQDialog from '../EditSLQDialog';
 
 const styles = theme => ({
     open: {
@@ -18,7 +21,9 @@ const styles = theme => ({
 @observer
 class QuestionListItem extends React.Component {
     state = {
-        selected: false
+        selected: false,
+        open: false,
+        editMode: false
     }
 
     constructor(props) {
@@ -28,13 +33,14 @@ class QuestionListItem extends React.Component {
 
     componentDidMount() {
         if (!this.props.profStore.dataLoaded) {
-            this.props.apiService.loadData().then(() => {
+            this.props.apiProfService.loadData().then(() => {
                 this.props.profStore.dataLoaded = true
             })
         }
         if (this.props.parentLecture !== undefined && this.props.questionObj.id !== undefined) {
             this.setState({ selected: this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.questionObj.id).is_open })
         }
+        this.setState({ editMode: this.props.mode === "editMode" })
     }
     componentDidUpdate(prevProps) {
         if(prevProps.parentLecture.id !== this.props.parentLecture.id) {
@@ -61,9 +67,18 @@ class QuestionListItem extends React.Component {
                             </Tooltip>
                         </Grid>
                         <Grid item className={this.styles.open}>
-                            <OpenClosedButton className={this.styles.open} parentLecture={this.props.parentLecture}
+                            {this.props.mode === "viewingMode" ? (<OpenClosedButton className={this.styles.open} parentLecture={this.props.parentLecture}
                                 questionId={this.props.questionObj.id} handleListClose={this.props.handleListClose}
-                                handleClick={this.props.handleClick} handleToUpdate={this.handleToUpdate} open={this.props.questionObj.is_open} recentlyClosedId={this.props.recentlyClosedId} recentlyOpenedId={this.props.recentlyOpenedId} />
+                                handleClick={this.props.handleClick} handleToUpdate={this.handleToUpdate} open={this.props.questionObj.is_open} 
+                                recentlyClosedId={this.props.recentlyClosedId} recentlyOpenedId={this.props.recentlyOpenedId} />) 
+                                : ( this.props.questionObj.question_type === 'free_text' ? 
+                                    (<EditFRQDialog questionObj={this.props.questionObj} getEdits={this.props.getEdits} />) 
+                                    : (this.props.questionObj.question_type === 'multiple_choice' ? 
+                                        (<EditMCQDialog questionObj={this.props.questionObj} getEdits={this.props.getEdits} />) 
+                                        : (null )) 
+                                )
+                            }
+                            
                         </Grid>
                     </Grid>
                 </ListItemSecondaryAction>

@@ -1,4 +1,4 @@
-import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI } from '../utils/api-facade';
+import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
 
 
 export default class APIProfService {
@@ -157,6 +157,17 @@ export default class APIProfService {
             })
     }
 
+    // edit a question
+    editQuestion(questionObj) {
+        patchUpdateQuestionAPI(questionObj)
+        .then(res => {
+            this.professorStore.updateQuestion(questionObj);
+        })
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+        })
+    }
     // remove lectures- input is array of lecture ids
     deleteLectures(lectures, courseId) {
         lectures.map(id => {
