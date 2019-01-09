@@ -177,6 +177,8 @@ export default class ProfessorStore {
     openQuestion(question_id, lecture_id) {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
             .find(lecture => lecture.id === lecture_id).questions.find(x => x.id === question_id).is_open = true;
+            this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+            .find(lecture => lecture.id === lecture_id).questions.find(x => x.id === question_id).opened_at = Date.now();
     }
 
     @action
