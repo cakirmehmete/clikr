@@ -19,9 +19,7 @@ class OpenClosedButton extends React.Component {
 
     state = {
         isOpen: false, 
-        recentlyOpenedByListButton: false,
         questionId: "",
-        openedByOCButton: false,
     }
     constructor(props) {
         super(props)
@@ -29,49 +27,27 @@ class OpenClosedButton extends React.Component {
     }
 
     componentDidMount() {
-        // Make sure the questions are updated
-        if (!this.props.profStore.dataLoaded) {
-            this.props.apiService.loadData().then(() => {
-                this.props.profStore.dataLoaded = true
-            })
-        }
 
-
-        this.setState({ isOpen: this.props.openQuestion === this.props.questionId, questionId: this.props.questionId })
+        this.setState({ isOpen: this.props.open, questionId: this.props.questionId })
         
     }
 
+    // this is to detect if the scrolling question button has opened or closed a question
     componentWillReceiveProps(nextProps) {
-
-        if (nextProps.openQuestion === this.state.questionId) {
-            if (!this.state.isOpen) {
-                this.setState({ isOpen: true, openedByOCButton: false })
-                this.props.handleToUpdate(true)
-                console.log("recently opened: " + nextProps.openQuestion)
-            }
-            
-        }
-    
-    
-        if (nextProps.recentlyClosedId === this.state.questionId && this.state.isOpen) {
-            const closed_question = nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.recentlyClosedId)
-            if (closed_question.is_open !== undefined) {
-                if (closed_question.id === this.state.questionId) {
-                    if (this.state.isOpen) {
-                        this.setState({ isOpen: false, openedByOCButton: false })
-                        this.props.handleToUpdate(false)
-                        //console.log("recently closed: " + nextProps.recentlyClosedId)
-                        console.log("recently closed: " + nextProps.recentlyClosedId)
-                    }
-                }
-                
+        
+        if (nextProps.recentlyOpenedId !== undefined) {
+            if (nextProps.recentlyOpenedId === this.state.questionId && !this.state.isOpen) {
+                this.props.handleToUpdate(true);
+                this.setState({ isOpen: true })
             }
         }
-        
-        
-       
+        if (nextProps.recentlyClosedId !== undefined) {
+            if (nextProps.recentlyClosedId === this.state.questionId && this.state.isOpen) {
+                this.props.handleToUpdate(false);
+                this.setState({ isOpen: false })
+            }
+        }
     }
-
 
     handleBtnClick() {
         
@@ -81,7 +57,7 @@ class OpenClosedButton extends React.Component {
             socket.emit('subscribe professor', this.props.questionId)
             this.props.handleClick(this.props.questionId)
             this.props.handleToUpdate(true)
-            this.setState({ isOpen: true, openedByOCButton: true })
+            this.setState({ isOpen: true })
         }
         else {
             // Handle the "Close Question"
@@ -89,7 +65,7 @@ class OpenClosedButton extends React.Component {
             this.props.apiService.closeQuestion(this.props.questionId, this.props.parentLecture.id)
             this.props.handleToUpdate(false)
             this.props.handleListClose(this.props.questionId)
-            this.setState({ isOpen: false, openedByOCButton: false })
+            this.setState({ isOpen: false })
         }
     }
 

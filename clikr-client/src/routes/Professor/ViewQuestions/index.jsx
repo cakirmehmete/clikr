@@ -13,11 +13,6 @@ import MCQuestionStats from '../../../components/MCQuestionStats';
 import FreeTextStats from '../../../components/FreeTextStats';
 import SliderStats from '../../../components/SliderStats';
 import APIProfService from '../../../services/APIProfService';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 
 const socket = socketIOClient(socketioURL)
 
@@ -100,7 +95,6 @@ class ProfessorViewQuestions extends React.Component {
 
     componentDidUpdate() {
         if (this.props.match.params.lectureId !== this.state.parentLecture.id) {
-            console.log("update")
             const { lectureId } = this.props.match.params
             this.lectureId = lectureId
             this.setState({
@@ -139,7 +133,7 @@ class ProfessorViewQuestions extends React.Component {
             case 0:
                 if (!this.profStore.getQuestionWithId(this.state.parentLecture, this.convertQuestionIndexToId(this.state.currentQuestionIndex)).is_open) {
                     // Handle the "Open Question"
-                    this.setState({ recentlyOpened: this.convertQuestionIndexToId(this.state.currentQuestionIndex )})
+                    this.setState({ recentlyOpenedId: this.convertQuestionIndexToId(this.state.currentQuestionIndex), recentlyClosedId: 0 })
                     this.apiProfService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex), this.state.parentLecture.id)
                     socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex))
                     this.setState({ btnStatus: 1,  openQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex), currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex) })
@@ -149,7 +143,7 @@ class ProfessorViewQuestions extends React.Component {
             case 1:
                 // Handle the "Close Question"
                 this.apiProfService.closeQuestion(this.state.currentQuestionId, this.state.parentLecture.id)
-                this.setState({ recentlyClosedId: this.state.openQuestionId })
+                this.setState({ recentlyClosedId: this.state.currentQuestionId, recentlyOpenedId: 0})
                 // Check if this is last question
                 if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length) {
                     
@@ -165,8 +159,8 @@ class ProfessorViewQuestions extends React.Component {
                 // Handle the "Open Next Question"
                 this.apiProfService.openQuestion(this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1), this.state.parentLecture.id)
                 socket.emit('subscribe professor', this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1))
-                this.setState({ recentlyOpenedId: this.convertQuestionIndexToId(this.state.currentQuestionIndex) + 1})
-                this.setState({ recentlyClosed: this.convertQuestionIndexToId(this.state.currentQuestionIndex)})
+                this.setState({ recentlyOpenedId: this.convertQuestionIndexToId(this.state.currentQuestionIndex + 1), recentlyClosedId: 0 })
+                
                 // Update the index to the next question
                 
                 this.setState({
@@ -189,7 +183,8 @@ class ProfessorViewQuestions extends React.Component {
             btnStatus: 1,
             currentQuestionIndex: this.convertQuestionIdToIndex(question_id),
             currentQuestionId: question_id,
-            openQuestionId: question_id
+            openQuestionId: question_id,
+            recentlyClosedId: 0
         })
     }
     
@@ -227,7 +222,7 @@ class ProfessorViewQuestions extends React.Component {
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={12} md={8}>
-                        <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} profStore={this.profStore}  apiProfService={this.apiProfService} parentLecture={this.state.parentLecture} parentLectureId={this.props.match.params.lectureId} handleFinalDeletion={this.handleFinalDeletion} recentlyClosedId={this.state.recentlyClosedId} recentlyOpenedId={this.state.openQuestionId} selectedQuestionId={this.state.openQuestionId} />
+                        <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} profStore={this.profStore}  apiProfService={this.apiProfService} parentLecture={this.state.parentLecture} parentLectureId={this.props.match.params.lectureId} handleFinalDeletion={this.handleFinalDeletion} recentlyClosedId={this.state.recentlyClosedId} recentlyOpenedId={this.state.recentlyOpenedId} selectedQuestionId={this.state.openQuestionId} />
                     </Grid>
                     <Grid item xs={12} sm={9} md={4}>
                         <List>

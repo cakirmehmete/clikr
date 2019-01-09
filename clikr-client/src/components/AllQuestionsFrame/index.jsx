@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import AddQuestionModalWrapped from '../AddQuestionModal';
 import QuestionListItem from '../QuestionListItem';
 import PropTypes from 'prop-types';
@@ -237,7 +237,7 @@ class AllQuestionsFrame extends React.Component {
                             // a must be equal to b
                             return 0;
                         }).map((questionObj, index) => {
-                            return (<QuestionListItem number={index} mode={this.state.mode} handleListClose={this.props.handleListClose} recentlyOpenedId={this.props.recentlyOpenedId} profStore={this.profStore} handleClick={this.props.handleClick} parentLectureId={this.state.parentLecture.id} parentLecture={this.state.parentLecture} questionObj={questionObj} key={index} recentlyClosedId={this.props.recentlyClosedId} openQuestion={this.props.selectedQuestionId} />
+                            return (<QuestionListItem number={index} mode={this.state.mode} handleListClose={this.props.handleListClose} recentlyOpenedId={this.props.recentlyOpenedId} profStore={this.profStore} handleClick={this.props.handleClick} parentLectureId={this.state.parentLecture.id} parentLecture={this.state.parentLecture} questionObj={questionObj} key={index} recentlyClosedId={this.props.recentlyClosedId} />
                             )
                         })}
                     </List>)
