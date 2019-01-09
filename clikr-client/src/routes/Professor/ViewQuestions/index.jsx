@@ -212,7 +212,7 @@ class ProfessorViewQuestions extends React.Component {
             <div>
                 <Paper className={this.styles.root} elevation={1}>
                     <Typography variant="h6" component="h5" className={this.styles.text}>
-                        {this.state.parentLecture.title} Lecture on {this.state.parentLecture.date}
+                        {this.state.parentLecture.title} on {this.state.parentLecture.date}
                     </Typography>
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.state.parentLecture.title}

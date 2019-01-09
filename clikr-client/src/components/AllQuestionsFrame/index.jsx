@@ -91,7 +91,8 @@ class AllQuestionsFrame extends React.Component {
         if (nextLecture.questions.length === this.state.questions.length) {
             this.setState({
                 parentLecture: nextLecture,
-                questions: nextLecture.questions
+                questions: nextLecture.questions,
+                lectureTitle: nextLecture.title
             })
         }
     }
@@ -182,7 +183,7 @@ class AllQuestionsFrame extends React.Component {
                     <Grid container direction='row' justify='space-between' alignItems='stretch'>
                         <Grid item>
                             <Typography className={this.styles.title} variant="h6" color="inherit">
-                                Questions for {this.state.lectureTitle + " Lecture"}
+                                Questions for {this.state.lectureTitle}
                             </Typography>
                         </Grid>
                         <Grid item>
