@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import AddQuestionModalWrapped from '../AddQuestionModal';
 import QuestionListItem from '../QuestionListItem';
 import PropTypes from 'prop-types';
@@ -22,6 +22,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import LectureObj from '../../models/LectureObj';
 
 const styles = theme => ({
     card: {
@@ -35,8 +36,6 @@ const styles = theme => ({
     },
 });
 
-@inject('profStore')
-@inject("apiService")
 @observer
 class AllQuestionsFrame extends React.Component {
     state = {
@@ -47,12 +46,57 @@ class AllQuestionsFrame extends React.Component {
         deletions: [],
         delTitles: [],
         open: false,
+        parentLecture: new LectureObj(),
+        lectureTitle: "",
+        questions: [],
     }
 
     constructor(props) {
         super(props)
         this.styles = props.classes
+        this.profStore = props.profStore
+        this.apiProfService = props.apiProfService
+        this.parentLectureId = props.parentLectureId
     }
+
+    componentDidMount() {
+        console.log("mounting")
+         if (!this.profStore.dataLoaded) {
+             this.apiProfService.loadData().then(() => {
+                 console.log("loading data")
+                 this.profStore.dataLoaded = true
+                 const lecture = this.profStore.getLectureWithId(this.parentLectureId);
+                 if (lecture !== undefined) {
+                    this.setState({
+                        parentLecture: lecture,
+                        questions: lecture.questions,
+                        lectureTitle: lecture.title
+                    })
+                 }
+                })
+            } else {
+            const lecture = this.profStore.getLectureWithId(this.parentLectureId);
+            if (lecture !== undefined) {
+                this.setState({
+                    parentLecture: lecture,
+                    questions: lecture.questions,
+                    lectureTitle: lecture.title
+                })
+             }
+         }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const nextLecture = nextProps.profStore.getLectureWithId(nextProps.parentLectureId);
+        if (nextLecture.questions.length === this.state.questions.length) {
+            this.setState({
+                parentLecture: nextLecture,
+                questions: nextLecture.questions
+            })
+        }
+    }
+    
+    
 
     handleNewQuestionClick = () => {
         this.setState(() => ({
@@ -119,17 +163,9 @@ class AllQuestionsFrame extends React.Component {
         });
     };
 
-    handleFinalDeletion = () => {
+    handleDeletion = () => {
 
-        for (let i = 0; i < this.state.delIds.length; i++) {
-            var question = this.props.parentLecture.questions.find(q => q.id === this.state.delIds[i]);
-            if (question && question.is_open) {
-                this.props.apiService.closeQuestion(this.state.delIds[i], this.props.parentLecture.id);
-                this.props.handleListClose(this.state.delIds[i]);
-            }
-        }
-        
-        this.props.apiService.deleteQuestions(this.state.delIds, this.props.parentLecture.id);
+        this.props.handleFinalDeletion(this.state.delIds)
         this.handleClose()
     };
 
@@ -142,10 +178,11 @@ class AllQuestionsFrame extends React.Component {
         return (
             <Card className={this.styles.card}>
                 <CardContent>
+                    {console.log(this.state.parentLecture)}
                     <Grid container direction='row' justify='space-between' alignItems='stretch'>
                         <Grid item>
                             <Typography className={this.styles.title} variant="h6" color="inherit">
-                                Questions for {this.props.parentLecture.title + " Lecture"}
+                                Questions for {this.state.lectureTitle + " Lecture"}
                             </Typography>
                         </Grid>
                         <Grid item>
@@ -181,16 +218,16 @@ class AllQuestionsFrame extends React.Component {
                                     )}
                                 </Grid>
                                 <Grid item>
-                                    <AddQuestionModalWrapped lectureId={this.props.parentLecture.id} />
+                                    <AddQuestionModalWrapped lectureId={this.state.parentLecture.id} />
                                 </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
                     {this.state.deleteMode ? 
-                    (<DeleteQuestionsList questions={this.props.parentLecture.questions} getDeletions={this.getDeletions}/>)
+                    (<DeleteQuestionsList questions={this.state.questions} getDeletions={this.getDeletions}/>)
                     : 
                     (<List component="nav">
-                        {this.props.parentLecture.questions.slice().sort(function (a, b) {
+                        {this.state.questions.slice().sort(function (a, b) {
                             if (a.created_at < b.created_at) {
                                 return -1;
                             }
@@ -200,7 +237,7 @@ class AllQuestionsFrame extends React.Component {
                             // a must be equal to b
                             return 0;
                         }).map((questionObj, index) => {
-                            return (<QuestionListItem number={index} mode={this.state.mode} handleListClose={this.props.handleListClose} handleClick={this.props.handleClick} parentLecture={this.props.parentLecture} questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId} />
+                            return (<QuestionListItem number={index} mode={this.state.mode} handleListClose={this.props.handleListClose} recentlyOpenedId={this.props.recentlyOpenedId} profStore={this.profStore} handleClick={this.props.handleClick} parentLectureId={this.state.parentLecture.id} parentLecture={this.state.parentLecture} questionObj={questionObj} key={index} recentlyClosedId={this.props.recentlyClosedId} />
                             )
                         })}
                     </List>)
@@ -222,11 +259,11 @@ class AllQuestionsFrame extends React.Component {
                         )}
                     </DialogContent>
                     <DialogActions>
+                        <Button onClick={this.handleDeletion} color="secondary">
+                            yes
+                        </Button>
                         <Button onClick={this.handleClose} autoFocus color="secondary">
                             no
-                        </Button>
-                        <Button onClick={this.handleFinalDeletion} color="secondary">
-                            yes
                         </Button>
                     </DialogActions>
                 </Dialog>
