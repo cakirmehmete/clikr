@@ -104,6 +104,10 @@ class ProfessorViewQuestions extends React.Component {
                 currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
             })
         }
+        if (this.state.currentQuestionId !== this.convertQuestionIndexToId(this.state.currentQuestionIndex))
+            this.setState({
+                currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+            })
     }
 
     componentWillUnmount() {
@@ -228,12 +232,12 @@ class ProfessorViewQuestions extends React.Component {
                         <List>
                             {this.state.parentLecture.questions.map((questionObj, index) => {
                                 if (questionObj.question_type === "multiple_choice")
-                                return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                    return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
                                 else if (questionObj.question_type === "free_text")
-                                return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                    return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
                                 else if (questionObj.question_type === "slider")
-                                return (<SliderStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
-                                
+                                    return (<SliderStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+
                                 // Something went wrong
                                 return (null)
                             })}
