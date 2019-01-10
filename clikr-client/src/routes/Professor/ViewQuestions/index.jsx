@@ -56,7 +56,9 @@ class ProfessorViewQuestions extends React.Component {
             recentlyClosedId: 0,
             recentlyOpenedId: 0,
             btnStatus: 0,
-            parentLecture: { questions: [], title: "" }
+            parentLecture: { questions: [], title: "" },
+            editDeleteMode: false,
+            updateMCQStats: false,
         }
         this.profStore = props.profStore
         this.apiProfService = new APIProfService(this.profStore)
@@ -116,7 +118,20 @@ class ProfessorViewQuestions extends React.Component {
         this.apiProfService.closeAllQuestions(this.lectureId)
     }
 
+    mcqStatsUpdated = () => {
+        this.setState({ updateMCQStats: false })
+    }
+    mcqEditDetect = () => {
+        this.setState({ updateMCQStats: true })
+    }
 
+    disableTopButton = () => {
+        this.setState({ editDeleteMode: true })
+    }
+
+    restoreTopButton = () => {
+        this.setState({ editDeleteMode: false });
+    }
     handleFinalDeletion = (delIds) => {
 
         for (let i = 0; i < delIds.length; i++) {
@@ -218,7 +233,7 @@ class ProfessorViewQuestions extends React.Component {
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
                     </Typography>
-                    <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3 || this.state.parentLecture.questions.length === 0}>
+                    <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3 || this.state.parentLecture.questions.length === 0 || this.state.editDeleteMode }>
                         {this.state.btnStatus === 0 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                             this.state.btnStatus === 1 ? "Close Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                                 this.state.btnStatus === 2 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 2) :
@@ -227,13 +242,16 @@ class ProfessorViewQuestions extends React.Component {
                 </Paper>
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={12} md={8}>
-                        <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} profStore={this.profStore}  apiProfService={this.apiProfService} parentLecture={this.state.parentLecture} parentLectureId={this.props.match.params.lectureId} handleFinalDeletion={this.handleFinalDeletion} recentlyClosedId={this.state.recentlyClosedId} recentlyOpenedId={this.state.recentlyOpenedId} selectedQuestionId={this.state.openQuestionId} />
+                        <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} profStore={this.profStore}  
+                        apiProfService={this.apiProfService} parentLecture={this.state.parentLecture} parentLectureId={this.props.match.params.lectureId} 
+                        handleFinalDeletion={this.handleFinalDeletion} recentlyClosedId={this.state.recentlyClosedId} recentlyOpenedId={this.state.recentlyOpenedId} 
+                        selectedQuestionId={this.state.openQuestionId} disableTopButton={this.disableTopButton} restoreTopButton={this.restoreTopButton} mcqEditDetect={this.mcqEditDetect}/>
                     </Grid>
                     <Grid item xs={12} sm={9} md={4}>
                         <List>
                             {this.state.parentLecture.questions.map((questionObj, index) => {
                                 if (questionObj.question_type === "multiple_choice")
-                                return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
+                                return (<MCQuestionStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} updateMCQStats={this.state.updateMCQStats} mcqStatsUpdated={this.mcqStatsUpdated} />)
                                 else if (questionObj.question_type === "free_text")
                                 return (<FreeTextStats key={index} parentLecture={this.state.parentLecture} selectedQuestionId={questionObj.id} />)
                                 else if (questionObj.question_type === "slider")

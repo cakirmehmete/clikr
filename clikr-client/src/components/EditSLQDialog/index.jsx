@@ -143,40 +143,47 @@ class EditFRQDialog extends React.Component {
     componentDidMount() {
         let correct_answer = this.props.questionObj.correct_answer;
         let lower_label = this.props.questionObj.lower_label;
+        let upper_label = this.props.questionObj.upper_label;
 
         this.setState({ title: this.props.questionObj.question_title })
 
-        if (lower_label !== null && lower_label !== "") {
-            this.setState({
-                labels: {lower: this.props.questionObj.lower_label, upper: this.props.questionObj.upper_label},
-                custom_labels: true
-            })
+        if (lower_label !== null) {
+            if (lower_label !== "0%" || upper_label !== "100%") {
+                this.setState({
+                    labels: {lower: this.props.questionObj.lower_label, upper: this.props.questionObj.upper_label},
+                })
+            }
         }
         
         if (correct_answer !== undefined &&  correct_answer !== null && correct_answer !== "") {
             const correct_arr = correct_answer.split(" ");
-            console.log(correct_answer)
-            this.setState({
-                answer_bounds: {
-                    lower: correct_arr[1]
-                },
-                equality_operators: {
-                    lower: correct_arr[0]
-                },
-                has_correct_answer: true,
-            })
-            if (correct_arr.length !== 2) {
+            if (correct_arr.length === 2) {
                 this.setState({
                     answer_bounds: {
-                        upper: correct_arr[4]
+                        lower: correct_arr[1],
+                        upper: "",
                     },
                     equality_operators: {
+                        lower: correct_arr[0],
+                        upper: ""
+                    },
+                })
+            }
+            else {
+                this.setState({
+                    answer_bounds: {
+                        lower: correct_arr[1],
+                        upper: correct_arr[4],
+                    },
+                    equality_operators: {
+                        lower: correct_arr[0],
                         upper: correct_arr[3]
                     },
                     range: true,
-                    notVal: "range"
+                    rangeVal: "range",
                 })
             }
+
         }
         
     }
@@ -475,7 +482,7 @@ class EditFRQDialog extends React.Component {
 
         
         let correct_answer = "";
-        if (this.state.has_correct_answer) {
+        if (this.state.answer_bounds.lower !== "") {
             
             if (this.state.range) {
                 let answerBounds = this.state.answer_bounds;
@@ -512,7 +519,7 @@ class EditFRQDialog extends React.Component {
 
         return (
             <div>
-                <Button variant="outlined" onClick={this.handleOpen}>
+                <Button variant="outlined" onClick={this.handleOpen} disabled={this.props.is_open}>
                     Edit
                 </Button>
                 <Dialog
@@ -525,7 +532,6 @@ class EditFRQDialog extends React.Component {
                 <DialogTitle id="alert-dialog-title">{"Edit Slider Question"}</DialogTitle>
                 <DialogContent>
                 <Grid container justify="center" className={this.styles.container}  >
-                <Grid item className={this.styles.gridItem} >
                     <Grid container direction="column" align-items="flex-start">
                         <Grid item className={this.styles.entry}>
                             <form noValidate autoComplete="off" onSubmit={this.handleSubmit}>
@@ -553,7 +559,7 @@ class EditFRQDialog extends React.Component {
                                     value={this.state.custom_labels}
                                     />
                                 }
-                                label="custom labels (optional)"
+                                label="change/set labels"
                             />
                         </Grid>
                         
@@ -594,7 +600,7 @@ class EditFRQDialog extends React.Component {
                                     value={this.state.has_correct_answer}
                                     />
                                 }
-                                label="set correct answer (optional)"
+                                label="change/set correct answer"
                             />
                         </Grid>
                         {this.state.has_correct_answer && 
@@ -722,7 +728,6 @@ class EditFRQDialog extends React.Component {
                             </Grid>
                         </Grid>)}
                     </Grid>
-                </Grid>
                 
             </Grid>
                 </DialogContent>

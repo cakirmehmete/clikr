@@ -72,10 +72,10 @@ class QuestionListItem extends React.Component {
                                 handleClick={this.props.handleClick} handleToUpdate={this.handleToUpdate} open={this.props.questionObj.is_open} 
                                 recentlyClosedId={this.props.recentlyClosedId} recentlyOpenedId={this.props.recentlyOpenedId} />) 
                                 : ( this.props.questionObj.question_type === 'free_text' ? 
-                                    (<EditFRQDialog questionObj={this.props.questionObj} getEdits={this.props.getEdits} />) 
+                                    (<EditFRQDialog questionObj={this.props.questionObj} getEdits={this.props.getEdits} is_open={this.state.selected}/>) 
                                     : (this.props.questionObj.question_type === 'multiple_choice' ? 
-                                        (<EditMCQDialog questionObj={this.props.questionObj} getEdits={this.props.getEdits} />) 
-                                        : (null )) 
+                                        (<EditMCQDialog questionObj={this.props.questionObj} getEdits={this.props.getEdits} is_open={this.state.selected}/>) 
+                                        : (<EditSLQDialog questionObj={this.props.questionObj} getEdits={this.props.getEdits} is_open={this.state.selected}/> )) 
                                 )
                             }
                             

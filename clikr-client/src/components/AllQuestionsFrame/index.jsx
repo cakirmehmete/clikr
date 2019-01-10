@@ -108,27 +108,25 @@ class AllQuestionsFrame extends React.Component {
     }
 
     handleDeleteQuestions = () => {  
+        this.props.disableTopButton()
         this.setState({ mode: "deleteMode", deleteMode: true, editMode: false }); 
     }
 
     handleEditQuestions = () => {
+        this.props.disableTopButton()
         this.setState({ mode: "editMode", deleteMode: false, editMode: true });
     }
 
     handleRestoreMode = () => {
+        this.props.restoreTopButton()
         this.setState({ mode: "viewingMode", deleteMode: false, editMode: false });
     }
 
     // gets course edits from child
     getEdits = (question) => {
-        if (question.is_open) {
-            this.props.apiProfService.closeQuestion(question.id, question.lecture_id);
-            this.props.apiProfService.editQuestion(question);
-            this.apiProfService.openQuestion(question.id, question.lecture_id);
-        }
-        else {
-            this.props.apiProfService.editQuestion(question);
-        } 
+
+        this.props.apiProfService.editQuestion(question);
+        this.props.mcqEditDetect();
         this.handleRestoreMode();
     }
 
@@ -212,7 +210,7 @@ class AllQuestionsFrame extends React.Component {
                                     </Tooltip>
                                     ) : (
                                     <Tooltip title={"edit questions"} placement="top-start">
-                                        <IconButton color="secondary" onClick={this.handleEditQuestions}>
+                                        <IconButton color="secondary" onClick={this.handleEditQuestions} component="div" disabled={this.state.mode === "deleteMode" || this.state.questions.length === 0}>  
                                             <EditIcon />
                                         </IconButton>
                                     </Tooltip>
@@ -221,13 +219,13 @@ class AllQuestionsFrame extends React.Component {
                                 <Grid item>
                                 {this.state.deleteMode ? (
                                     <Tooltip title={"done deleting"} placement="top-start">
-                                        <IconButton color="secondary" onClick={this.handleDelete.bind(this)} disabled={this.state.mode === "viewingMode" || this.state.mode === "editMode"}>
+                                        <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
                                             <DoneIcon />
                                         </IconButton>
                                     </Tooltip>
                                     ) : (
                                     <Tooltip title={"delete questions"} placement="top-start">
-                                        <IconButton color="secondary" onClick={this.handleDeleteQuestions}>
+                                        <IconButton color="secondary" onClick={this.handleDeleteQuestions} component="div" disabled={this.state.mode === "editMode" || this.state.questions.length === 0}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>

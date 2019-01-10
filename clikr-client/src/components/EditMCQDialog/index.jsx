@@ -352,7 +352,7 @@ class EditMCQDialog extends React.Component {
 
         return (
             <div>
-                <Button variant="outlined" onClick={this.handleOpen}>
+                <Button variant="outlined" onClick={this.handleOpen} disabled={this.props.is_open}>
                     Edit
                 </Button>
                 <Dialog
