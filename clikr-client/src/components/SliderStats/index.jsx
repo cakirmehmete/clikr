@@ -17,12 +17,17 @@ class SliderStats extends React.Component {
             question: { id: 0 },
             data: {},
             responsesNumber: 0,
+            override: false,
         }
         defaults.global.legend.display = false;
         defaults.global.tooltips.enabled = false;
     }
 
     componentDidMount() {
+        if (this.props.selectedQuestionId !== 0) {
+            const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
+            this.setState({ question: question })
+        }
         if (this.state.question.id !== this.props.selectedQuestionId) {
             if (this.props.selectedQuestionId !== 0) {
                 const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
@@ -47,6 +52,39 @@ class SliderStats extends React.Component {
                     this.updateChartData(msg.answers, msg.count)
                 }
             })
+        }
+        this.setState({ override: this.props.override })
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const next_question = nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.selectedQuestionId);
+        this.setState({ override: nextProps.override, question: next_question })
+        if (next_question.id === this.state.question.id) {
+
+            if (this.state.question.id !== nextProps.selectedQuestionId) {
+                if (nextProps.selectedQuestionId !== 0) {
+                    socket.emit('subscribe professor', next_question.id)
+                    this.updateChartLabels(next_question)
+                } else {
+                    this.setState({
+                        question: { id: 0, data: { labels: [] } }
+                    })
+                }
+            }
+    
+            if (!nextProps.override) {
+                socket.on('new results', (msg) => {
+                    if (msg.question_id === nextProps.selectedQuestionId) {
+                        this.updateChartData(msg.answers, msg.count)
+                    }
+                })
+            } else {
+                nextProps.apiService.loadAnswers(nextProps.selectedQuestionId).then((msg) => {
+                    if (msg.question_id === nextProps.selectedQuestionId) {
+                        this.updateChartData(msg.answers, msg.count)
+                    }
+                })
+            }
         }
     }
 
@@ -82,7 +120,7 @@ class SliderStats extends React.Component {
     }
 
     componentWillUnmount() {
-        if (!this.props.override) {
+        if (!this.state.override) {
             socket.removeAllListeners("new results");
         }
     }
@@ -106,7 +144,7 @@ class SliderStats extends React.Component {
         }
 
         return (
-            <BaseStatsComponent question={this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)} responsesNumber={this.state.responsesNumber} timer={!this.props.override} questionTitle={this.state.question.question_title} hidden={this.props.override ? false : !this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open}  >
+            <BaseStatsComponent question={this.state.question} responsesNumber={this.state.responsesNumber} timer={!this.state.override} questionTitle={this.state.question.question_title} hidden={this.state.override ? false : !this.state.question.is_open}  >
                 <Bar key={this.props.selectedQuestionId} data={this.state.data} options={options} />
             </BaseStatsComponent>
         );

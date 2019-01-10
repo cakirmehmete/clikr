@@ -16,13 +16,17 @@ class MCQuestionStats extends React.Component {
         this.state = {
             question: { id: 0 },
             data: {},
-            responsesNumber: 0
+            responsesNumber: 0,
+            update: false,
+            override: true
         }
         defaults.global.legend.display = false;
         defaults.global.tooltips.enabled = false;
     }
 
     componentDidMount() {
+
+        this.setState({ override: this.props.override })
         if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
             const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
             socket.emit('subscribe professor', question.id)
@@ -69,7 +73,8 @@ class MCQuestionStats extends React.Component {
                                 data: values,
                             }]
                         },
-                        responsesNumber: msg.count
+                        responsesNumber: msg.count,
+                        question: question,
                     })
                 }
             })
@@ -94,15 +99,113 @@ class MCQuestionStats extends React.Component {
                                 data: values,
                             }]
                         },
-                        responsesNumber: msg.count
+                        responsesNumber: msg.count,
+                        question: question
                     })
                 }
             })
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        const question = nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.selectedQuestionId)
+        if (nextProps.updateMCQStats !== this.state.update) {
+            this.setState({ update: nextProps.updateMCQStats, question: question })
+        }
+        if (nextProps.updateMCQStats) {
+
+            this.setState({ override: nextProps.override })
+
+            if (this.state.question.id === nextProps.selectedQuestionId) {
+                if (this.state.question.id !== nextProps.selectedQuestionId && nextProps.selectedQuestionId === 0) {
+                    this.setState({
+                        question: { id: 0, data: { labels: [] } }
+                    })
+                }
+                else {
+                    const labels = []
+                    for (var i = 0; i < question.number_of_options; i++) {
+                        let currLabel = question["option" + (i + 1)]
+                        if (currLabel.length > 10)
+                            currLabel = "Option " + (i + 1)
+                        labels.push(currLabel)
+                    }
+                    if (this.state.question.id !== nextProps.selectedQuestionId && nextProps.selectedQuestionId !== 0) {
+
+                        socket.emit('subscribe professor', question.id)
+                        
+            
+                        this.setState({
+                            question: question,
+                            data: {
+                                labels: labels
+                            }
+                        })
+                    }
+                    if (!nextProps.override) {
+                        socket.on('new results', (msg) => {
+            
+                            if (msg.question_id === nextProps.selectedQuestionId) {
+                                const values = []
+            
+                                for (var i = 1; i <= question.number_of_options; i++) {
+                                    values[i - 1] = msg.answers[i]
+                                    if (msg.answers[i] === undefined)
+                                        values[i - 1] = 0;
+                                }
+            
+                                this.setState({
+                                    data: {
+                                        datasets: [{
+                                            label: "Question Statistics",
+                                            backgroundColor: '#E9C46A',
+                                            borderColor: '#E9C46A',
+                                            data: values,
+                                        }],
+                                        labels: labels
+                                    },
+                                    responsesNumber: msg.count,
+                                    question: question
+                                })
+                            }
+                        })
+                    }
+                    else {
+                        nextProps.apiService.loadAnswers(nextProps.selectedQuestionId).then((msg) => {
+                            if (msg.question_id === nextProps.selectedQuestionId) {
+                                const values = []
+            
+                                const question = nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.selectedQuestionId)
+                                for (var i = 1; i <= question.number_of_options; i++) {
+                                    values[i - 1] = msg.answers[i]
+                                    if (msg.answers[i] === undefined)
+                                        values[i - 1] = 0;
+                                }
+
+            
+                                this.setState({
+                                    data: {
+                                        datasets: [{
+                                            label: "Question Statistics",
+                                            backgroundColor: '#E9C46A',
+                                            borderColor: '#E9C46A',
+                                            data: values,
+                                        }],
+                                        labels: labels
+                                    },
+                                    responsesNumber: msg.count,
+                                    question: question
+                                })
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }
+
     componentWillUnmount() {
-        if (!this.props.override) {
+        if (!this.state.override) {
             socket.removeAllListeners("new results");
         }
     }
@@ -126,11 +229,10 @@ class MCQuestionStats extends React.Component {
         }
 
         return (
-            <BaseStatsComponent question={this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)}
+            <BaseStatsComponent question={this.state.question}
                 responsesNumber={this.state.responsesNumber}
-                timer={!this.props.override} questionTitle={this.state.question.question_title}
-                hidden={this.props.override ? false : !this.props.profStore.getQuestionWithId(this.props.parentLecture,
-                    this.props.selectedQuestionId).is_open} >
+                timer={!this.state.override} questionTitle={this.state.question.question_title}
+                hidden={this.state.override ? false : !this.state.question.is_open} >
                 <Bar key={this.props.selectedQuestionId} data={this.state.data} options={options} />
             </BaseStatsComponent>
         );

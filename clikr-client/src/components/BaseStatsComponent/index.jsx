@@ -24,12 +24,17 @@ class BaseStatsComponent extends React.Component {
         this.state = {
             time: 0,
             isOn: false,
+            questionTitle: "",
+            hidden: props.hidden
         }
         this.startTimer = this.startTimer.bind(this)
         this.stopTimer = this.stopTimer.bind(this)
         this.resetTimer = this.resetTimer.bind(this)
     }
 
+    componentDidMount() {
+        this.setState({ hidden: this.props.hidden })
+    }
     startTimer() {
         this.setState({
             isOn: true
@@ -56,17 +61,25 @@ class BaseStatsComponent extends React.Component {
                 this.resetTimer()
             }
         }
+        if (this.props.questionTitle !== this.state.questionTitle) {
+            this.setState({ questionTitle: this.props.questionTitle })
+        }
+
+        if (this.props.hidden !== this.state.hidden ){
+            this.setState({ hidden: this.props.hidden })
+        }
     }
 
     componentWillUnmount() {
         this.stopTimer()
         this.resetTimer()
+        this.setState({ hidden: true })
     }
 
 
     render() {
         return (
-            <Card className={this.styles.card} hidden={this.props.hidden}>
+            <Card className={this.styles.card} hidden={this.state.hidden}>
                 <CardContent>
                     <Typography variant="h6" color="inherit">
                         Statistics for {this.props.questionTitle}
