@@ -175,7 +175,7 @@ class EditMCQDialog extends React.Component {
         // this is not the nicest way to do this, but it's functional, and I couldn't find my bug in my nicer code
         options.map(option => answer_choices[Object.keys(option)[0]] = Object.values(option)[0]);
 
-        if (correct_answer !== "") checked[correct_answer] = true;
+        if (correct_answer !== "" && correct_answer !== null) checked[correct_answer] = true;
 
         this.setState({
             should_delete: { option1:false, option2:false, option3:false, option4:false, option5:false },
@@ -334,7 +334,11 @@ class EditMCQDialog extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        let correct_answer = this.state.correct_answer.substring(6, 7);
+        let correct_answer = "";
+        if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
+            correct_answer = this.state.correct_answer.substring(6, 7);
+        }
+       
         if(this.state.formValid) {
             this.props.getEdits( 
                 new MultipleChoiceQuestionObj(this.props.questionObj.id,

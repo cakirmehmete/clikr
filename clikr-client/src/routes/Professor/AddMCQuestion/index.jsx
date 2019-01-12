@@ -316,7 +316,11 @@ class ProfessorAddMCQuestion extends React.Component {
     handleSubmit = () => {
         const { lectureId } = this.props.match.params
 
-        let correct_answer = this.state.correct_answer.substring(6, 7)
+        let correct_answer = "";
+        if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
+            correct_answer = this.state.correct_answer.substring(6, 7);
+        }
+        
         // Send course to API
         this.props.apiService.addQuestion(
             new MultipleChoiceQuestionObj(null,
