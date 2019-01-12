@@ -109,98 +109,95 @@ class MCQuestionStats extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         const question = nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.selectedQuestionId)
-        if (nextProps.updateMCQStats !== this.state.update) {
-            this.setState({ update: nextProps.updateMCQStats, question: question })
-        }
-        if (nextProps.updateMCQStats) {
+        this.setState({ question: question, override: nextProps.override })
+        if (this.state.question.id !== nextProps.selectedQuestionId && nextProps.selectedQuestionId !== 0) {
+            
+            socket.emit('subscribe professor', question.id)
+            const labels = []
+            for (var i = 0; i < question.number_of_options; i++) {
+                let currLabel = question["option" + (i + 1)]
+                if (currLabel.length > 10)
+                    currLabel = "Option " + (i + 1)
+                labels.push(currLabel)
+            }
 
-            this.setState({ override: nextProps.override })
-
-            if (this.state.question.id === nextProps.selectedQuestionId) {
-                if (this.state.question.id !== nextProps.selectedQuestionId && nextProps.selectedQuestionId === 0) {
-                    this.setState({
-                        question: { id: 0, data: { labels: [] } }
-                    })
+            this.setState({
+                data: {
+                    labels: labels
                 }
-                else {
+            })
+        }
+
+        if (this.state.question.id !== nextProps.selectedQuestionId && nextProps.selectedQuestionId === 0) {
+            this.setState({
+                question: { id: 0, data: { labels: [] } }
+            })
+        }
+        if (!nextProps.override) {
+            socket.on('new results', (msg) => {
+
+                if (msg.question_id === nextProps.selectedQuestionId) {
+                    const values = []
+
+                    for (var i = 1; i <= question.number_of_options; i++) {
+                        values[i - 1] = msg.answers[i]
+                        if (msg.answers[i] === undefined)
+                            values[i - 1] = 0;
+                    }
                     const labels = []
-                    for (var i = 0; i < question.number_of_options; i++) {
-                        let currLabel = question["option" + (i + 1)]
+                    for (var j = 0; j < question.number_of_options; j++) {
+                        let currLabel = question["option" + (j + 1)]
                         if (currLabel.length > 10)
-                            currLabel = "Option " + (i + 1)
+                            currLabel = "Option " + (j + 1)
                         labels.push(currLabel)
                     }
-                    if (this.state.question.id !== nextProps.selectedQuestionId && nextProps.selectedQuestionId !== 0) {
 
-                        socket.emit('subscribe professor', question.id)
-                        
-            
-                        this.setState({
-                            question: question,
-                            data: {
-                                labels: labels
-                            }
-                        })
-                    }
-                    if (!nextProps.override) {
-                        socket.on('new results', (msg) => {
-            
-                            if (msg.question_id === nextProps.selectedQuestionId) {
-                                const values = []
-            
-                                for (var i = 1; i <= question.number_of_options; i++) {
-                                    values[i - 1] = msg.answers[i]
-                                    if (msg.answers[i] === undefined)
-                                        values[i - 1] = 0;
-                                }
-            
-                                this.setState({
-                                    data: {
-                                        datasets: [{
-                                            label: "Question Statistics",
-                                            backgroundColor: '#E9C46A',
-                                            borderColor: '#E9C46A',
-                                            data: values,
-                                        }],
-                                        labels: labels
-                                    },
-                                    responsesNumber: msg.count,
-                                    question: question
-                                })
-                            }
-                        })
-                    }
-                    else {
-                        nextProps.apiService.loadAnswers(nextProps.selectedQuestionId).then((msg) => {
-                            if (msg.question_id === nextProps.selectedQuestionId) {
-                                const values = []
-            
-                                const question = nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.selectedQuestionId)
-                                for (var i = 1; i <= question.number_of_options; i++) {
-                                    values[i - 1] = msg.answers[i]
-                                    if (msg.answers[i] === undefined)
-                                        values[i - 1] = 0;
-                                }
-
-            
-                                this.setState({
-                                    data: {
-                                        datasets: [{
-                                            label: "Question Statistics",
-                                            backgroundColor: '#E9C46A',
-                                            borderColor: '#E9C46A',
-                                            data: values,
-                                        }],
-                                        labels: labels
-                                    },
-                                    responsesNumber: msg.count,
-                                    question: question
-                                })
-                            }
-                        })
-                    }
+                    this.setState({
+                        data: {
+                            datasets: [{
+                                label: "Question Statistics",
+                                backgroundColor: '#E9C46A',
+                                borderColor: '#E9C46A',
+                                data: values,
+                            }],
+                            labels: labels
+                        },
+                        responsesNumber: msg.count,
+                    })
                 }
-            }
+            })
+        } else {
+            nextProps.apiService.loadAnswers(nextProps.selectedQuestionId).then((msg) => {
+                if (msg.question_id === nextProps.selectedQuestionId) {
+                    const values = []
+
+                    for (var i = 1; i <= question.number_of_options; i++) {
+                        values[i - 1] = msg.answers[i]
+                        if (msg.answers[i] === undefined)
+                            values[i - 1] = 0;
+                    }
+                    const labels = []
+                    for (var j = 0; j < question.number_of_options; j++) {
+                        let currLabel = question["option" + (j + 1)]
+                        if (currLabel.length > 10)
+                            currLabel = "Option " + (j + 1)
+                        labels.push(currLabel)
+                    }
+
+                    this.setState({
+                        data: {
+                            datasets: [{
+                                label: "Question Statistics",
+                                backgroundColor: '#E9C46A',
+                                borderColor: '#E9C46A',
+                                data: values,
+                            }],
+                            labels: labels
+                        },
+                        responsesNumber: msg.count,
+                    })
+                }
+            })
         }
     }
 
