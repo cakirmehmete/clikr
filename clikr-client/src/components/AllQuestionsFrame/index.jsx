@@ -127,7 +127,6 @@ class AllQuestionsFrame extends React.Component {
 
         this.props.apiProfService.editQuestion(question);
         this.props.mcqEditDetect();
-        this.handleRestoreMode();
     }
 
      // gets questions to be deleted from child component
@@ -138,10 +137,8 @@ class AllQuestionsFrame extends React.Component {
     }
 
     handleDelete = () => {
-        if (!this.state.deleteMode) {
-            this.setState({
-                deleteMode: true,
-            })
+        if (this.state.deletions.length === 0) {
+            this.handleRestoreMode();
         }
         else {
             const qArr = [];
@@ -161,7 +158,6 @@ class AllQuestionsFrame extends React.Component {
             }
             else {
                 this.handleClose()
-                this.handleRestoreMode();
             }
         }
 
@@ -179,8 +175,9 @@ class AllQuestionsFrame extends React.Component {
 
     handleDeletion = () => {
 
-        this.props.handleFinalDeletion(this.state.delIds)
-        this.handleClose()
+        this.props.handleFinalDeletion(this.state.delIds);
+        this.handleClose();
+        this.handleRestoreMode();
     };
 
     render() {
