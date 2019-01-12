@@ -71,10 +71,15 @@ const styles = theme => ({
 });
 
 function answersValid(new_options) {
-    if (new_options.length === 0) return false;
+    if (new_options.length < 2) return false;
     for (const option of new_options) {
         for (const val of Object.values(option)) {
-            if (val === "") return false; 
+            if (val === undefined) {
+                return false; 
+            }
+            else {
+                if (val.replace(/^\s+|\s+$/g, '') === "") return false;
+            }
         }     
     }
     return true;
@@ -228,7 +233,7 @@ class EditMCQDialog extends React.Component {
     }
     
     validateForm() {
-        const titleValid = this.state.title !== "";
+        const titleValid = this.state.title.replace(/^\s+|\s+$/g, '') !== "";
         if (!titleValid) {
             this.setState({ titleValid: false })
         }
@@ -490,12 +495,14 @@ class EditMCQDialog extends React.Component {
             </Grid>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleClose} autoFocus color="secondary">
-                        cancel
-                    </Button>
-                    <Button onClick={this.handleSubmit} color="secondary" disabled={!this.state.formValid}>
-                        submit
-                    </Button>
+                    <form onSubmit={this.handleSubmit}>
+                        <Button onClick={this.handleClose} type="button" autoFocus color="secondary">
+                            cancel
+                        </Button>
+                        <Button onClick={this.handleSubmit} type="submit" color="secondary" disabled={!this.state.formValid}>
+                            submit
+                        </Button>
+                    </form>
             </DialogActions>
                 </Dialog>
             </div>
