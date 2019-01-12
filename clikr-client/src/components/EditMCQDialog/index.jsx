@@ -339,22 +339,24 @@ class EditMCQDialog extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        let correct_answer = "";
-        if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
-            correct_answer = this.state.correct_answer.substring(6, 7);
-        }
-       
-        if(this.state.formValid) {
-            this.props.getEdits( 
-                new MultipleChoiceQuestionObj(this.props.questionObj.id,
-                this.props.questionObj.lecture_id, "multiple_choice",
-                this.state.title, correct_answer,
-                this.props.questionObj.creator_id, this.props.questionObj.is_open, this.props.questionObj.opened_at, this.props.questionObj.closed_at,
-                this.props.questionObj.created_at, this.props.questionObj.modified_at, this.props.questionObj.answer,
-                this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
-                this.state.number_of_options))
-        }
-        this.handleClose();
+        if (this.state.formValid) {
+            let correct_answer = "";
+            if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
+                correct_answer = this.state.correct_answer.substring(6, 7);
+            }
+        
+            if(this.state.formValid) {
+                this.props.getEdits( 
+                    new MultipleChoiceQuestionObj(this.props.questionObj.id,
+                    this.props.questionObj.lecture_id, "multiple_choice",
+                    this.state.title, correct_answer,
+                    this.props.questionObj.creator_id, this.props.questionObj.is_open, this.props.questionObj.opened_at, this.props.questionObj.closed_at,
+                    this.props.questionObj.created_at, this.props.questionObj.modified_at, this.props.questionObj.answer,
+                    this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
+                    this.state.number_of_options))
+            }
+            this.handleClose();
+        }  
     }
     
     render() {
@@ -376,7 +378,7 @@ class EditMCQDialog extends React.Component {
                 <DialogContent>
                 <Grid container direction="column" justify="center">
                 <Grid item className={this.styles.item}>
-                    <form className={this.styles.container} noValidate autoComplete="off">
+                    <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
                         <TextField
                             required
                             fullWidth
