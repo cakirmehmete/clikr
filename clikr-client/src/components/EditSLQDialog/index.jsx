@@ -406,10 +406,8 @@ class EditFRQDialog extends React.Component {
 
     handleLabelsValidation() {
         let valid = false;
-        if (this.state.labels.upper === "" && this.state.labels.lower === "") valid  = true;
-        else {
-            if (this.state.labels.upper !== "" && this.state.labels.lower !== "") valid = true;
-        }
+        if (this.state.labels.upper.replace(/^\s+|\s+$/g, '') !== "" && this.state.labels.lower.replace(/^\s+|\s+$/g, '') !== "") valid  = true;
+
         let fieldsValid = this.state.fieldsValid;
         fieldsValid.lower_label = valid;
         fieldsValid.upper_label = valid;
