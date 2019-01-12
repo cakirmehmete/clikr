@@ -33,6 +33,7 @@ class ProfessorAddFreeTextQuestion extends React.Component {
         correct_answer: '',
         error: '',
         titleValid: false,
+        correct_answer_valid: true,
     };
 
     constructor(props) {
@@ -40,18 +41,37 @@ class ProfessorAddFreeTextQuestion extends React.Component {
         this.styles = props.classes
     }
 
-    handleValidation() {
-        if (this.state.title === '') {
-            this.setState({
-                error: "This field is required",
-                titleValid: false,
-            })
-        } else {
-            this.setState({
-                error: "",
-                titleValid: true,
-            });
+    handleValidation(name, value) {
+        switch(name) {
+            case "title":
+                if (this.state.title.replace(/^\s+|\s+$/g, '') === '') {
+                    this.setState({
+                        error: "This field is required",
+                        titleValid: false,
+                    })
+                } else {
+                    this.setState({
+                        error: "",
+                        titleValid: true,
+                    });
+                }
+                break;
+            case "correct_answer":
+                if (this.state.correct_answer !== "") {
+                    if (this.state.correct_answer.replace(/^\s+|\s+$/g, '') === '') {
+                        this.setState({ correct_answer_valid: false })
+                    }
+                    else {
+                        this.setState({ correct_answer_valid: true })
+                    }
+                }
+                else {
+                    if (!this.state.correct_answer_valid) this.setState({ correct_answer_valid: true })
+                }
+                break;
+            default:
         }
+        
     }
 
     handleChange = name => event => {
@@ -108,7 +128,7 @@ class ProfessorAddFreeTextQuestion extends React.Component {
                     />
                     <Button
                         type="submit"
-                        disabled={!this.state.titleValid}
+                        disabled={!this.state.titleValid || !this.state.correct_answer_valid}
                         variant="outlined"
                         color="primary"
                         onClick={this.handleSubmit}>Submit</Button>
