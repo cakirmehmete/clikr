@@ -100,26 +100,41 @@ class ProfessorViewQuestions extends React.Component {
 
             if (this.state.parentLecture.questions.length > 0) {
                 this.apiProfService.closeAllQuestions(this.state.parentLecture.id);
+                const { lectureId } = this.props.match.params
+                this.lectureId = lectureId
+                this.setState({
+                    parentLecture: this.profStore.getLectureWithId(lectureId),
+                    currentQuestionIndex: 0,
+                    currentQuestionId: this.convertQuestionIndexToId(0),
+                    openQuestionId: 0,
+                    recentlyClosedId: 0,
+                    recentlyOpenedId: 0,
+                    btnStatus: 0,
+                    editDeleteMode: false,
+                    updateMCQStats: false,
+                })
+            }
+            else {
+                const { lectureId } = this.props.match.params
+                this.lectureId = lectureId
+                const lecture = this.profStore.getLectureWithId(lectureId)
+                if (lecture !== undefined) {
+                    this.setState({
+                        parentLecture: this.profStore.getLectureWithId(lectureId)
+                    })
+                    this.setState({
+                        currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+                    })
+                }
             }
                 
-            const { lectureId } = this.props.match.params
-            this.lectureId = lectureId
-            this.setState({
-                parentLecture: this.profStore.getLectureWithId(lectureId),
-                currentQuestionIndex: 0,
-                currentQuestionId: this.convertQuestionIndexToId(0),
-                openQuestionId: 0,
-                recentlyClosedId: 0,
-                recentlyOpenedId: 0,
-                btnStatus: 0,
-                editDeleteMode: false,
-                updateMCQStats: false,
-            })
+            
         }
-        if (this.state.currentQuestionId !== this.convertQuestionIndexToId(this.state.currentQuestionIndex))
+        if (this.state.currentQuestionId !== this.convertQuestionIndexToId(this.state.currentQuestionIndex)) {
             this.setState({
                 currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
             })
+        }     
     }
 
     componentWillUnmount() {
@@ -172,7 +187,7 @@ class ProfessorViewQuestions extends React.Component {
             case 1:
                 // Handle the "Close Question"
                 this.apiProfService.closeQuestion(this.state.currentQuestionId, this.state.parentLecture.id)
-                this.setState({ recentlyClosedId: this.state.currentQuestionId, recentlyOpenedId: 0})
+                this.setState({ recentlyClosedId: this.convertQuestionIndexToId(this.state.currentQuestionIndex), recentlyOpenedId: 0})
                 // Check if this is last question
                 if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length) {
                     
@@ -212,8 +227,7 @@ class ProfessorViewQuestions extends React.Component {
             btnStatus: 1,
             currentQuestionIndex: this.convertQuestionIdToIndex(question_id),
             currentQuestionId: question_id,
-            openQuestionId: question_id,
-            recentlyClosedId: 0
+            openQuestionId: question_id
         })
     }
     
@@ -221,13 +235,14 @@ class ProfessorViewQuestions extends React.Component {
         // Update the index to the next question
         if (this.state.currentQuestionIndex + 1 >= this.state.parentLecture.questions.length) {
             
-            this.setState({ btnStatus: 3, openQuestionId: 0 })
+            this.setState({ btnStatus: 3, openQuestionId: 0, recentlyOpenedId: 0 })
         }
         else{
             
             this.setState({
                 btnStatus: 2,
-                openQuestionId: 0
+                openQuestionId: 0,
+                recentlyOpenedId: 0
             })
         }
     }

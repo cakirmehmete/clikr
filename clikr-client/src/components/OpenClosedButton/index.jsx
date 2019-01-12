@@ -58,6 +58,7 @@ class OpenClosedButton extends React.Component {
         
         if (!this.state.isOpen) {
             // Handle the "Open Question"
+            console.log("openeint the quesiton in button")
             this.props.apiService.openQuestion(this.props.questionId, this.props.parentLecture.id)
             socket.emit('subscribe professor', this.props.questionId)
             this.props.handleClick(this.props.questionId)
@@ -66,7 +67,7 @@ class OpenClosedButton extends React.Component {
         }
         else {
             // Handle the "Close Question"
-
+            console.log("closing question in button")
             this.props.apiService.closeQuestion(this.props.questionId, this.props.parentLecture.id)
             this.props.handleToUpdate(false)
             this.props.handleListClose(this.props.questionId)
