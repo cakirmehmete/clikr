@@ -97,14 +97,23 @@ class ProfessorViewQuestions extends React.Component {
 
     componentDidUpdate() {
         if (this.props.match.params.lectureId !== this.state.parentLecture.id) {
-            
+
+            if (this.state.parentLecture.questions.length > 0) {
+                this.apiProfService.closeAllQuestions(this.state.parentLecture.id);
+            }
+                
             const { lectureId } = this.props.match.params
             this.lectureId = lectureId
             this.setState({
-                parentLecture: this.profStore.getLectureWithId(lectureId)
-            })
-            this.setState({
-                currentQuestionId: this.convertQuestionIndexToId(this.state.currentQuestionIndex)
+                parentLecture: this.profStore.getLectureWithId(lectureId),
+                currentQuestionIndex: 0,
+                currentQuestionId: this.convertQuestionIndexToId(0),
+                openQuestionId: 0,
+                recentlyClosedId: 0,
+                recentlyOpenedId: 0,
+                btnStatus: 0,
+                editDeleteMode: false,
+                updateMCQStats: false,
             })
         }
         if (this.state.currentQuestionId !== this.convertQuestionIndexToId(this.state.currentQuestionIndex))
