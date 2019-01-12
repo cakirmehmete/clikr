@@ -74,7 +74,7 @@ function answersValid(new_options) {
     if (new_options.length === 0) return false;
     for (const option of new_options) {
         for (const val of Object.values(option)) {
-            if (val === "") return false; 
+            if (val.replace(/^\s+|\s+$/g, '') === "") return false; 
         }     
     }
     return true;
@@ -189,7 +189,7 @@ class ProfessorAddMCQuestion extends React.Component {
 
         switch(name) {
             case "title":
-                if (value === "") {
+                if (value.replace(/^\s+|\s+$/g, '') === "") {
                     titleError = "This field is required";
                     titleValid = false;
                 }
@@ -313,7 +313,9 @@ class ProfessorAddMCQuestion extends React.Component {
         }, () => { this.validateFields(name, value) });
     };
 
-    handleSubmit = () => {
+    handleSubmit = (event) => {
+        event.preventDefault();
+
         const { lectureId } = this.props.match.params
 
         let correct_answer = "";
@@ -474,13 +476,16 @@ class ProfessorAddMCQuestion extends React.Component {
 
                 <Grid item className={this.styles.item}>
                     <Grid container direction="row" className={this.styles.buttonContainer}>
-                        <Button
-                            disabled={!this.state.formValid}
-                            variant="outlined"
-                            color="primary"
-                            onClick={this.handleSubmit}>
-                                Submit
-                        </Button>
+                        <form>
+                            <Button
+                                type="submit"
+                                disabled={!this.state.formValid}
+                                variant="outlined"
+                                color="primary"
+                                onClick={this.handleSubmit}>
+                                    Submit
+                            </Button>
+                        </form>
                     </Grid>
                 </Grid>
             </Grid>
