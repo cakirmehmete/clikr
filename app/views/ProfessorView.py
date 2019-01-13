@@ -271,7 +271,7 @@ def export_students(current_user, course_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     # build csv file
-    headers = ['netid']
+    headers = ['username']
     student_netIds = []
 
     students = course.students
@@ -681,11 +681,11 @@ def _export_grades(course=None, lecture=None):
 
     if course:
         lectures = course.lectures
-        file_id = course.title + '_' + course.id
+        file_id = 'course_' + course.id
     elif lecture:
         course = lecture.course
         lectures = [lecture]
-        file_id = course.title + '_' + lecture.title + '_' + lecture.id
+        file_id = 'lecture_' + lecture.id
     else:
         raise Exception('must pass either course or lecture')
 
