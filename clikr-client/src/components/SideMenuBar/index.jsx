@@ -53,6 +53,39 @@ class SideMenuBar extends React.Component {
 
     state = {
         open: null,
+        selectedCourse: 0,
+        selectedLecture: 0,
+    }
+    componentDidMount() {
+        if (this.props.location.pathname !== undefined) {
+            if (this.props.location.pathname.length !== "") {
+                const url_parts_arr = this.props.location.pathname.split("/");
+                if (url_parts_arr[3] === "questions") {
+                    this.setState({ selectedLecture: url_parts_arr[2], open: this.profStore.getLectureWithId(url_parts_arr[2]).course_id, selectedCourse: this.profStore.getLectureWithId(url_parts_arr[2]).course_id})
+                }
+                if (url_parts_arr[3] === "lectures") {
+                    this.setState({ selectedLecture:0, selectedCourse: url_parts_arr[2]})
+                }
+            }
+        }
+    }
+    componentDidUpdate() {
+        if (this.props.location.pathname !== undefined) {
+            if (this.props.location.pathname.length !== "") {
+                const url_parts_arr = this.props.location.pathname.split("/");
+                if (url_parts_arr[3] === "questions" && this.state.selectedLecture !== url_parts_arr[2]) {
+                    this.setState({ selectedLecture: url_parts_arr[2], open: this.profStore.getLectureWithId(url_parts_arr[2]).course_id, selectedCourse: this.profStore.getLectureWithId(url_parts_arr[2]).course_id })
+                }
+                if (url_parts_arr[3] === "lectures" && this.state.selectedCourse !== url_parts_arr[2]) {
+                    this.setState({ selectedLecture:0, selectedCourse: url_parts_arr[2]})
+                }
+                if (url_parts_arr.length === 2) {
+                    if (this.state.selectedLecture !== 0 ||this.state.selectedCourse !== 0) {
+                        this.setState({ selectedLecture: 0, selectedCourse: 0 })
+                    }
+                }
+            }
+        }
     }
 
     handleCourseClick(id) {
@@ -78,49 +111,50 @@ class SideMenuBar extends React.Component {
 
     render() {
         return (
-            <Drawer
-                className={this.styles.drawer}
-                variant="permanent"
-                classes={{
-                    paper: this.styles.drawerPaper,
-                }}
-                anchor="left"
-            >
-                <Grid container direction="column" alignItems="center" justify="space-around">
-                    <img src={logo} alt="logo" width="50%"></img>
+            <Grid container direction="column" justify="center" alignItems="center">
+                <Drawer
+                    className={this.styles.drawer}
+                    variant="permanent"
+                    classes={{
+                        paper: this.styles.drawerPaper,
+                    }}
+                    anchor="left"
+                >
+                
+                <Grid item><Grid container direction="row" justify="center" ><img src={logo} alt="logo" height={80}/></Grid></Grid>
+                <Grid item><Divider /></Grid>
+                <Grid item>
+                    <List>
+                        {this.profStore.courses.map((courseObj, index) => {
+                            var lectures = this.profStore.getCourseLectures(courseObj.id);
+                            return (
+                                <div key={"div" + index}>
+                                    <ListItem className={this.styles.hover} button key={index} onClick={() => this.handleCourseClick(courseObj.id)} selected={this.state.selectedCourse === courseObj.id}>
+                                        <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} />
+                                        <ListItemSecondaryAction>
+                                            <IconButton color="primary" disabled={lectures.length === 0} onClick={() => this.handleExpand(courseObj.id)}>
+                                                {lectures.length > 0 && this.state.open === courseObj.id ? <ExpandLess /> : <ExpandMore />}
+                                            </IconButton>
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                    <Collapse in={this.state.open === courseObj.id} timeout="auto" unmountOnExit>
+                                        <List component="div" disablePadding>
+                                            {lectures.map((lectureObj, innerIndex) => {
+                                                return (
+                                                    <ListItem button key={courseObj.id + "_lecture_" + innerIndex} onClick={() => this.handleLectureClick(lectureObj.id)} selected={this.state.selectedLecture === lectureObj.id}>
+                                                        <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.nestedListtext}> {lectureObj.title} </Typography>} />
+                                                    </ListItem>
+                                                )
+                                            })}
+                                        </List>
+                                    </Collapse>
+                                </div>
+                            )
+                        })}
+                    </List>
                 </Grid>
-
-                <Divider />
-                <List>
-                    {this.profStore.courses.map((courseObj, index) => {
-                        var lectures = this.profStore.getCourseLectures(courseObj.id);
-                        return (
-                            <div key={"div" + index}>
-                                <ListItem className={this.styles.hover} button key={index} onClick={() => this.handleCourseClick(courseObj.id)}>
-                                    <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} />
-                                    <ListItemSecondaryAction>
-                                        <IconButton color="primary" disabled={lectures.length === 0} onClick={() => this.handleExpand(courseObj.id)}>
-                                            {lectures.length > 0 && this.state.open === courseObj.id ? <ExpandLess /> : <ExpandMore />}
-                                        </IconButton>
-                                    </ListItemSecondaryAction>
-                                </ListItem>
-                                <Collapse in={this.state.open === courseObj.id} timeout="auto" unmountOnExit>
-                                    <List component="div" disablePadding>
-                                        {lectures.map((lectureObj, innerIndex) => {
-                                            return (
-                                                <ListItem button key={courseObj.id + "_lecture_" + innerIndex} onClick={() => this.handleLectureClick(lectureObj.id)}>
-                                                    <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.nestedListtext}> {lectureObj.title} </Typography>} />
-                                                </ListItem>
-                                            )
-                                        })}
-                                    </List>
-                                </Collapse>
-                            </div>
-                        )
-                    })}
-                </List>
-            </Drawer>
-
+                </Drawer>
+            </Grid>
         );
     }
 }

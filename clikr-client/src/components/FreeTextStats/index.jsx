@@ -20,24 +20,24 @@ class MCQuestionStats extends React.Component {
         this.state = {
             question: { id: 0 },
             responsesNumber: 0,
-            responses: {}
+            responses: {},
+            override: false,
         }
     }
 
     componentDidMount() {
+        const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
+        this.setState({ override: this.props.override, question: question })
+
         if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
-            const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
             socket.emit('subscribe professor', question.id)
-            this.setState({
-                question: question,
-            })
         }
         if (!this.props.override) {
             socket.on('new results', (msg) => {
                 if (msg.question_id === this.props.selectedQuestionId) {
                     this.setState({
                         responsesNumber: msg.count,
-                        responses: msg.answers
+                        responses: msg.answers,
                     })
                 }
             })
@@ -54,15 +54,22 @@ class MCQuestionStats extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        const next_question = nextProps.profStore.getQuestionWithId(nextProps.parentLecture, nextProps.selectedQuestionId);
+
+        this.setState({ override: nextProps.override, question: next_question})
+        
+    }
+
     componentWillUnmount() {
-        if (!this.props.override) {
+        if (!this.state.override) {
             socket.removeAllListeners("new results");
         }
     }
 
     render() {
         return (
-            <BaseStatsComponent question={this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)} responsesNumber={this.state.responsesNumber} timer={!this.props.override} questionTitle={this.state.question.question_title} hidden={this.props.override ? false : !this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId).is_open}  >
+            <BaseStatsComponent question={this.state.question} responsesNumber={this.state.responsesNumber} timer={!this.state.override} questionTitle={this.state.question.question_title} hidden={this.state.override ? false : !this.state.question.is_open}  >
                 <Table>
                     <TableHead>
                         <TableRow>

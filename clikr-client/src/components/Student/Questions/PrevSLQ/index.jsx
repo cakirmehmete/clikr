@@ -101,7 +101,7 @@ class PrevSLQ extends Component {
     
     // check if answer is correct
     checkAnswer(correct_answer, answer) {
-        if (correct_answer === null) return true;
+        if (correct_answer === null || correct_answer === "") return true;
         const expression = correct_answer.split(" ");
         if (expression.length === 2) {
             return this.operatorToComparison(Number(answer), expression[0], Number(expression[1]))

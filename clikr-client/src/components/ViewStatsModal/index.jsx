@@ -30,6 +30,7 @@ const styles = theme => ({
 class ViewStatsModal extends React.Component {
     state = {
         open: false,
+        question: {id: 0}
     };
 
     constructor(props) {

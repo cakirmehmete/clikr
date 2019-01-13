@@ -1,15 +1,16 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import { Redirect } from "react-router-dom";
 import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import { observer, inject } from 'mobx-react';
-import { SliderQuestionObj } from '../../../models/QuestionObj';
-import Card from '@material-ui/core/Card';
+import { observer } from 'mobx-react';
 import Grid from '@material-ui/core/Grid';
+import APIProfService from '../../services/APIProfService';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import TextField from '@material-ui/core/TextField';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import { SliderQuestionObj } from '../../models/QuestionObj';
 import Switch from '@material-ui/core/Switch';
-import Slider from '@material-ui/lab/Slider';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import MenuItem from '@material-ui/core/MenuItem';
 import Radio from '@material-ui/core/Radio';
@@ -20,6 +21,12 @@ import FormControl from '@material-ui/core/FormControl';
 const styles = theme => ({
     gridItem: {
         padding: theme.spacing.unit,
+    },
+    button:{
+        color: theme.palette.secondary.main
+    },
+    icon: {
+        margin: theme.spacing.unit
     },
     card: {
         backgroundColor: theme.palette.secondary.main,
@@ -59,9 +66,7 @@ const styles = theme => ({
     container: {
         flexWrap: 'wrap',
     },
-    button: {
-        paddingTop: theme.spacing.unit*3,
-    },
+
     andor: {
         padding: theme.spacing.unit,
         width: "15%"
@@ -109,15 +114,13 @@ const answerBoundOptions = [
     },
   ];
 
-@inject("profStore")
-@inject("apiService")
 @observer
-class ProfessorAddSliderQuestion extends React.Component {
+class EditFRQDialog extends React.Component {
+    
     state = {
-        toQuestions: false,
+        open: false,
         title: '',
         titleError: "",
-        correct_answer: '', // will be sent as statement such as = 5 or >2 && < 100
         labels: {lower:"0%", upper:"100%"}, // labels on slider
         answer_bounds: {upper:"", lower:""}, 
         range: false, // whether or not correct answer has a range
@@ -126,16 +129,70 @@ class ProfessorAddSliderQuestion extends React.Component {
         slider_value: 50,
         has_correct_answer: false,
         custom_labels: false,
-        fieldsValid: {title: false, lower_label:false, upper_label:false, lower_bound:false, upper_bound: false, equality_operators: false},
-        disabled: true
+        fieldsValid: {title: true, lower_label:true, upper_label:true, lower_bound:true, upper_bound: true, equality_operators: true},
+        disabled: false
     };
 
     constructor(props) {
         super(props)
         this.styles = props.classes
+        this.profStore = props.profStore
+        this.apiProfService = new APIProfService(this.profStore)
     }
 
-    validateAnswers() {
+    componentDidMount() {
+        let correct_answer = this.props.questionObj.correct_answer;
+        let lower_label = this.props.questionObj.lower_label;
+        let upper_label = this.props.questionObj.upper_label;
+
+        this.setState({ title: this.props.questionObj.question_title })
+
+        if (lower_label !== null) {
+            if (lower_label !== "0%" || upper_label !== "100%") {
+                this.setState({
+                    labels: {lower: this.props.questionObj.lower_label, upper: this.props.questionObj.upper_label},
+                })
+            }
+        }
+        
+        if (correct_answer !== undefined &&  correct_answer !== null && correct_answer !== "") {
+            const correct_arr = correct_answer.split(" ");
+            if (correct_arr.length === 2) {
+                this.setState({
+                    answer_bounds: {
+                        lower: correct_arr[1],
+                        upper: "",
+                    },
+                    equality_operators: {
+                        lower: correct_arr[0],
+                        upper: ""
+                    },
+                })
+            }
+            else {
+                this.setState({
+                    answer_bounds: {
+                        lower: correct_arr[1],
+                        upper: correct_arr[4],
+                    },
+                    equality_operators: {
+                        lower: correct_arr[0],
+                        upper: correct_arr[3]
+                    },
+                    range: true,
+                    rangeVal: "range",
+                })
+            }
+
+        }
+        
+    }
+
+    handleClose = () => {
+        this.setState({ open: false });
+    };
+
+      validateAnswers() {
         let disabled = false;
 
         if (this.state.custom_labels && this.state.has_correct_answer) {
@@ -408,18 +465,23 @@ class ProfessorAddSliderQuestion extends React.Component {
         return condition;
     }
 
-    handleSubmit = (e) => {
-        e.preventDefault();
+
+    handleOpen = () => {
+        this.setState({ open: true })
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
 
         // need this check for submitting with enter key
         if (this.state.disabled) {
             return;
         }
 
-        const { lectureId } = this.props.match.params;
-        let correct_answer = "";
         
-        if (this.state.has_correct_answer) {
+        let correct_answer = "";
+        if (this.state.answer_bounds.lower !== "") {
+            
             if (this.state.range) {
                 let answerBounds = this.state.answer_bounds;
                 let equalityOperators = this.state.equality_operators;
@@ -439,30 +501,36 @@ class ProfessorAddSliderQuestion extends React.Component {
             }
         }
 
-        // Send course to API
-        this.props.apiService.addQuestion(
-            new SliderQuestionObj(null, lectureId, "slider", this.state.title, correct_answer, null, null, null, null, null, null, null, this.state.labels.lower, this.state.labels.upper)
-        );
-
-        this.setState({ toQuestions: true });
-    }
-
-    render() {
-        const { lectureId } = this.props.match.params
-
-        if (this.state.toQuestions === true) {
-            return <Redirect to={'/professor/' + lectureId + '/questions'} push />
+        if(!this.state.disabled) {
+            this.props.getEdits( 
+                new SliderQuestionObj(this.props.questionObj.id, 
+                    this.props.questionObj.lecture_id, "slider", 
+                    this.state.title, correct_answer, 
+                    this.props.questionObj.creator_id, this.props.questionObj.is_open, 
+                    this.props.questionObj.opened_at, this.props.questionObj.closed_at, 
+                    this.props.questionObj.created_at, null, null, this.state.labels.lower, this.state.labels.upper))
         }
+        this.handleClose();
+    }
+    
+    render() {
 
         return (
-            <Grid container justify="center" className={this.styles.container} spacing={24} >
-                <Grid item className={this.styles.gridItem} xs={12} sm={6}>
+            <div>
+                <Button variant="outlined" onClick={this.handleOpen} disabled={this.props.is_open}>
+                    Edit
+                </Button>
+                <Dialog
+                    fullWidth
+                    open={this.state.open}
+                    onClose={this.handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                <DialogTitle id="alert-dialog-title">{"Edit Slider Question"}</DialogTitle>
+                <DialogContent>
+                <Grid container justify="center" className={this.styles.container}  >
                     <Grid container direction="column" align-items="flex-start">
-                        <Grid item>
-                            <Typography variant="h6" color="textPrimary">
-                                Add New Question:
-                            </Typography>
-                        </Grid>
                         <Grid item className={this.styles.entry}>
                             <form noValidate autoComplete="off" onSubmit={this.handleSubmit}>
                                 <TextField
@@ -489,7 +557,7 @@ class ProfessorAddSliderQuestion extends React.Component {
                                     value={this.state.custom_labels}
                                     />
                                 }
-                                label="custom labels (optional)"
+                                label="change/set labels"
                             />
                         </Grid>
                         
@@ -530,7 +598,7 @@ class ProfessorAddSliderQuestion extends React.Component {
                                     value={this.state.has_correct_answer}
                                     />
                                 }
-                                label="set correct answer (optional)"
+                                label="change/set correct answer"
                             />
                         </Grid>
                         {this.state.has_correct_answer && 
@@ -658,59 +726,20 @@ class ProfessorAddSliderQuestion extends React.Component {
                             </Grid>
                         </Grid>)}
                     </Grid>
-                    <Grid container className={this.styles.button}>
-                        <Button
-                            disabled={this.state.disabled}
-                            variant="outlined"
-                            color="primary"
-                            type="submit"
-                            onClick={this.handleSubmit}>
-                            Submit
-                        </Button>
-                    </Grid>
-                </Grid>
-                <Grid item className={this.styles.gridItem} xs={12} sm={6}>
-                    <Grid container direction="column" align-items="flex-start" spacing={24}>
-                        <Grid item><Typography variant="h6" color="textPrimary"> Preview: </Typography></Grid>
-                        <Grid item>
-                            <Grid container direction="column" justify="center" spacing={24}>
-                                <Grid item xs={12}>
-                                    <Grid container direction="row" justify="space-between" className={this.styles.titleContainer}>
-                                        <Grid item>
-                                            <div className={this.styles.titleWrap}> {this.state.title} </div>
-                                        </Grid>
-                                        <Grid item>
-                                            <Grid container direction="row" justify="flex-end">
-                                                <Card className={this.styles.card}>
-                                                    <Typography align="center" className={this.styles.percentText}>
-                                                        {this.state.slider_value.toString() + " "}%
-                                                    </Typography>
-                                                </Card>
-                                            </Grid>
-                                        </Grid>  
-                                    </Grid>
-                                </Grid>
-                                <Grid container direction="row" justify="flex-start" alignItems="center" className={this.styles.slidercontainer} spacing={24}>
-                                    <Grid item xs><div className={this.styles.labels}>{this.state.labels.lower}</div></Grid>
-                                    <Grid item xs={8}>
-                                        <Slider
-                                            value={this.state.slider_value}
-                                            min={0}
-                                            max={100}
-                                            step={1}
-                                            aria-labelledby="label"
-                                            onChange={this.handleSliderChange}
-                                        />
-                                    </Grid>
-                                    <Grid item xs><div className={this.styles.labels}>{this.state.labels.upper}</div></Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Grid>  
+                
             </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.handleClose} autoFocus color="secondary">
+                        cancel
+                    </Button>
+                    <Button onClick={this.handleSubmit} color="secondary" disabled={this.state.disabled}>
+                        submit
+                    </Button>
+            </DialogActions>
+                </Dialog>
+            </div>
         );
     }
 }
-
-export default withStyles(styles)(ProfessorAddSliderQuestion);
+export default withStyles(styles)(EditFRQDialog);

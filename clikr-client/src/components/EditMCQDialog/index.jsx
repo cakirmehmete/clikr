@@ -1,15 +1,19 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
-import { Redirect } from "react-router-dom";
 import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import { observer, inject } from 'mobx-react';
-import { MultipleChoiceQuestionObj } from '../../../models/QuestionObj';
+import { observer } from 'mobx-react';
+import Grid from '@material-ui/core/Grid';
+import APIProfService from '../../services/APIProfService';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import TextField from '@material-ui/core/TextField';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import { MultipleChoiceQuestionObj } from '../../models/QuestionObj';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
+import Typography from '@material-ui/core/Typography';
 import Select from '@material-ui/core/Select';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -23,12 +27,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import DoneIcon from '@material-ui/icons/Done';
 
 const styles = theme => ({
-    paper: {
-        position: 'absolute',
-        width: theme.spacing.unit*44,
+    button:{
+        color: theme.palette.secondary.main
     },
     select: {
-        width: theme.spacing.unit*44
+        width: 200
     },
     icon: {
         margin: theme.spacing.unit,
@@ -38,10 +41,7 @@ const styles = theme => ({
         flexWrap: 'wrap',
     },
     item: {
-        paddingBottom: theme.spacing.unit*4,
-    },
-    buttonContainer: {
-        paddingTop: theme.spacing.unit*2,
+        paddingBottom: theme.spacing.unit,
     },
     bootstrapInput: {
         borderRadius: 4,
@@ -71,22 +71,25 @@ const styles = theme => ({
 });
 
 function answersValid(new_options) {
-    if (new_options.length === 0) return false;
+    if (new_options.length < 2) return false;
     for (const option of new_options) {
         for (const val of Object.values(option)) {
-            if (val.replace(/^\s+|\s+$/g, '') === "") return false; 
+            if (val === undefined) {
+                return false; 
+            }
+            else {
+                if (val.replace(/^\s+|\s+$/g, '') === "") return false;
+            }
         }     
     }
     return true;
 }
 
-
-@inject("profStore")
-@inject("apiService")
 @observer
-class ProfessorAddMCQuestion extends React.Component {
+class EditMCQDialog extends React.Component {
+    
     state = {
-        toQuestions: false,
+        open: false,
         title: '',
         correct_answer: '',
         number_of_options: "",
@@ -95,10 +98,10 @@ class ProfessorAddMCQuestion extends React.Component {
         checked: {option1: false, option2: false, option3: false, option4: false, option5: false},
         should_delete: {option1:false, option2:false, option3:false, option4:false, option5:false},
         titleError: "",
-        formValid: false,
+        formValid: true,
         titleValid: true,
-        hasAnswers: false,
-        optionsValid: false,
+        hasAnswers: true,
+        optionsValid: true,
         delete_mode: false,
         deleteDisabled: false,
         deleteConfirmDisabled: false,
@@ -107,24 +110,36 @@ class ProfessorAddMCQuestion extends React.Component {
     constructor(props) {
         super(props)
         this.styles = props.classes
+        this.profStore = props.profStore
+        this.apiProfService = new APIProfService(this.profStore)
     }
 
-    setAnswerObject(num_options) {
+    componentDidMount() {
         let answer_choices = {};
-        for (let i = 1; i <= num_options; i++) {
-            let option_string = "option" + i.toString();
-            answer_choices[option_string] = "";
+        let checked = this.state.checked;
+        let correct = this.props.questionObj.correct_answer 
+        const number_of_options = Number(this.props.questionObj.number_of_options);
+        let options = [];
+
+        for (let i = 1; i <= number_of_options; i++) {
+            let option_string= "option" + i.toString();
+            answer_choices[option_string] = this.props.questionObj[option_string];
+            options.push({ [option_string]: answer_choices[option_string] })
         }
-        return answer_choices;
-    }
-    setCheckedObject(num_options) {
-        let checked = {};
-        for (let i = 1; i <= num_options; i++) {
-            let option_string = "option" + i.toString();
-            checked[option_string] = false;
+        if (correct !== null) {
+            correct = "option" + correct;
+            checked[correct] = true;
         }
-        return checked;
+       
+        this.setState({ title: this.props.questionObj.question_title, correct_answer: correct, number_of_options: number_of_options,  answer_choices: answer_choices, checked: checked, options: options })
+       
+        
     }
+    handleClose = () => {
+        this.setState({ open: false });
+    };
+
+
     handleDelete() {
 
         let answer_choices = this.state.answer_choices;
@@ -165,7 +180,7 @@ class ProfessorAddMCQuestion extends React.Component {
         // this is not the nicest way to do this, but it's functional, and I couldn't find my bug in my nicer code
         options.map(option => answer_choices[Object.keys(option)[0]] = Object.values(option)[0]);
 
-        if (correct_answer !== "") checked[correct_answer] = true;
+        if (correct_answer !== "" && correct_answer !== null) checked[correct_answer] = true;
 
         this.setState({
             should_delete: { option1:false, option2:false, option3:false, option4:false, option5:false },
@@ -189,7 +204,7 @@ class ProfessorAddMCQuestion extends React.Component {
 
         switch(name) {
             case "title":
-                if (value.replace(/^\s+|\s+$/g, '') === "") {
+                if (value === "") {
                     titleError = "This field is required";
                     titleValid = false;
                 }
@@ -218,7 +233,7 @@ class ProfessorAddMCQuestion extends React.Component {
     }
     
     validateForm() {
-        const titleValid = this.state.title !== "";
+        const titleValid = this.state.title.replace(/^\s+|\s+$/g, '') !== "";
         if (!titleValid) {
             this.setState({ titleValid: false })
         }
@@ -313,54 +328,60 @@ class ProfessorAddMCQuestion extends React.Component {
         }, () => { this.validateFields(name, value) });
     };
 
-    handleSubmit = (event) => {
-        event.preventDefault();
-        if (this.state.formValid) {
-            const { lectureId } = this.props.match.params
-    
-            let correct_answer = "";
-            if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
-                correct_answer = this.state.correct_answer.substring(6, 7);
-            }
-            
-            // Send course to API
-            this.props.apiService.addQuestion(
-                new MultipleChoiceQuestionObj(null,
-                    lectureId, "multiple_choice",
-                    this.state.title, correct_answer,
-                    null, null, null, null, null, null, null,
-                    this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
-                    this.state.number_of_options)
-            )
-    
-            this.setState({ toQuestions: true });
-        }
-
-    }
     setDeleteMode() {
         const delete_mode = !this.state.delete_mode;
         this.setState({ delete_mode: delete_mode });
     }
 
-    render() {
-        const { lectureId } = this.props.match.params
+    handleOpen =  () => {
+        this.setState({ open: true })
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        if (this.state.formValid) {
+            let correct_answer = "";
+            if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
+                correct_answer = this.state.correct_answer.substring(6, 7);
+            }
         
-        if (this.state.toQuestions === true) {
-            return <Redirect to={'/professor/' + lectureId + '/questions'} push />
-        }
+            if(this.state.formValid) {
+                this.props.getEdits( 
+                    new MultipleChoiceQuestionObj(this.props.questionObj.id,
+                    this.props.questionObj.lecture_id, "multiple_choice",
+                    this.state.title, correct_answer,
+                    this.props.questionObj.creator_id, this.props.questionObj.is_open, this.props.questionObj.opened_at, this.props.questionObj.closed_at,
+                    this.props.questionObj.created_at, this.props.questionObj.modified_at, this.props.questionObj.answer,
+                    this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
+                    this.state.number_of_options))
+            }
+            this.handleClose();
+        }  
+    }
+    
+    render() {
 
         return (
-            <Grid container direction="column" justify="center" className={this.styles.paper}>
-                <Grid item >
-                    <Typography variant="h6" color="textPrimary">
-                        Add New Question:
-                    </Typography>
-                </Grid>
+            <div>
+                <Button variant="outlined" onClick={this.handleOpen} disabled={this.props.is_open}>
+                    Edit
+                </Button>
+                <Dialog
+                    fullWidth
+                    scroll="paper"
+                    open={this.state.open}
+                    onClose={this.handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                <DialogTitle id="alert-dialog-title">{"Edit Multiple Choice Question"}</DialogTitle>
+                <DialogContent>
+                <Grid container direction="column" justify="center">
                 <Grid item className={this.styles.item}>
                     <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
                         <TextField
-                            fullWidth
                             required
+                            fullWidth
                             error={!this.state.titleValid}
                             id="standard-name"
                             label="Question Title"
@@ -417,7 +438,7 @@ class ProfessorAddMCQuestion extends React.Component {
                                                 value={Object.keys(option)[0]}
                                             />
                                         </TableCell>
-                                        <TableCell align="right">
+                                        <TableCell>
                                             <Typography variant="body1" align="justify"> {this.state.answer_choices[Object.keys(option)[0]]}</Typography>
                                         </TableCell>
                                     </TableRow>
@@ -473,26 +494,21 @@ class ProfessorAddMCQuestion extends React.Component {
                     </Grid>
                 }
                 
-                
-                
-
-                <Grid item className={this.styles.item}>
-                    <Grid container direction="row" className={this.styles.buttonContainer}>
-                        <form>
-                            <Button
-                                type="submit"
-                                disabled={!this.state.formValid}
-                                variant="outlined"
-                                color="primary"
-                                onClick={this.handleSubmit}>
-                                    Submit
-                            </Button>
-                        </form>
-                    </Grid>
-                </Grid>
             </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <form onSubmit={this.handleSubmit}>
+                        <Button onClick={this.handleClose} type="button" autoFocus color="secondary">
+                            cancel
+                        </Button>
+                        <Button onClick={this.handleSubmit} type="submit" color="secondary" disabled={!this.state.formValid}>
+                            submit
+                        </Button>
+                    </form>
+            </DialogActions>
+                </Dialog>
+            </div>
         );
     }
 }
-
-export default withStyles(styles)(ProfessorAddMCQuestion);
+export default withStyles(styles)(EditMCQDialog);

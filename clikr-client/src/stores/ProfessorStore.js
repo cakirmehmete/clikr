@@ -1,4 +1,6 @@
 import { observable, action } from "mobx";
+import LectureObj from '../models/LectureObj';
+import QuestionObj from '../models/LectureObj';
 
 export default class ProfessorStore {
     @observable
@@ -23,7 +25,21 @@ export default class ProfessorStore {
         return this.courses.find(x => x.id === course_id)
     }
 
+    getLectureById(lecture_id) {
+        
+        if (lecture_id === 0)
+        return { questions: [] };
+        const course = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id))
+        
+        if (course === undefined)
+            return new LectureObj();
+
+        const lectures = course.lectures
+        return lectures.find(lecture => lecture.id === lecture_id)
+    }
+
     getLectureWithId(lecture_id) {
+        
         if (lecture_id === 0)
             return { questions: [] };
         const course = this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id))
@@ -39,12 +55,26 @@ export default class ProfessorStore {
         return this.courses.find(x => x.id === course_id).lectures;
     }
 
+    // getQuestionWithId(lecture, question_id) {
+    //     console.log("get question with id")
+    //     console.log(lecture)
+    //     console.log(question_id)
+    //     if (lecture.questions === [])
+    //         return { questions: [] };
+
+    //     if (lecture.questions.find(x => x.id === question_id) === undefined)
+    //         return { questions: [] };
+
+    //     return this.courses.find(course => course.lectures.find(lec => lec.id === lecture.id)).lectures
+    //         .find(lec => lec.id === lecture.id).questions.find(x => x.id === question_id)
+    // }
     getQuestionWithId(lecture, question_id) {
+
         if (lecture.questions === [])
-            return { questions: [] };
+            return new QuestionObj();
 
         if (lecture.questions.find(x => x.id === question_id) === undefined)
-            return { questions: [] };
+            return new QuestionObj();
 
         return this.courses.find(course => course.lectures.find(lec => lec.id === lecture.id)).lectures
             .find(lec => lec.id === lecture.id).questions.find(x => x.id === question_id)
@@ -142,12 +172,21 @@ export default class ProfessorStore {
                 return 0;
             });
     }
+    @action 
+    updateQuestion(questionObj) {
+        const lecture = this.courses.find(course => course.lectures.find(lecture => lecture.id === questionObj.lecture_id)).lectures
+        .find(lecture => lecture.id === questionObj.lecture_id);
+        const question = lecture.questions.find(q => q.id === questionObj.id);
+       
+        const keys = Object.keys(questionObj);
+        for (const key of keys) question[key] = questionObj[key];
+    }
 
     @action
     openQuestion(question_id, lecture_id) {
         this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
             .find(lecture => lecture.id === lecture_id).questions.find(x => x.id === question_id).is_open = true;
-            this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures
+            this.courses.find(course => course.lectures.find(lecture => lecture.id === lecture_id)).lectures	
             .find(lecture => lecture.id === lecture_id).questions.find(x => x.id === question_id).opened_at = Date.now();
     }
 

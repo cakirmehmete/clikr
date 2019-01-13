@@ -9,6 +9,8 @@ import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Typography from '@material-ui/core/Typography';
+
 const styles = theme => ({
     checkBox: {
         color: theme.palette.primary.dark,
@@ -36,9 +38,12 @@ class DeleteQuestionsList extends React.Component {
         this.questions  = props.questions
     }
     componentDidMount() {
-        let shouldDelete = []
-        console.log(this.questions)
-        this.questions.slice().sort(function (a, b) {
+        let shouldDelete = [];
+        let closed_questions = [];
+        for (let i = 0; i < this.questions.length; i++) {
+            if (!this.questions[i].is_open) closed_questions.push(this.questions[i]); // open questions cannot be deleted
+        }
+        closed_questions.slice().sort(function (a, b) {
             if (a.created_at < b.created_at) {
                 return -1;
             }
@@ -53,9 +58,9 @@ class DeleteQuestionsList extends React.Component {
             checked: false,
             title: questionObj.question_title
         }))
-        if (this.questions !== undefined && this.questions !== null) {
+        if (closed_questions !== undefined && closed_questions !== null) {
             this.setState({
-                questions: this.questions,
+                questions: closed_questions,
                 delQuestions: shouldDelete
             })
         }
@@ -75,7 +80,8 @@ class DeleteQuestionsList extends React.Component {
 
     render() {
         return (
-            <FormControl component="fieldset" fullWidth>
+            this.state.questions.length > 0 ? (
+                <FormControl component="fieldset" fullWidth>
                 <FormGroup
                     name="delQuestions"
                     value={this.state.delQuestions}
@@ -99,6 +105,10 @@ class DeleteQuestionsList extends React.Component {
                     </List>
                 </FormGroup>
             </FormControl>
+            ) : (
+                <Typography variant="body1" > It looks like all your questions are open... Please close questions you would like to delete. </Typography>
+            )
+            
         );
     }
 }

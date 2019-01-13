@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import AddQuestionModalWrapped from '../AddQuestionModal';
 import QuestionListItem from '../QuestionListItem';
 import PropTypes from 'prop-types';
@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import DoneIcon from '@material-ui/icons/Done';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteQuestionsList from '../DeleteQuestionsList';
@@ -22,6 +23,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import LectureObj from '../../models/LectureObj';
 
 const styles = theme => ({
     card: {
@@ -35,24 +37,69 @@ const styles = theme => ({
     },
 });
 
-@inject('profStore')
-@inject("apiService")
 @observer
 class AllQuestionsFrame extends React.Component {
     state = {
         toNewQuestion: false,
         deleteMode: false,
         editMode: false,
-        mode: "viewing",
+        mode: "viewingMode",
         deletions: [],
         delTitles: [],
         open: false,
+        parentLecture: new LectureObj(),
+        lectureTitle: "",
+        questions: [],
     }
 
     constructor(props) {
         super(props)
         this.styles = props.classes
+        this.profStore = props.profStore
+        this.apiProfService = props.apiProfService
+        this.parentLectureId = props.parentLectureId
     }
+
+    componentDidMount() {
+        console.log("mounting")
+         if (!this.profStore.dataLoaded) {
+             this.apiProfService.loadData().then(() => {
+                 console.log("loading data")
+                 this.profStore.dataLoaded = true
+                 const lecture = this.profStore.getLectureWithId(this.parentLectureId);
+                 if (lecture !== undefined) {
+                    this.setState({
+                        parentLecture: lecture,
+                        questions: lecture.questions,
+                        lectureTitle: lecture.title
+                    })
+                 }
+                })
+            } else {
+            const lecture = this.profStore.getLectureWithId(this.parentLectureId);
+            if (lecture !== undefined) {
+                this.setState({
+                    parentLecture: lecture,
+                    questions: lecture.questions,
+                    lectureTitle: lecture.title
+                })
+             }
+         }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const nextLecture = nextProps.profStore.getLectureWithId(nextProps.parentLectureId);
+        if (nextLecture.questions.length === this.state.questions.length || nextLecture.id !== this.state.parentLecture.id) {
+            this.setState({
+                parentLecture: nextLecture,
+                questions: nextLecture.questions,
+                lectureTitle: nextLecture.title
+            })
+        }
+    }
+
+    
+    
 
     handleNewQuestionClick = () => {
         this.setState(() => ({
@@ -61,15 +108,25 @@ class AllQuestionsFrame extends React.Component {
     }
 
     handleDeleteQuestions = () => {  
+        this.props.disableTopButton()
         this.setState({ mode: "deleteMode", deleteMode: true, editMode: false }); 
     }
 
     handleEditQuestions = () => {
+        this.props.disableTopButton()
         this.setState({ mode: "editMode", deleteMode: false, editMode: true });
     }
 
     handleRestoreMode = () => {
+        this.props.restoreTopButton()
         this.setState({ mode: "viewingMode", deleteMode: false, editMode: false });
+    }
+
+    // gets course edits from child
+    getEdits = (question) => {
+
+        this.props.apiProfService.editQuestion(question);
+        this.props.mcqEditDetect();
     }
 
      // gets questions to be deleted from child component
@@ -80,10 +137,8 @@ class AllQuestionsFrame extends React.Component {
     }
 
     handleDelete = () => {
-        if (!this.state.deleteMode) {
-            this.setState({
-                deleteMode: true,
-            })
+        if (this.state.deletions.length === 0) {
+            this.handleRestoreMode();
         }
         else {
             const qArr = [];
@@ -103,7 +158,6 @@ class AllQuestionsFrame extends React.Component {
             }
             else {
                 this.handleClose()
-                this.handleRestoreMode();
             }
         }
 
@@ -119,18 +173,11 @@ class AllQuestionsFrame extends React.Component {
         });
     };
 
-    handleFinalDeletion = () => {
+    handleDeletion = () => {
 
-        for (let i = 0; i < this.state.delIds.length; i++) {
-            var question = this.props.parentLecture.questions.find(q => q.id === this.state.delIds[i]);
-            if (question && question.is_open) {
-                this.props.apiService.closeQuestion(this.state.delIds[i], this.props.parentLecture.id);
-                this.props.handleListClose(this.state.delIds[i]);
-            }
-        }
-        
-        this.props.apiService.deleteQuestions(this.state.delIds, this.props.parentLecture.id);
-        this.handleClose()
+        this.props.handleFinalDeletion(this.state.delIds);
+        this.handleClose();
+        this.handleRestoreMode();
     };
 
     render() {
@@ -142,15 +189,16 @@ class AllQuestionsFrame extends React.Component {
         return (
             <Card className={this.styles.card}>
                 <CardContent>
+                    {console.log(this.state.parentLecture)}
                     <Grid container direction='row' justify='space-between' alignItems='stretch'>
                         <Grid item>
                             <Typography className={this.styles.title} variant="h6" color="inherit">
-                                Questions for {this.props.parentLecture.title + " Lecture"}
+                                Questions for {this.state.lectureTitle}
                             </Typography>
                         </Grid>
                         <Grid item>
                             <Grid container direction="row" justify="flex-end">
-                                {/* <Grid item>
+                                <Grid item>
                                     {this.state.editMode ? (
                                     <Tooltip title={"done editing"} placement="top-start">
                                         <IconButton color="secondary" onClick={this.handleRestoreMode}>
@@ -159,38 +207,38 @@ class AllQuestionsFrame extends React.Component {
                                     </Tooltip>
                                     ) : (
                                     <Tooltip title={"edit questions"} placement="top-start">
-                                        <IconButton color="secondary" onClick={this.handleEditQuestions}>
+                                        <IconButton color="secondary" onClick={this.handleEditQuestions} component="div" disabled={this.state.mode === "deleteMode" || this.state.questions.length === 0}>  
                                             <EditIcon />
                                         </IconButton>
                                     </Tooltip>
                                     )}    
-                                </Grid> */}
+                                </Grid>
                                 <Grid item>
                                 {this.state.deleteMode ? (
                                     <Tooltip title={"done deleting"} placement="top-start">
-                                        <IconButton color="secondary" onClick={this.handleDelete.bind(this)} disabled={this.state.mode === "viewingMode" || this.state.mode === "editMode"}>
+                                        <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
                                             <DoneIcon />
                                         </IconButton>
                                     </Tooltip>
                                     ) : (
                                     <Tooltip title={"delete questions"} placement="top-start">
-                                        <IconButton color="secondary" onClick={this.handleDeleteQuestions}>
+                                        <IconButton color="secondary" onClick={this.handleDeleteQuestions} component="div" disabled={this.state.mode === "editMode" || this.state.questions.length === 0}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>
                                     )}
                                 </Grid>
                                 <Grid item>
-                                    <AddQuestionModalWrapped lectureId={this.props.parentLecture.id} />
+                                    <AddQuestionModalWrapped lectureId={this.state.parentLecture.id} />
                                 </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
                     {this.state.deleteMode ? 
-                    (<DeleteQuestionsList questions={this.props.parentLecture.questions} getDeletions={this.getDeletions}/>)
+                    (<DeleteQuestionsList questions={this.state.questions} getDeletions={this.getDeletions}/>)
                     : 
                     (<List component="nav">
-                        {this.props.parentLecture.questions.slice().sort(function (a, b) {
+                        {this.state.questions.slice().sort(function (a, b) {
                             if (a.created_at < b.created_at) {
                                 return -1;
                             }
@@ -200,7 +248,7 @@ class AllQuestionsFrame extends React.Component {
                             // a must be equal to b
                             return 0;
                         }).map((questionObj, index) => {
-                            return (<QuestionListItem number={index} mode={this.state.mode} handleListClose={this.props.handleListClose} handleClick={this.props.handleClick} parentLecture={this.props.parentLecture} questionObj={questionObj} key={index} openQuestion={this.props.selectedQuestionId} />
+                            return (<QuestionListItem number={index} mode={this.state.mode} getEdits={this.getEdits} handleListClose={this.props.handleListClose} recentlyOpenedId={this.props.recentlyOpenedId} profStore={this.profStore} handleClick={this.props.handleClick} parentLectureId={this.state.parentLecture.id} parentLecture={this.state.parentLecture} questionObj={questionObj} key={index} recentlyClosedId={this.props.recentlyClosedId} />
                             )
                         })}
                     </List>)
@@ -225,7 +273,7 @@ class AllQuestionsFrame extends React.Component {
                         <Button onClick={this.handleClose} autoFocus color="secondary">
                             no
                         </Button>
-                        <Button onClick={this.handleFinalDeletion} color="secondary">
+                        <Button onClick={this.handleDeletion} color="secondary">
                             yes
                         </Button>
                     </DialogActions>

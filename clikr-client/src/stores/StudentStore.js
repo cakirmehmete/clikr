@@ -73,6 +73,25 @@ export default class StudentStore {
   }
 
   @action
+  updateQuestion(question) {
+    const original_question = this.questions.find(x => x.id === question.id);
+    if (question.question_type === 'free_text') {
+      original_question.id = question.id;
+      original_question.lecture_id = question.lecture_id;
+      original_question.question_type = question.question_type;
+      original_question.question_title = question.question_title;
+      original_question.correct_answer = question.correct_answer;
+      original_question.creator_id = question.creator_id;
+      original_question.is_open = question.is_open;
+      original_question.opened_at = question.opened_at;
+      original_question.closed_at = question.closed_at;
+      original_question.created_at = question.created_at;
+      original_question.modified_at = question.modified_at;
+      original_question.answer =  question.answer;
+      original_question.word_limit = question.word_limit;
+    }
+  }
+  @action
   updateAllQuestions(questions) {
       this.questions = []
 
