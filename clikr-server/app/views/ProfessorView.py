@@ -675,7 +675,7 @@ def _export_grades(course=None, lecture=None):
     """
 
     # build csv file
-    headers = ['username']
+    headers = ['username', 'total']
     score_dict = {}    # dictionary with student id's as keys, dictionaries as values (which in turn have question ids as keys and scores as values)
 
 
@@ -691,7 +691,7 @@ def _export_grades(course=None, lecture=None):
 
     # fill score_dict with empty dicts for enrolled students
     for student in course.students:
-        score_dict[student.id] = {}
+        score_dict[student.id] = {'total': 0}
 
     # process all questions
     for lecture in lectures:
@@ -708,6 +708,7 @@ def _export_grades(course=None, lecture=None):
 
                 # add score to the student's list (if enrolled)
                 if student_id in score_dict:
+                    score_dict[student_id]['total'] += score
                     score_dict[student_id][col_header] = score
 
     # note that heroku discards dynamically generated files on dyno restart!
