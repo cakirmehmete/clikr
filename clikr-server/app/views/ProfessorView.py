@@ -675,23 +675,30 @@ def _export_grades(course=None, lecture=None):
     """
 
     # build csv file
-    headers = ['netid']
+    headers = ['username']
     score_dict = {}    # dictionary with student id's as keys, dictionaries as values (which in turn have question ids as keys and scores as values)
+
 
     if course:
         lectures = course.lectures
-        file_id = course.id
+        file_id = course.title + '_' + course.id
     elif lecture:
+        course = lecture.course
         lectures = [lecture]
-        file_id = lecture.id
+        file_id = course.title + '_' + lecture.title + '_' + lecture.id
     else:
         raise Exception('must pass either course or lecture')
+
+    # fill score_dict with empty dicts for enrolled students
+    for student in course.students:
+        score_dict[student.id] = {}
 
     # process all questions
     for lecture in lectures:
         questions = lecture.questions
         for question in questions:
-            headers.append(question.question_title + ' (' + question.id + ')')
+            col_header = lecture.title + ': ' + question.question_title + ' [' + question.id + ']'
+            headers.append(col_header)
             answers = question.answers
 
             # process each answer to this question
@@ -699,20 +706,19 @@ def _export_grades(course=None, lecture=None):
                 student_id = answer.student_id
                 score = 1 if question.is_correct(answer.answer) else 0
 
-                # add score to the student's list
-                if not student_id in score_dict:
-                    score_dict[student_id] = {}
-                score_dict[answer.student_id][question.question_title + ' (' + question.id + ')'] = score
+                # add score to the student's list (if enrolled)
+                if student_id in score_dict:
+                    score_dict[student_id][col_header] = score
 
     # note that heroku discards dynamically generated files on dyno restart!
     filename = 'grades_' + file_id + '.csv'
     with open('app/views/dynamic_content/grades/' + filename, 'w') as f:
         csv.register_dialect('quote all', quoting=csv.QUOTE_ALL)
-        writer = csv.DictWriter(f, headers, restval='', dialect='quote all')
+        writer = csv.DictWriter(f, headers, restval=0, dialect='quote all')
         writer.writeheader()
         for student_id, inner_dict in score_dict.items():
             netId = StudentModel.get_student_by_uuid(student_id).netId
-            inner_dict['netid'] = netId
+            inner_dict['username'] = netId
             writer.writerow(inner_dict)
 
     dirname = os.path.dirname(__file__)
