@@ -315,25 +315,27 @@ class ProfessorAddMCQuestion extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-
-        const { lectureId } = this.props.match.params
-
-        let correct_answer = "";
-        if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
-            correct_answer = this.state.correct_answer.substring(6, 7);
+        if (this.state.formValid) {
+            const { lectureId } = this.props.match.params
+    
+            let correct_answer = "";
+            if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
+                correct_answer = this.state.correct_answer.substring(6, 7);
+            }
+            
+            // Send course to API
+            this.props.apiService.addQuestion(
+                new MultipleChoiceQuestionObj(null,
+                    lectureId, "multiple_choice",
+                    this.state.title, correct_answer,
+                    null, null, null, null, null, null, null,
+                    this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
+                    this.state.number_of_options)
+            )
+    
+            this.setState({ toQuestions: true });
         }
-        
-        // Send course to API
-        this.props.apiService.addQuestion(
-            new MultipleChoiceQuestionObj(null,
-                lectureId, "multiple_choice",
-                this.state.title, correct_answer,
-                null, null, null, null, null, null, null,
-                this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
-                this.state.number_of_options)
-        )
 
-        this.setState({ toQuestions: true });
     }
     setDeleteMode() {
         const delete_mode = !this.state.delete_mode;
@@ -355,7 +357,7 @@ class ProfessorAddMCQuestion extends React.Component {
                     </Typography>
                 </Grid>
                 <Grid item className={this.styles.item}>
-                    <form className={this.styles.container} noValidate autoComplete="off">
+                    <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
                         <TextField
                             fullWidth
                             required

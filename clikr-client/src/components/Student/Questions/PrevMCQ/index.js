@@ -72,7 +72,7 @@ class PrevMCQ extends Component {
         // compute correct answer
         var a =  this.question.correct_answer
         if (a !== undefined) {
-            if (a !== null) {
+            if (a !== null && a !== "") {
                 this.correct = Number(a) - 1;
             } else {
                 this.correct = null;
