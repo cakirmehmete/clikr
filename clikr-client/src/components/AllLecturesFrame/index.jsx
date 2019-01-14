@@ -98,7 +98,7 @@ class AllLecturesFrame extends React.Component {
     handleNewLectureClick = () => {
         this.setState(() => ({
             toNewLecture: true,
-            numLects: this.profStore.getCourseLectures(this.courseId).length + 1
+            numLects: this.profStore.getCourseLectures(this.state.parentCourse.id).length + 1
         }))
     }
 
@@ -155,7 +155,7 @@ class AllLecturesFrame extends React.Component {
         // Handle routes
         if (this.state.toNewLecture === true) {
             return <Redirect to={{
-                pathname: '/professor/' + this.courseId + '/new',
+                pathname: '/professor/' + this.state.parentCourse.id + '/new',
                 state: { numLects: this.state.numLects }
             }} />
         } else if (this.state.referrerLectureIndex !== -1) {
