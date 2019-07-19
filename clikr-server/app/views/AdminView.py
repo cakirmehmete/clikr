@@ -10,7 +10,7 @@ from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
 from .. import db
 from ..shared.Authentication import Auth
-from ..shared.Util import custom_response
+from ..shared.Util import custom_response, validate_user_exists
 
 admin_api = Blueprint('admins', __name__)
 student_schema = StudentSchema()
@@ -31,10 +31,9 @@ def create_professor():
         return custom_response(error, 400)
 
     # check if professor already exists in the db
-    professor_in_database = ProfessorModel.get_professor_by_netId(data.get('netId'))
-    if professor_in_database:
-        message = {'error': 'Professor already exists, please supply another netId'}
-        return custom_response(message, 400)
+    user_exists_error = validate_user_exists(data.get('netId')):
+    if user_exists_error
+        return user_exists_error
 
     professor = ProfessorModel(data)
     professor.save()
@@ -61,10 +60,9 @@ def create_student():
         return custom_response(error, 400)
 
     # check if student already exists in the db
-    student_in_database = StudentModel.get_student_by_netId(data.get('netId'))
-    if student_in_database:
-        message = {'error': 'Student already exists, please supply another netId'}
-        return custom_response(message, 400)
+    user_exists_error = validate_user_exists(data.get('netId')):
+    if user_exists_error
+        return user_exists_error
 
     student = StudentModel(data)
     student.save()
