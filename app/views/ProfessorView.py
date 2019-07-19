@@ -13,7 +13,7 @@ from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoice
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
-from ..shared.Util import custom_response
+from ..shared.Util import custom_response, validate_user_exists
 from ..shared.SocketIOUtil import emit_question_statistics, compute_question_statistics
 from ..shared.MarshmallowUtil import dump_questions, dump_one_question, load_one_question
 
