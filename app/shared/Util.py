@@ -1,6 +1,8 @@
 from flask import Response, json
 from marshmallow import fields
 
+import datetime
+
 def custom_response(res, status_code):
     """
     Custom Response Function
@@ -21,6 +23,10 @@ def validate_user_exists(netId: str):
     if in_student_database:
         message = {'error': 'User already exists in student database, please supply another netId'}
         return custom_response(message, 400)
+
+def get_timestamp_string():
+    now = datetime.datetime.now()
+    return now.strftime('%Y-%m-%dT%H:$M:$S')
 
 # Use these custom fields to treat the empty string as None when loading marshmallow schemas
 class NoneMixin(object):
