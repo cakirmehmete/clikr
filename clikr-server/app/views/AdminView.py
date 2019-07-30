@@ -10,7 +10,7 @@ from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema
 from .. import db
 from ..shared.Authentication import Auth
-from ..shared.Util import custom_response, validate_user_exists
+from ..shared.Util import custom_response
 
 admin_api = Blueprint('admins', __name__)
 student_schema = StudentSchema()
@@ -31,8 +31,8 @@ def create_professor():
         return custom_response(error, 400)
 
     # check if professor already exists in the db
-    user_exists_error = validate_user_exists(data.get('netId')):
-    if user_exists_error
+    user_exists_error = validate_user_exists(data.get('netId'))
+    if user_exists_error:
         return user_exists_error
 
     professor = ProfessorModel(data)
@@ -41,6 +41,17 @@ def create_professor():
     professor_data = professor_schema.dump(professor).data
 
     return custom_response({'message': 'professor created', 'id': professor_data.get('id')}, 201)
+
+def validate_user_exists(netId: str):
+    in_professor_database = ProfessorModel.get_professor_by_netId(netId)
+    if in_professor_database:
+        message = {'error': 'User already exists in professor database, please supply another netId'}
+        return custom_response(message, 400)
+
+    in_student_database = StudentModel.get_student_by_netId(netId)
+    if in_student_database:
+        message = {'error': 'User already exists in student database, please supply another netId'}
+        return custom_response(message, 400)
 
 @admin_api.route('/professors', methods=['GET'])
 def get_professors():
@@ -60,8 +71,8 @@ def create_student():
         return custom_response(error, 400)
 
     # check if student already exists in the db
-    user_exists_error = validate_user_exists(data.get('netId')):
-    if user_exists_error
+    user_exists_error = validate_user_exists(data.get('netId'))
+    if user_exists_error:
         return user_exists_error
 
     student = StudentModel(data)
