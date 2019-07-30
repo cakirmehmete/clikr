@@ -6,11 +6,11 @@ pipenv shell
 ``` 
 
 # Env
-export FLASK_ENV=development
-export DATABASE_URL=postgres://postgres@localhost:5432/clikr_api_db
-export PORT=5000
-export JWT_SECRET_KEY=aaa
-export SECRET_KEY=aaa
+export FLASK_ENV=development 
+export DATABASE_URL=postgres://USER:PASS@HOST:PORT/DB_NAME 
+export PORT= 
+export JWT_SECRET_KEY= 
+export SECRET_KEY=
 
 # Database
 1. Install Docker
