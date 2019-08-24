@@ -254,6 +254,9 @@ class ProfessorViewQuestions extends React.Component {
                     <Typography variant="h6" component="h5" className={this.styles.text}>
                         {this.state.parentLecture.title} on {this.state.parentLecture.date}
                     </Typography>
+                    <Typography variant="h6" component="h5" className={this.styles.text}>
+                        Code: {this.state.parentLecture.enroll_code}
+                    </Typography>
                     <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
                     </Typography>

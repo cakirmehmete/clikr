@@ -82,7 +82,7 @@ class LectListItemNavEdit extends React.Component {
                 this.setState({
                     lectureTitle: nextProps.lectureTitle,
                     newTitle: nextProps.lectureTitle,
-                    lectureId: nextProps.lectureId
+                    lectureId: nextProps.lectureId,
                 })
             }
         } 

@@ -10,7 +10,7 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import logoprof from '../../assets/clikrlogo2.png';
 import logostudent from '../../assets/clikrlogo.png';
-import background from '../../assets/background.png';
+import background from '../../assets/background.jpeg';
 
 
 const styles = theme => ({
@@ -21,7 +21,13 @@ const styles = theme => ({
     color: theme.palette.primary.main,
   },
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    height: '100vh',
+    width: '100vw',
+    backgroundImage: 'url(' + background + ')',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center center',
   },
   appBar: {
     top: 'auto',
@@ -45,7 +51,7 @@ const styles = theme => ({
       maxWidth: 300,
     },
     marginBottom: 16,
-  },
+  }
 });
 
 
@@ -121,6 +127,7 @@ class Home extends Component {
             </Card>
           </Grid>
         </Grid>
+
         <AppBar position="fixed" color="primary" className={this.styles.appBar}>
           <Grid
             container
