@@ -26,6 +26,7 @@ class StudentModel(db.Model):
     lastName = db.Column(db.String(128), nullable=True)
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
+    lecture_attending = db.Column(db.String(128), nullable=True)
 
     # relationships
     courses = db.relationship('CourseModel', secondary=courses_students, lazy=True, backref='students', passive_deletes=True)

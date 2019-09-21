@@ -101,7 +101,7 @@ def create_course(current_user):
     """
     # get data from request body and create new course
     req_data = request.get_json()
-    print('req_data = ' + str(req_data))
+    
     req_data['creator_id'] = current_user.id
     data, error = course_schema.load(req_data)
 
@@ -111,7 +111,7 @@ def create_course(current_user):
     course = CourseModel(data)
 
     # generate enrollment code and save to database
-    enroll_code = _generate_enroll_code()
+    enroll_code = _generate_course_enroll_code()
     course.enroll_code = enroll_code
     course.save()
 
@@ -217,7 +217,7 @@ def reset_enrollment_code(current_user, course_id):
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
-    enroll_code = _generate_enroll_code()
+    enroll_code = _generate_course_enroll_code()
     updated_data = {'enroll_code' : enroll_code}
     course.update(updated_data)
 
@@ -225,7 +225,7 @@ def reset_enrollment_code(current_user, course_id):
 
 ENROLL_CODE_VALID_CHARACTERS = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789"
 
-def _generate_enroll_code():
+def _generate_course_enroll_code():
     """
     generate an enrollment code and check that it isn't a duplicate
     """
@@ -425,6 +425,11 @@ def create_lecture(current_user, course_id):
     lecture = LectureModel(data)
     lecture.save()
 
+    # generate enrollment code and save to database
+    enroll_code = _generate_lecture_enroll_code()
+    lecture.enroll_code = enroll_code
+    lecture.save()
+
     # add the lecture to this course's list of lectures
     course.lectures.append(lecture)
     db.session.commit()
@@ -433,6 +438,18 @@ def create_lecture(current_user, course_id):
     all_lectures = course.lectures
     all_lectures_data = lecture_schema.dump(all_lectures, many=True).data
     return custom_response({'message': 'lecture created', 'id': lecture.id, 'lectures': all_lectures_data}, 201)
+
+def _generate_lecture_enroll_code():
+    """
+    generate an enrollment code and check that it isn't a duplicate
+    """
+    enroll_code = ''.join(random.choices(ENROLL_CODE_VALID_CHARACTERS, k=8))
+    lecture = LectureModel.get_lecture_by_code(enroll_code)
+
+    while lecture:
+        enroll_code = ''.join(random.choices(ENROLL_CODE_VALID_CHARACTERS, k=8))
+        lecture = LectureModel.get_lecture_by_code(enroll_code)
+    return enroll_code
 
 @professor_api.route('/lectures/<lecture_id>', methods=['GET'])
 @Auth.professor_auth_required
