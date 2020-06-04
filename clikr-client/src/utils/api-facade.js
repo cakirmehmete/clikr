@@ -7,6 +7,38 @@ export function getProfDataAPI() {
     return axios.get(baseURL + 'professor/data');
 }
 
+export function loginProfessorAPI(username, password) {
+    return axios.post(baseURL + 'admin/professorlogin', {
+        netId: username,
+        password: password
+    });
+}
+
+export function createProfessorAPI(username, password, firstName, lastName) {
+    return axios.post(baseURL + 'admin/professor', {
+        netId: username,
+        password: password,
+        firstName: firstName,
+        lastName: lastName
+    });
+}
+
+export function loginStudentAPI(username, password) {
+    return axios.post(baseURL + 'admin/studentlogin', {
+        netId: username,
+        password: password
+    });
+}
+
+export function createStudentAPI(username, password, firstName, lastName) {
+    return axios.post(baseURL + 'admin/student', {
+        netId: username,
+        password: password,
+        firstName: firstName,
+        lastName: lastName
+    });
+}
+
 export function getProfAnswers(question_id) {
     return axios.get(baseURL + 'professor/questions/' + question_id + '/statistics');
 }

@@ -26,6 +26,10 @@ const styles = theme => ({
     listtext: {
         color: theme.palette.primary.main
     },
+    titletext: {
+        color: theme.palette.primary.main,
+        paddingTop: theme.spacing.unit*2
+    },
     nestedListtext: {
         color: theme.palette.primary.main,
         paddingLeft: theme.spacing.unit*2,
@@ -123,6 +127,7 @@ class SideMenuBar extends React.Component {
                 
                 <Grid item><Grid container direction="row" justify="center" ><img src={logo} alt="logo" height={80}/></Grid></Grid>
                 <Grid item><Divider /></Grid>
+                <Grid item align="center"><Typography variant="h5" className={this.styles.titletext}>Courses</Typography></Grid>
                 <Grid item>
                     <List>
                         {this.profStore.courses.map((courseObj, index) => {
