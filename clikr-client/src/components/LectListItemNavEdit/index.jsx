@@ -59,6 +59,7 @@ class LectListItemNavEdit extends React.Component {
         this.lectureId = props.lectureId
         this.lectureTitle = props.lectureTitle
     }
+    
     state = {
         editMode: false,
         lectureTitle: this.lectureTitle,

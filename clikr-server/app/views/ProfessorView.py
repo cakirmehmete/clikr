@@ -83,6 +83,15 @@ def get_all_data(current_user):
 
     return custom_response(result, 200)
 
+@professor_api.route('/name', methods=['GET'])
+@Auth.professor_auth_required
+def get_name(current_user):
+    """
+    Returns name of the current prof
+    """
+    full_name = f'{current_user.firstName} {current_user.lastName}'
+    return custom_response({'name': full_name}, 200)
+
 @professor_api.route('/courses', methods=['GET'])
 @Auth.professor_auth_required
 def get_courses(current_user):
@@ -101,9 +110,12 @@ def create_course(current_user):
     """
     # get data from request body and create new course
     req_data = request.get_json()
+    print("REQ_DATA:", req_data)
     
     req_data['creator_id'] = current_user.id
     data, error = course_schema.load(req_data)
+    print("DATA:", data)
+    print("ERROR:", error)
 
     if error:
         return custom_response(error, 400)

@@ -1,9 +1,21 @@
-import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
+import { getProfDataAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
 
 
 export default class APIProfService {
     constructor(professorStore) {
         this.professorStore = professorStore;
+    }
+    
+    async getName() {
+        return getProfNameAPI()
+            .then(res => {
+                return res.data.name
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
     }
 
     loadData() {
@@ -138,6 +150,17 @@ export default class APIProfService {
         patchUpdateCourseAPI(courseId, courseTitle)
             .then(res => {
                 this.professorStore.updateCourse(courseId, courseTitle)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
+    changeCourseData(courseId, course) {
+        patchUpdateCourseDataAPI(courseId, course)
+            .then(res => {
+                this.professorStore.updateCourseData(courseId, course)
             })
             .catch(error => {
                 console.log(error);

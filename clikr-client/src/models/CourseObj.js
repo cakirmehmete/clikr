@@ -1,5 +1,5 @@
 export default class CourseObj {
-    constructor(title, id, num, dept, description, term, joinCode, year ) {
+    constructor(title, num, dept, year, term, description, joinCode, id) {
         this.title = title;
         this.id = id;
         this.num = num;

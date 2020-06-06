@@ -40,7 +40,16 @@ class ListOfAllCourses extends React.Component {
             <List component="nav">
                 {this.profStore.courses.map((courseObj, index) => {
                     return (
-                        <CourseListItemNavEdit key={index} profStore={this.profStore} apiProfService={this.apiProfService} courseId={courseObj.id} courseTitle={courseObj.title} joinCode={courseObj.enroll_code} />
+                        <CourseListItemNavEdit 
+                            key={index} 
+                            profStore={this.profStore} 
+                            apiProfService={this.apiProfService} 
+                            courseId={courseObj.id} 
+                            courseTitle={courseObj.title} 
+                            courseYear={courseObj.year}
+                            courseTerm={courseObj.term}
+                            joinCode={courseObj.enroll_code} 
+                        />
                     )
                 })}
             </List>

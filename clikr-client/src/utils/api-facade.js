@@ -43,6 +43,14 @@ export function getProfAnswers(question_id) {
     return axios.get(baseURL + 'professor/questions/' + question_id + '/statistics');
 }
 
+export function getProfNameAPI() {
+    return axios.get(baseURL + 'professor/name');
+}
+
+export function getStudentNameAPI() {
+    return axios.get(baseURL + 'student/name');
+}
+
 export function getStudentCoursesAPI() {
     return axios.get(baseURL + 'student/courses');
 }
@@ -84,7 +92,12 @@ export function postCloseAllQuestionsAPI(lecture_id) {
 // course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {
-        title: course.title
+        title: course.title,
+        dept: course.dept,
+        coursenum: course.num,
+        description: course.description,
+        year: course.year,
+        term: course.term
     });
 }
 
@@ -120,6 +133,19 @@ export function patchUpdateCourseAPI(course_id, course_title) {
         title: course_title
     });
 }
+
+export function patchUpdateCourseDataAPI(course_id, course) {
+    debugger
+    return axios.patch(baseURL + 'professor/courses/' + course_id, {
+        title: course.title,
+        dept: course.dept,
+        coursenum: course.coursenum,
+        year: course.year,
+        term: course.term,
+        description: course.description
+    });
+}
+
 // course: CourseObj
 export function patchUpdateLectureAPI(lecture_id, lecture_title) {
     return axios.patch(baseURL + 'professor/lectures/' + lecture_id, {

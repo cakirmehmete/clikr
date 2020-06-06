@@ -26,7 +26,8 @@ const styles = theme => ({
 @observer
 class StudentHome extends Component {
     state = {
-        course_ids: []
+        course_ids: [],
+        userName: ""
     }
 
     constructor(props) {
@@ -35,7 +36,13 @@ class StudentHome extends Component {
         this.apiStudentService = new APIStudentService(this.store)
         this.styles = props.classes
         this.socketIOStudentService = new SocketIOStudentService(this.store);
-        
+    }
+
+    componentDidMount() {
+        this.apiStudentService.getName()
+            .then(name => {
+                this.setState({ userName: name });
+            })
     }
     
     componentWillReceiveProps() {
@@ -46,7 +53,7 @@ class StudentHome extends Component {
         return (
            
             <Grid container direction='column' spacing={Number("16")}>
-                <Header />
+                <Header userName={this.state.userName} />
                 <Grid item className={this.styles.gridItem}>
                     <Paper className={this.styles.paper}>
                         <Grid container direction="row" alignItems="flex-start" justify="space-between" className={this.styles.gridContainer}>

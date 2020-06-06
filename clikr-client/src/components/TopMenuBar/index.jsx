@@ -10,6 +10,7 @@ import { Redirect } from 'react-router-dom';
 import { withRouter } from "react-router";
 
 import Menu from '@material-ui/core/Menu';
+import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import APIProfService from '../../services/APIProfService'
 
@@ -35,14 +36,21 @@ class TopMenuBar extends React.Component {
         this.styles = props.classes
         this.store  = props.store
         this.apiProfService = new APIProfService(this.store)
-
     }
 
     state = {
       anchorEl: null,
       goHome: false,
-      logout: false
+      logout: false,
+      userName: ""
     };
+
+    componentDidMount() {
+        this.apiProfService.getName()
+            .then(name => {
+                this.setState({ userName: name });
+            })
+    }
 
     handleMenu = event => {
         this.setState({ anchorEl: event.currentTarget });
@@ -87,11 +95,15 @@ class TopMenuBar extends React.Component {
                                 d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
                         </SvgIcon>
                     </IconButton>
+                    
                     <ToolbarGroup style={{
                         float: 'none',
                         marginRight: 'auto'
                     }}>
                     </ToolbarGroup>
+
+                    <Typography variant="h8" color="secondary" align="center"> {this.state.userName} </Typography>
+
                     <IconButton
                         aria-haspopup="true"
                         onClick={this.handleMenu}

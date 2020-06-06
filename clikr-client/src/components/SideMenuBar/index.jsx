@@ -26,6 +26,9 @@ const styles = theme => ({
     listtext: {
         color: theme.palette.primary.main
     },
+    listsubtext: {
+        color: theme.palette.primary.dark
+    },
     titletext: {
         color: theme.palette.primary.main,
         paddingTop: theme.spacing.unit*2
@@ -135,7 +138,11 @@ class SideMenuBar extends React.Component {
                             return (
                                 <div key={"div" + index}>
                                     <ListItem className={this.styles.hover} button key={index} onClick={() => this.handleCourseClick(courseObj.id)} selected={this.state.selectedCourse === courseObj.id}>
-                                        <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} />
+                                        <ListItemText disableTypography 
+                                            primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} 
+                                            secondary={<Typography type="body2" className={this.styles.listsubtext}>{courseObj.term} {courseObj.year}</Typography>}
+                                        />
+
                                         <ListItemSecondaryAction>
                                             <IconButton color="primary" disabled={lectures.length === 0} onClick={() => this.handleExpand(courseObj.id)}>
                                                 {lectures.length > 0 && this.state.open === courseObj.id ? <ExpandLess /> : <ExpandMore />}

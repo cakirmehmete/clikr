@@ -1,4 +1,4 @@
-import { getStudentCoursesAPI, postEnrollStudentAPI, getStudentQuestionsByCourseAPI, getStudentPrevQuestionsByCourseAPI, postAnswerQuestionAPI, getLogoutStudentAPI, deleteDropCourseAPI } from '../utils/api-facade';
+import { getStudentCoursesAPI, getStudentNameAPI, postEnrollStudentAPI, getStudentQuestionsByCourseAPI, getStudentPrevQuestionsByCourseAPI, postAnswerQuestionAPI, getLogoutStudentAPI, deleteDropCourseAPI } from '../utils/api-facade';
 
 export default class APIStudentService {
     constructor(studentStore) {
@@ -17,6 +17,18 @@ export default class APIStudentService {
                 this._checkAuth(error);
             })
         
+    }
+
+    async getName() {
+        return getStudentNameAPI()
+            .then(res => {
+                return res.data.name
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
     }
 
     loadAllQuestions(course_id) {

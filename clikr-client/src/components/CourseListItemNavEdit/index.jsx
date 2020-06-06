@@ -59,8 +59,11 @@ class CourseListItemNavEdit extends React.Component {
         this.apiProfService = props.apiProfService
         this.courseId = props.courseId
         this.courseTitle = props.courseTitle
+        this.courseYear = props.courseYear
+        this.courseTerm = props.courseTerm
         this.joinCode = props.joinCode
     }
+
     state = {
         editMode: false,
         courseTitle: this.courseTitle,
@@ -171,7 +174,11 @@ class CourseListItemNavEdit extends React.Component {
         else {
             return (
                  <ListItem button divider onClick={this.handleToCourse}>
-                   <ListItemText primary={this.state.courseTitle} />
+                    <Grid container direction="row" justify="flex-start">
+                        <Grid item>
+                            <ListItemText primary={this.state.courseTitle} secondary={this.courseTerm + ' ' + this.courseYear} />
+                        </Grid>
+                    </Grid>
                     <ListItemSecondaryAction>
                         <Grid container direction="row" justify="flex-end">
                             <Grid item>

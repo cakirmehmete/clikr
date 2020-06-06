@@ -61,6 +61,15 @@ def on_join(course_id):
     
     emit('all open questions', {'questions': questions_data, 'message': 'you joined the room (course) ' + course_id})
 
+@student_api.route('/name', methods=['GET'])
+@Auth.student_auth_required
+def get_name(current_user):
+    """
+    Returns name of the current prof
+    """
+    full_name = f'{current_user.firstName} {current_user.lastName}'
+    return custom_response({'name': full_name}, 200)
+
 @student_api.route('/courses', methods=['GET'])
 @Auth.student_auth_required
 def get_courses(current_user):
