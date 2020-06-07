@@ -42,7 +42,7 @@ class LectureModel(db.Model):
         timestamp = datetime.datetime.utcnow()
         self.created_at = timestamp
         self.modified_at = timestamp
-        self.enroll_code = None
+        self.enroll_code = data.get('enroll_code')
 
     def save(self):
         db.session.add(self)
