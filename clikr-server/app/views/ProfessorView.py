@@ -67,6 +67,7 @@ def get_all_data(current_user):
 
         lectures_data = []
         lectures = course.lectures
+        lectures.sort(key=lambda lecture: lecture.created_at)
 
         # process each lecture within the course
         for lecture in lectures:
@@ -99,6 +100,7 @@ def get_courses(current_user):
     Returns all courses of the current prof
     """
     courses = current_user.courses
+    courses.sort(key=lambda x: x.created_at)
     course_data = course_schema.dump(courses, many=True).data
     return custom_response(course_data, 200)
 
@@ -110,12 +112,9 @@ def create_course(current_user):
     """
     # get data from request body and create new course
     req_data = request.get_json()
-    print("REQ_DATA:", req_data)
     
     req_data['creator_id'] = current_user.id
     data, error = course_schema.load(req_data)
-    print("DATA:", data)
-    print("ERROR:", error)
 
     if error:
         return custom_response(error, 400)
@@ -304,9 +303,7 @@ def export_students(current_user, course_id):
 
     dirname = os.path.dirname(__file__)
     path = os.path.join(dirname, "dynamic_content/students/", filename)
-    print("======THE PATH IS: ", path)
     if os.path.exists(path):
-        print("GOING TO SEND A FILE!")
         try:
             return send_from_directory('views/dynamic_content/students', filename, as_attachment=True)
         finally:
@@ -430,16 +427,13 @@ def create_lecture(current_user, course_id):
     req_data['creator_id'] = current_user.id
     req_data['course_id'] = course_id
     data, error = lecture_schema.load(req_data)
+    enroll_code = _generate_lecture_enroll_code()
+    data['enroll_code'] = enroll_code # generate enroll code
 
     if error:
         return custom_response(error, 400)
 
     lecture = LectureModel(data)
-    lecture.save()
-
-    # generate enrollment code and save to database
-    enroll_code = _generate_lecture_enroll_code()
-    lecture.enroll_code = enroll_code
     lecture.save()
 
     # add the lecture to this course's list of lectures
@@ -529,6 +523,7 @@ def update_lecture(current_user, lecture_id):
 
     # get data from request body
     updated_data = request.get_json()
+    print("UPDATE:", updated_data)
     lecture.update(updated_data)
 
     return custom_response({'message': 'lecture updated'}, 200)
@@ -699,7 +694,7 @@ def export_lecture_grades(current_user, lecture_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     # call helper function to create the export file
-    return _export_grades(lecture=lecture)
+    return _export_grades(lecture=lecture, course=None)
 
 def _export_grades(course=None, lecture=None):
     """
@@ -709,27 +704,39 @@ def _export_grades(course=None, lecture=None):
     # build csv file
     headers = ['username', 'total']
     score_dict = {}    # dictionary with student id's as keys, dictionaries as values (which in turn have question ids as keys and scores as values)
-
+    export_course = False
 
     if course:
         lectures = course.lectures
-        file_id = 'course_' + course.id
+        lectures.sort(key=lambda x: x.created_at)
+        course_title = course.title.replace(' ', '_')
+        file_id = course_title
+        export_course = True
     elif lecture:
         course = lecture.course
+        course_title = course.title.replace(' ', '_')
         lectures = [lecture]
-        file_id = 'lecture_' + lecture.id
+        lecture_title = lecture.title.replace(' ', '_')
+        file_id = f'{lecture_title}_of_{course_title}'
     else:
         raise Exception('must pass either course or lecture')
 
     # fill score_dict with empty dicts for enrolled students
     for student in course.students:
         score_dict[student.id] = {'total': 0}
+    
+    if export_course:
+        for lecture in lectures:
+            lecture_header = f'total for {lecture.title}'
+            headers.append(lecture_header)
+            for student in course.students:
+                score_dict[student.id] = {lecture_header: 0}
 
     # process all questions
     for lecture in lectures:
         questions = lecture.questions
         for question in questions:
-            col_header = f'{lecture.title}: {question.question_title} [{question_id}]'
+            col_header = f'{lecture.title}: {question.question_title}'
             headers.append(col_header)
             answers = question.answers
 
@@ -742,10 +749,12 @@ def _export_grades(course=None, lecture=None):
                 if student_id in score_dict:
                     score_dict[student_id]['total'] += score
                     score_dict[student_id][col_header] = score
+                    if export_course:
+                        score_dict[student_id][lecture_header] += score
 
     # note that heroku discards dynamically generated files on dyno restart!
-    now = get_timestamp_string
-    filename = f'grades_{file_id}_on_{now}.csv'
+    today = datetime.date.today().strftime("%b-%d-%Y")
+    filename = f'grades_for_{file_id}_on_{today}.csv'
     dirname = os.path.dirname(__file__)
     with open(os.path.join(dirname, 'dynamic_content/grades/', filename), 'w') as f:
         csv.register_dialect('quote all', quoting=csv.QUOTE_ALL)
@@ -756,12 +765,16 @@ def _export_grades(course=None, lecture=None):
             inner_dict['username'] = netId
             writer.writerow(inner_dict)
 
+    with open(os.path.join(dirname, 'dynamic_content/grades/', filename), 'r') as f:
+        file_data = f.read()
+
     path = os.path.join(dirname, "dynamic_content/grades/", filename)
-    print("======THE PATH IS: ", path)
     if os.path.exists(path):
-        print("GOING TO SEND A FILE!")
         try:
-            return send_from_directory('views/dynamic_content/grades', filename, as_attachment=True)
+            return custom_response({
+                'fileData': file_data,
+                'fileName': filename
+            }, 200)
         finally:
             os.remove(path)
     else:

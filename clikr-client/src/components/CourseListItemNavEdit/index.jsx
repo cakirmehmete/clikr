@@ -129,6 +129,18 @@ class CourseListItemNavEdit extends React.Component {
         })
     }
 
+    handleExportGrades = () => {
+        this.apiProfService.exportGradesCourse(this.courseId)
+            .then(data => {
+                const element = document.createElement("a");
+                const file = new Blob([data.fileData], {type: 'text/csv;charset=utf-8;'});
+                element.href = URL.createObjectURL(file);
+                element.download = data.fileName;
+                document.body.appendChild(element); // Required for this to work in FireFox
+                element.click();
+            })
+    }
+
     render () {
         if (this.state.nav) {
             return  <Redirect to={'/professor/' + this.state.courseId + '/lectures'} push />
@@ -190,7 +202,7 @@ class CourseListItemNavEdit extends React.Component {
                             </Grid>
                             <Grid item>
                                 <Tooltip title="Export Grades" placement="top">
-                                    <IconButton color="secondary" href={baseURL + "professor/courses/" + this.courseId + "/exportgrades"} target="_blank">
+                                    <IconButton color="secondary" onClick={this.handleExportGrades}>
                                         <ImportExportIcon />
                                     </IconButton>
                                 </Tooltip>

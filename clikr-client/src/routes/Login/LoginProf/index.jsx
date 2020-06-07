@@ -108,7 +108,7 @@ class LoginProf extends Component {
                      </Grid>
 
                      <Grid item className={this.styles.gridItem}>
-                        <Typography variant="h8" color="primary" align="center"> Username </Typography>
+                        <Typography variant="h6" color="primary" align="center"> Username </Typography>
                         <TextField
                                  name = 'username'
                                  value={this.state.username}
@@ -117,7 +117,7 @@ class LoginProf extends Component {
                      </Grid>
 
                      <Grid item className={this.styles.gridItem}>
-                        <Typography variant="h8" color="primary" align="center"> Password </Typography>
+                        <Typography variant="h6" color="primary" align="center"> Password </Typography>
                         <TextField
                                  name = 'password'
                                  type = 'password'

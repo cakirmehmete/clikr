@@ -68,7 +68,7 @@ class StudentHome extends Component {
                             {this.store.courses.map(function (courseObj, index) {
                                 const colorIndex = index%4;
                                 return (
-                                    <ClassCard key={index} name={courseObj.title} id={courseObj.id} colorIndex={colorIndex}/>
+                                    <ClassCard key={index} course={courseObj} id={courseObj.id} colorIndex={colorIndex}/>
                                 );
                             })}
                         </Grid>

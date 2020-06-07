@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import CourseObj from '../../models/LectureObj';
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
+import Paper from '@material-ui/core/Paper';
 import Tooltip from '@material-ui/core/Tooltip';
 import DoneIcon from '@material-ui/icons/Done';
 import Grid from '@material-ui/core/Grid';
@@ -12,6 +13,18 @@ import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 
 const styles = theme => ({
+    root: {
+        ...theme.mixins.gutters(),
+        paddingTop: theme.spacing.unit * 2,
+        paddingBottom: theme.spacing.unit * 7,
+        backgroundColor: theme.palette.secondary.main
+    },
+    editRoot: {
+        ...theme.mixins.gutters(),
+        paddingTop: theme.spacing.unit * 2,
+        paddingBottom: theme.spacing.unit * 7,
+        backgroundColor: theme.palette.primary.main
+    },
     card: {
         minWidth: 275,
     },
@@ -20,11 +33,25 @@ const styles = theme => ({
     },
     title: {
         margin: theme.spacing.unit,
+        color: '#FFFFFF'
     },
-    textField: {
+    termYear: {
+        margin: theme.spacing.unit,
+        color: '#FFFFFF',
+        fontStyle: 'italic'
+    },
+    textFieldShort: {
         marginLeft: theme.spacing.unit,
         marginRight: theme.spacing.unit,
-        width: 350,
+        width: 350
+    },
+    textFieldLong: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        width: 1000
+    },
+    divider: {
+        backgroundColor: '#FFFFFF'
     }
 });
 
@@ -94,107 +121,111 @@ class CourseInfo extends React.Component {
     render() {
         if (this.state.editMode) {
             return (
-                <Grid container direction='column' justify='space-between' alignItems='stretch'>
-                    <Grid item xs={12}>
-                        <Grid container direction='row' justify='space-between' alignItems='stretch'>
-                            <Grid item xs={11}>
-                                <TextField
-                                    label="Course Name"
-                                    name="title"
-                                    className={this.styles.textField}
-                                    value={this.state.parentCourse.title}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                />
+                <Paper className={this.styles.editRoot} elevation={1}>
+                    <Grid container direction='column' justify='space-between' alignItems='stretch' >
+                        <Grid item xs={12}>
+                            <Grid container direction='row' justify='space-between' alignItems='stretch'>
+                                <Grid item xs={11}>
+                                    <TextField
+                                        label="Course Name"
+                                        name="title"
+                                        className={this.styles.textFieldShort}
+                                        value={this.state.parentCourse.title}
+                                        onChange={this.handleChange}
+                                        margin="normal"
+                                    />
 
-                                <TextField
-                                    label="Department"
-                                    name="dept"
-                                    className={this.styles.textField}
-                                    value={this.state.parentCourse.dept}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                />
+                                    <TextField
+                                        label="Department"
+                                        name="dept"
+                                        className={this.styles.textFieldShort}
+                                        value={this.state.parentCourse.dept}
+                                        onChange={this.handleChange}
+                                        margin="normal"
+                                    />
 
-                                <TextField
-                                    label="Course Number"
-                                    name="coursenum"
-                                    className={this.styles.textField}
-                                    value={this.state.parentCourse.coursenum}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                />
+                                    <TextField
+                                        label="Course Number"
+                                        name="coursenum"
+                                        className={this.styles.textFieldShort}
+                                        value={this.state.parentCourse.coursenum}
+                                        onChange={this.handleChange}
+                                        margin="normal"
+                                    />
+                                </Grid>
+
+                                <Grid item>
+                                    <Tooltip title="Done Editing" placement="top">
+                                        <IconButton color="secondary" disabled={!this.state.parentCourse.title} onClick={this.handleEditClose}>
+                                            <DoneIcon className={this.styles.iconDone}/>
+                                        </IconButton>
+                                    </Tooltip>
+                                </Grid>
                             </Grid>
 
-                            <Grid item>
-                                <Tooltip title="Done Editing" placement="top">
-                                    <IconButton color="secondary" disabled={!this.state.parentCourse.title} onClick={this.handleEditClose}>
-                                        <DoneIcon className={this.styles.iconDone}/>
-                                    </IconButton>
-                                </Tooltip>
+                            <Grid container direction='row' justify='space-between' alignItems='stretch'>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        label="Term"
+                                        name="term"
+                                        className={this.styles.textFieldShort}
+                                        value={this.state.parentCourse.term}
+                                        onChange={this.handleChange}
+                                        margin="normal"
+                                    />
+
+                                    <TextField
+                                        label="Year"
+                                        name="year"
+                                        className={this.styles.textFieldShort}
+                                        value={this.state.parentCourse.year}
+                                        onChange={this.handleChange}
+                                        margin="normal"
+                                    />
+                                </Grid>
                             </Grid>
+
+                            <TextField
+                                label="Description"
+                                name="description"
+                                className={this.styles.textFieldLong}
+                                value={this.state.parentCourse.description}
+                                onChange={this.handleChange}
+                                multiline={true}
+                                margin="normal"
+                            />
                         </Grid>
-
-                        <Grid container direction='row' justify='space-between' alignItems='stretch'>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Term"
-                                    name="term"
-                                    className={this.styles.textField}
-                                    value={this.state.parentCourse.term}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                />
-
-                                <TextField
-                                    label="Year"
-                                    name="year"
-                                    className={this.styles.textField}
-                                    value={this.state.parentCourse.year}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                />
-                            </Grid>
-                        </Grid>
-
-                        <TextField
-                            label="Description"
-                            name="description"
-                            className={this.styles.textField}
-                            value={this.state.parentCourse.description}
-                            onChange={this.handleChange}
-                            multiline={true}
-                            margin="normal"
-                        />
                     </Grid>
-                </Grid>
+                </Paper>
             )
         } else {
             return (
-                <Grid container direction='row' justify='space-between' alignItems='stretch'>
-                    <Grid item xs={12}>
-                        <Grid container direction='row' justify='space-between' alignItems='stretch'>
-                            <Grid item>
-                                <Typography className={this.styles.title} 
-                                            variant="h4" 
-                                            color="inherit">
-                                                {this.state.parentCourse.dept} {this.state.parentCourse.coursenum} - {this.state.parentCourse.title} 
-                                </Typography>
+                <Paper className={this.styles.root} elevation={1}>
+                    <Grid container direction='row' justify='space-between' alignItems='stretch'>
+                        <Grid item xs={12}>
+                            <Grid container direction='row' justify='space-between' alignItems='stretch'>
+                                <Grid item>
+                                    <Typography className={this.styles.title} 
+                                                variant="h4" 
+                                                color="inherit">
+                                                    {this.state.parentCourse.dept} {this.state.parentCourse.coursenum} - {this.state.parentCourse.title} 
+                                    </Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Tooltip title="Edit Course Info" placement="top">
+                                        <IconButton color="primary" onClick={this.handleEditOpen}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Tooltip title="Edit Course Info" placement="top">
-                                    <IconButton color="secondary" onClick={this.handleEditOpen}>
-                                        <EditIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </Grid>
+                                
+                            <Typography className={this.styles.termYear} variant="h8" >{this.state.parentCourse.term} {this.state.parentCourse.year}</Typography>
+                            <Divider className={this.styles.divider} />
+                            <Typography className={this.styles.title} variant="body2" color="inherit">{this.state.parentCourse.description}</Typography>
                         </Grid>
-                            
-                        <Typography className={this.styles.title} variant="h8" color="inherit">{this.state.parentCourse.term} {this.state.parentCourse.year}</Typography>
-                        <Divider />
-                        <Typography className={this.styles.title} variant="body2" color="inherit">{this.state.parentCourse.description}</Typography>
                     </Grid>
-                </Grid>
+                </Paper>
             )
         }
         

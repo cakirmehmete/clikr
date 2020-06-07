@@ -115,7 +115,7 @@ const answerBoundOptions = [
   ];
 
 @observer
-class EditFRQDialog extends React.Component {
+class EditSLQDialog extends React.Component {
     
     state = {
         open: false,
@@ -141,21 +141,21 @@ class EditFRQDialog extends React.Component {
     }
 
     componentDidMount() {
-        let correct_answer = this.props.questionObj.correct_answer;
-        let lower_label = this.props.questionObj.lower_label;
-        let upper_label = this.props.questionObj.upper_label;
+        const {lower_label, upper_label, correct_answer} = this.props.questionObj
 
         this.setState({ title: this.props.questionObj.question_title })
 
         if (lower_label !== null) {
             if (lower_label !== "0%" || upper_label !== "100%") {
                 this.setState({
-                    labels: {lower: this.props.questionObj.lower_label, upper: this.props.questionObj.upper_label},
+                    labels: {lower: lower_label, 
+                             upper: upper_label
+                            }
                 })
             }
         }
         
-        if (correct_answer !== undefined &&  correct_answer !== null && correct_answer !== "") {
+        if (correct_answer) {
             const correct_arr = correct_answer.split(" ");
             if (correct_arr.length === 2) {
                 this.setState({
@@ -183,16 +183,14 @@ class EditFRQDialog extends React.Component {
                     rangeVal: "range",
                 })
             }
-
         }
-        
     }
 
     handleClose = () => {
         this.setState({ open: false });
     };
 
-      validateAnswers() {
+    validateAnswers() {
         let disabled = false;
 
         if (this.state.custom_labels && this.state.has_correct_answer) {
@@ -742,4 +740,4 @@ class EditFRQDialog extends React.Component {
         );
     }
 }
-export default withStyles(styles)(EditFRQDialog);
+export default withStyles(styles)(EditSLQDialog);

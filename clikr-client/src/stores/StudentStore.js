@@ -53,9 +53,9 @@ export default class StudentStore {
     this.courses = []
 
     courses.forEach(element => {
-      // id: any, title: any, num: any, dept: any, description: any, term: any, joinCode: any, year: any
-      this.courses.push(new CourseObj(element.title, element.id, element.coursenum,
-        element.dept, element.description, element.term, element.enroll_code, element.year))
+      // title, num, dept, year, term, description, joinCode, id
+      this.courses.push(new CourseObj(element.title, element.coursenum, element.dept,
+        element.year, element.term, element.description, element.enroll_code, element.id))
     })
   }
 

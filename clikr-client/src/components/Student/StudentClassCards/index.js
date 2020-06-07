@@ -88,7 +88,9 @@ class ClassCard extends React.Component {
 
     
     render() {
+        debugger;
         return (
+            
                 <Card className={this.state.colorStyle}>
                     <CardContent>
                         <Grid container direction="row" justify="space-between" alignItems="stretch" spacing={24}>
@@ -100,7 +102,7 @@ class ClassCard extends React.Component {
                                 }
                                 }}>
                                     <Typography className={this.styles.typography} variant="h4">
-                                        {this.props.name}
+                                        {this.props.course.dept} {this.props.course.num} - {this.props.course.title}: {this.props.course.term} {this.props.course.year}
                                     </Typography>
                                 </Link>
                             </Grid>

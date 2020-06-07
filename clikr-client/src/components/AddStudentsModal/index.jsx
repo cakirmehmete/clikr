@@ -59,10 +59,13 @@ class AddStudentsModal extends React.Component {
         this.profStore = props.profStore
     }
     componentDidMount() {
-        
-        this.setState({
-            code: this.joinCode
-        })
+        this.setState({ code: this.joinCode })
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.joinCode !== undefined) {
+            this.setState({ code: nextProps.joinCode })
+        }
     }
 
     handleOpen = () => {
@@ -84,7 +87,7 @@ class AddStudentsModal extends React.Component {
         return (
             <Grid item>
                 <Tooltip title="add students" placement="top">
-                    <IconButton color="secondary" onClick={this.handleOpen}>
+                    <IconButton color="primary" onClick={this.handleOpen}>
                         <PersonAddIcon />
                     </IconButton>
                 </Tooltip>

@@ -1,4 +1,4 @@
-import { getProfDataAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
+import { getProfDataAPI, exportGradesCourseAPI, exportGradesLectureAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
 
 
 export default class APIProfService {
@@ -10,6 +10,31 @@ export default class APIProfService {
         return getProfNameAPI()
             .then(res => {
                 return res.data.name
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
+    }
+
+    exportGradesLecture(lecture_id) {
+        return exportGradesLectureAPI(lecture_id)
+            .then(res => {
+                return res.data
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
+    }
+
+    exportGradesCourse(course_id) {
+        return exportGradesCourseAPI(course_id)
+            .then(res => {
+                debugger;
+                return res.data
             })
             .catch(error => {
                 console.log(error)

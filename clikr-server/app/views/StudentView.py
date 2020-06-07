@@ -106,9 +106,9 @@ def enroll_in_course(current_user):
 
 # TODO: implement
 
-@student_api.route('/lectures/<lecture_id>', methods=['POST'])
+@student_api.route('/lectures', methods=['POST'])
 @Auth.student_auth_required
-def attend_lecture(current_user, lecture_id):
+def attend_lecture(current_user):
     """
     allows the current student to answer questions in a lecture
     """
@@ -120,7 +120,7 @@ def attend_lecture(current_user, lecture_id):
 
     # retrieve course and check if valid
     lecture = LectureModel.get_lecture_by_code(enroll_code)
-    if not lecture or lecture.id != lecture_id:
+    if not lecture or lecture.id != lecture.id:
         return custom_response({'error': 'invalid attendance code'}, 400)
 
     # update the lecture that the student is currently attending

@@ -135,7 +135,6 @@ export function patchUpdateCourseAPI(course_id, course_title) {
 }
 
 export function patchUpdateCourseDataAPI(course_id, course) {
-    debugger
     return axios.patch(baseURL + 'professor/courses/' + course_id, {
         title: course.title,
         dept: course.dept,
@@ -144,6 +143,14 @@ export function patchUpdateCourseDataAPI(course_id, course) {
         term: course.term,
         description: course.description
     });
+}
+
+export function exportGradesLectureAPI(lecture_id) {
+    return axios.get(baseURL + 'professor/lectures/' + lecture_id + '/exportgrades')
+}
+
+export function exportGradesCourseAPI(course_id) {
+    return axios.get(baseURL + 'professor/courses/' + course_id + '/exportgrades')
 }
 
 // course: CourseObj
