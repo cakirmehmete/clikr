@@ -54,7 +54,7 @@ def on_join(question_id):
 
 @professor_api.route('/data', methods=['GET'])
 @Auth.professor_auth_required
-def get_all_data(current_user):
+def get_data(current_user):
     """
     returns all courses, lectures, and questions of the current prof
     """
@@ -146,6 +146,29 @@ def get_course_info(current_user, course_id):
         return custom_response({'error': 'permission denied'}, 400)
 
     course_data = course_schema.dump(course).data
+    return custom_response(course_data, 200)
+
+@professor_api.route('/courses/<course_id>/duplicate', methods=['POST'])
+@Auth.professor_auth_required
+def duplicate_course(current_user, course_id):
+    # retrieve course and check if valid, permissions
+    req_data = request.get_json()
+
+    new_term = req_data['term']
+    new_year = req_data['year']
+
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    course_data = course_schema.dump(course).data
+    course_data['term'] = new_term
+    course_data['year'] = new_year
+
+    lectures = course.lectures
+
     return custom_response(course_data, 200)
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
@@ -702,7 +725,7 @@ def _export_grades(course=None, lecture=None):
     """
 
     # build csv file
-    headers = ['username', 'total']
+    headers = ['Student', 'Course Total']
     score_dict = {}    # dictionary with student id's as keys, dictionaries as values (which in turn have question ids as keys and scores as values)
     export_course = False
 
@@ -723,11 +746,11 @@ def _export_grades(course=None, lecture=None):
 
     # fill score_dict with empty dicts for enrolled students
     for student in course.students:
-        score_dict[student.id] = {'total': 0}
+        score_dict[student.id] = {'Course Total': 0}
     
     if export_course:
         for lecture in lectures:
-            lecture_header = f'total for {lecture.title}'
+            lecture_header = f'Total for {lecture.title}'
             headers.append(lecture_header)
             for student in course.students:
                 score_dict[student.id] = {lecture_header: 0}
@@ -747,7 +770,7 @@ def _export_grades(course=None, lecture=None):
 
                 # add score to the student's list (if enrolled)
                 if student_id in score_dict:
-                    score_dict[student_id]['total'] += score
+                    score_dict[student_id]['Course Total'] += score
                     score_dict[student_id][col_header] = score
                     if export_course:
                         score_dict[student_id][lecture_header] += score
@@ -762,7 +785,7 @@ def _export_grades(course=None, lecture=None):
         writer.writeheader()
         for student_id, inner_dict in score_dict.items():
             netId = StudentModel.get_student_by_uuid(student_id).netId
-            inner_dict['username'] = netId
+            inner_dict['Student'] = netId
             writer.writerow(inner_dict)
 
     with open(os.path.join(dirname, 'dynamic_content/grades/', filename), 'r') as f:
