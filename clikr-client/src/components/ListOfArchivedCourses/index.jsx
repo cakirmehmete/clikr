@@ -13,7 +13,7 @@ const styles = theme => ({
 });
 
 @observer
-class ListOfAllCourses extends React.Component {
+class ListOfArchivedCourses extends React.Component {
     state = {
         referrerCourseId: null,
     }
@@ -39,13 +39,13 @@ class ListOfAllCourses extends React.Component {
         return (
             <List component="nav">
                 {this.profStore.courses.map((courseObj, index) => {
-                    if (courseObj.is_current) {
+                    if (!courseObj.is_current) {
                         return (
                             <CourseListItemNavEdit 
                                 key={index} 
                                 profStore={this.profStore} 
                                 apiProfService={this.apiProfService} 
-                                courseId={courseObj.id} 
+                                courseId={courseObj.id}
                                 courseTitle={courseObj.title} 
                                 courseYear={courseObj.year}
                                 courseTerm={courseObj.term}
@@ -59,4 +59,4 @@ class ListOfAllCourses extends React.Component {
     }
 }
 
-export default withStyles(styles)(ListOfAllCourses);
+export default withStyles(styles)(ListOfArchivedCourses);

@@ -54,6 +54,7 @@ export default class APIProfService {
                     this._checkAuth(error);
                 })
         }
+
         return new Promise(function () {
             return true
         })

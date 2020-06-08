@@ -32,16 +32,21 @@ class DeleteCoursesList extends React.Component {
     }
     componentDidMount() {
         let shouldDelete = []
-        this.profStore.courses.map(courseObj => 
-           shouldDelete.push({
-            id: courseObj.id,
-            checked: false,
-            title: courseObj.title
-        }))
-        
+        this.profStore.courses.map(courseObj => {
+            if (courseObj.is_current !== this.props.archive) {
+                shouldDelete.push({
+                    id: courseObj.id,
+                    checked: false,
+                    title: courseObj.title,
+                    term: courseObj.term,
+                    year: courseObj.year
+                })
+            }
+        })
+
         this.setState({
             delCourses: shouldDelete
-        }) 
+        })
     }
 
     handleChange = id =>  event => {
@@ -67,7 +72,7 @@ class DeleteCoursesList extends React.Component {
                             {this.state.delCourses.map((c, index) => {
                                 return (
                                     <ListItem divider key={index}>
-                                        <ListItemText primary={c.title}/>
+                                        <ListItemText primary={c.title} secondary={c.term + ' ' + c.year} />
                                         <ListItemSecondaryAction>
                                             <FormControlLabel key={index} control={
                                                     <Checkbox className={this.styles.checkBox} key={c.id} checked={c.checked} onChange={this.handleChange(c.id)} value={c.id} />

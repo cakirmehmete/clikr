@@ -134,34 +134,36 @@ class SideMenuBar extends React.Component {
                 <Grid item>
                     <List>
                         {this.profStore.courses.map((courseObj, index) => {
-                            var lectures = this.profStore.getCourseLectures(courseObj.id);
-                            return (
-                                <div key={"div" + index}>
-                                    <ListItem className={this.styles.hover} button key={index} onClick={() => this.handleCourseClick(courseObj.id)} selected={this.state.selectedCourse === courseObj.id}>
-                                        <ListItemText disableTypography 
-                                            primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} 
-                                            secondary={<Typography type="body2" className={this.styles.listsubtext}>{courseObj.term} {courseObj.year}</Typography>}
-                                        />
+                            if (courseObj.is_current) {
+                                var lectures = this.profStore.getCourseLectures(courseObj.id);
+                                return (
+                                    <div key={"div" + index}>
+                                        <ListItem className={this.styles.hover} button key={index} onClick={() => this.handleCourseClick(courseObj.id)} selected={this.state.selectedCourse === courseObj.id}>
+                                            <ListItemText disableTypography 
+                                                primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} 
+                                                secondary={<Typography type="body2" className={this.styles.listsubtext}>{courseObj.term} {courseObj.year}</Typography>}
+                                            />
 
-                                        <ListItemSecondaryAction>
-                                            <IconButton color="primary" disabled={lectures.length === 0} onClick={() => this.handleExpand(courseObj.id)}>
-                                                {lectures.length > 0 && this.state.open === courseObj.id ? <ExpandLess /> : <ExpandMore />}
-                                            </IconButton>
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                    <Collapse in={this.state.open === courseObj.id} timeout="auto" unmountOnExit>
-                                        <List component="div" disablePadding>
-                                            {lectures.map((lectureObj, innerIndex) => {
-                                                return (
-                                                    <ListItem button key={courseObj.id + "_lecture_" + innerIndex} onClick={() => this.handleLectureClick(lectureObj.id)} selected={this.state.selectedLecture === lectureObj.id}>
-                                                        <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.nestedListtext}> {lectureObj.title} </Typography>} />
-                                                    </ListItem>
-                                                )
-                                            })}
-                                        </List>
-                                    </Collapse>
-                                </div>
+                                            <ListItemSecondaryAction>
+                                                <IconButton color="primary" disabled={lectures.length === 0} onClick={() => this.handleExpand(courseObj.id)}>
+                                                    {lectures.length > 0 && this.state.open === courseObj.id ? <ExpandLess /> : <ExpandMore />}
+                                                </IconButton>
+                                            </ListItemSecondaryAction>
+                                        </ListItem>
+                                        <Collapse in={this.state.open === courseObj.id} timeout="auto" unmountOnExit>
+                                            <List component="div" disablePadding>
+                                                {lectures.map((lectureObj, innerIndex) => {
+                                                    return (
+                                                        <ListItem button key={courseObj.id + "_lecture_" + innerIndex} onClick={() => this.handleLectureClick(lectureObj.id)} selected={this.state.selectedLecture === lectureObj.id}>
+                                                            <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.nestedListtext}> {lectureObj.title} </Typography>} />
+                                                        </ListItem>
+                                                    )
+                                                })}
+                                            </List>
+                                        </Collapse>
+                                    </div>
                             )
+                            }
                         })}
                     </List>
                 </Grid>
