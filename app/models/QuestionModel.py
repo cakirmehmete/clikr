@@ -123,6 +123,7 @@ class FreeTextModel(QuestionModel):
     def __init__(self, data):
         super().__init__(data)
 
+        print("HELLO")
         self.word_limit = data.get('word_limit')
 
 class SliderModel(QuestionModel):
@@ -215,7 +216,7 @@ class QuestionSchema(Schema):
     lecture_id = CustomStringField(required=True)
     question_type = CustomStringField(required=True)
     question_title = CustomStringField()
-    question_text = CustomStringField()
+    question_text = CustomStringField(required=False)
     correct_answer = CustomStringField()
     creator_id = CustomStringField()
     is_open = CustomBoolField(dump_only=True)
@@ -230,7 +231,7 @@ class MultipleChoiceSchema(QuestionSchema):
     option3 = CustomStringField()
     option4 = CustomStringField()
     option5 = CustomStringField()
-    number_of_options = CustomIntegerField(required=True)
+    number_of_options = CustomIntegerField()
 
 class FreeTextSchema(QuestionSchema):
     word_limit = CustomIntegerField()

@@ -104,33 +104,6 @@ def enroll_in_course(current_user):
     course_data = course_schema.dump(course).data
     return custom_response({'message': 'student enrolled', 'id': course_data.get('id')}, 201)
 
-# TODO: implement
-
-@student_api.route('/lectures', methods=['POST'])
-@Auth.student_auth_required
-def attend_lecture(current_user):
-    """
-    allows the current student to answer questions in a lecture
-    """
-    req_data = request.get_json()
-    enroll_code = req_data.get("enroll_code")
-
-    current_user.lecture_attending = None
-    db.session.commit()
-
-    # retrieve course and check if valid
-    lecture = LectureModel.get_lecture_by_code(enroll_code)
-    if not lecture or lecture.id != lecture.id:
-        return custom_response({'error': 'invalid attendance code'}, 400)
-
-    # update the lecture that the student is currently attending
-    current_user.lecture_attending = lecture.id
-    db.session.commit()
-
-    # prepare response
-    lecture_data = lecture_schema.dump(lecture).data
-    return custom_response({'message': 'student enrolled', 'id': lecture_data.get('id')}, 201)
-
 @student_api.route('/courses/<course_id>', methods=['GET'])
 @Auth.student_auth_required
 def get_course_info(current_user, course_id):
@@ -269,12 +242,7 @@ def submit_answer(current_user, question_id):
     # retrieve course and check permissions
     course = question.lecture.course
     if not current_user in course.students:
-        return custom_response({'error': 'permission denied'}, 400)
-
-    # retrieve lecture and check permissions
-    lecture = question.lecture
-    if current_user.lecture_attending != lecture.id:
-        return custom_response({'error': 'permission denied - student is not in attendance'}, 400)
+        return custom_response({'error': 'permission denied - student is not enrolled'}, 400)
 
     # check if question is open
     if not question.is_open:

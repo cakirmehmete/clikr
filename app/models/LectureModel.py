@@ -23,7 +23,6 @@ class LectureModel(db.Model):
     creator_id = db.Column(db.String(36), db.ForeignKey('professors.id', onupdate='CASCADE', ondelete='SET NULL'))
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
-    enroll_code = db.Column(db.String(8), nullable=True)    # TODO: should not be nullable
 
     # relationships
     questions = db.relationship('QuestionModel', backref='lecture', lazy=True, passive_deletes=True)
@@ -42,7 +41,6 @@ class LectureModel(db.Model):
         timestamp = datetime.datetime.utcnow()
         self.created_at = timestamp
         self.modified_at = timestamp
-        self.enroll_code = data.get('enroll_code')
 
     def save(self):
         db.session.add(self)
@@ -66,10 +64,6 @@ class LectureModel(db.Model):
     def get_lecture_by_uuid(value):
         return LectureModel.query.filter_by(id=value).first()
 
-    @staticmethod
-    def get_lecture_by_code(value):
-        return LectureModel.query.filter_by(enroll_code=value).first()
-
     def __repr__(self):
         return '<Lecture(id {})>'.format(self.id)
 
@@ -85,4 +79,3 @@ class LectureSchema(Schema):
     creator_id = CustomStringField()
     created_at = CustomDateTimeField(dump_only=True)
     modified_at = CustomDateTimeField(dump_only=True)
-    enroll_code = CustomStringField(dump_only=True)
