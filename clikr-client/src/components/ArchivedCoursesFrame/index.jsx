@@ -122,17 +122,17 @@ class ArchivedCoursesFrame extends React.Component {
             return <Redirect to='/professor/new' push />
         }
         let list = <ListOfArchivedCourses profStore={this.profStore} apiProfService={this.apiProfService} />
-        let deleteAction="delete"
+        let deleteAction="Delete"
         
         if (this.state.deleteMode) {
             list = <DeleteCoursesList profStore={this.profStore} getDeletions={this.getDeletions} archive={true} />
-            deleteAction="done"
+            deleteAction="Done"
         }
 
         var titleString = this.state.showArchive ? "Archived Courses" : "Show Archived Courses"
         var delButton = ""
         if (this.state.showArchive) {
-            delButton = deleteAction === 'delete' ? <DeleteIcon /> : <DoneIcon />
+            delButton = deleteAction === 'Delete' ? <DeleteIcon /> : <DoneIcon />
         } 
 
         return (
@@ -176,7 +176,7 @@ class ArchivedCoursesFrame extends React.Component {
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                         >
-                            <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the folowing course(s): "}</DialogTitle>
+                            <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the following course(s): "}</DialogTitle>
                             <DialogContent>
                                 {this.state.delTitles.map((title, index) => 
                                     <DialogContentText key={index} id="alert-dialog-description">

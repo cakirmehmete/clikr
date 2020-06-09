@@ -47,6 +47,7 @@ class ProfessorAddLecture extends React.Component {
             toLecture: false,
             title: "Lecture ",
             courseId: this.courseId,
+            description: "",
             numLects: this.props.location.state.numLects.toString(),
             errors: {title: ''},
             titleValid: true,
@@ -90,16 +91,17 @@ class ProfessorAddLecture extends React.Component {
         })
     }  
 
-    handleChange = name => event => {
+    handleChange = (event) => {
+        const {name, value} = event.target
         this.setState({
-            [name]: event.target.value,
+            [name]: value
         }, () => { this.handleValidation() });
     };
 
     handleSubmit = () => {
         // Send course to API
         this.props.apiService.addLecture(
-            new LectureObj(this.state.title, this.state.selectedDate, null, this.state.courseId)
+            new LectureObj(this.state.title, this.state.selectedDate, null, this.state.courseId, this.state.description)
         )
         this.setState({ toLecture: true });
     }
@@ -122,11 +124,20 @@ class ProfessorAddLecture extends React.Component {
                         <TextField
                             requiredtitle="true"
                             error={!this.state.titleValid}
-                            id="standard-name"
+                            name="title"
                             label="Lecture Title"
                             className={this.styles.textField}
                             value={this.state.title}
-                            onChange={this.handleChange('title')}
+                            onChange={this.handleChange}
+                            margin="normal"
+                            helperText={this.state.errors["title"]}
+                        />
+                        <TextField
+                            label="Lecture Description"
+                            name="description"
+                            className={this.styles.textField}
+                            value={this.state.description}
+                            onChange={this.handleChange}
                             margin="normal"
                             helperText={this.state.errors["title"]}
                         />

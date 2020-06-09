@@ -79,7 +79,7 @@ class EditCourseDialog extends React.Component {
 
         return (
             <Grid item>
-                <Tooltip title="change title" placement="top-start">
+                <Tooltip title="Change Title" placement="top-start">
                     <Button variant="text" size="small" onClick={this.handleOpen}>
                         <Icon className={classes.icon} color="secondary">edit</Icon>
                     </Button>

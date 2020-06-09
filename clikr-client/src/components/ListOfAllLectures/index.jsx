@@ -47,7 +47,7 @@ class ListOfAllLectures extends React.Component {
             <List component="nav">
                 {this.state.lectures.map((lectureObj, index) => {
                     return (
-                        <LectListItemNavEdit key={index} profStore={this.profStore} apiProfService={this.apiProfService} lectureId={lectureObj.id} lectureTitle={lectureObj.title} />
+                        <LectListItemNavEdit key={index} profStore={this.profStore} apiProfService={this.apiProfService} lecture={lectureObj} />
                     )
                 })}
             </List>

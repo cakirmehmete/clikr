@@ -23,6 +23,17 @@ export function createProfessorAPI(username, password, firstName, lastName) {
     });
 }
 
+export function archiveCourseAPI(course_id) {
+    return axios.post(baseURL + 'professor/courses/' + course_id + '/archive');
+}
+
+export function duplicateCourseAPI(course_id, year, term) {
+    return axios.post(baseURL + 'professor/courses/' + course_id + '/duplicate', {
+        year: year,
+        term: term
+    });
+}
+
 export function loginStudentAPI(username, password) {
     return axios.post(baseURL + 'admin/studentlogin', {
         netId: username,
@@ -106,6 +117,7 @@ export function postNewLectureAPI(lecture) {
     return axios.post(baseURL + 'professor/courses/' + lecture.course_id + '/lectures', {
         title: lecture.title,
         date: lecture.date,
+        description: lecture.description
     });
 }
 

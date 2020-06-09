@@ -86,7 +86,7 @@ class AddStudentsModal extends React.Component {
 
         return (
             <Grid item>
-                <Tooltip title="add students" placement="top">
+                <Tooltip title="Add Students" placement="top">
                     <IconButton color="primary" onClick={this.handleOpen}>
                         <PersonAddIcon />
                     </IconButton>

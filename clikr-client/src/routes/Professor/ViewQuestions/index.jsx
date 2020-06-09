@@ -12,7 +12,6 @@ import AllQuestionsFrame from '../../../components/AllQuestionsFrame';
 import MCQuestionStats from '../../../components/MCQuestionStats';
 import FreeTextStats from '../../../components/FreeTextStats';
 import SliderStats from '../../../components/SliderStats';
-import AddStudentsModal from '../../../components/AddStudentsModal';
 import APIProfService from '../../../services/APIProfService';
 
 const socket = socketIOClient(socketioURL)
@@ -252,18 +251,19 @@ class ProfessorViewQuestions extends React.Component {
     }
 
     render() {
-        debugger;
         return (
             <div>
                 <Paper className={this.styles.root} elevation={1}>
-                    <Typography variant="h6" component="h5" className={this.styles.text}>
+                    <Typography variant="h6" component="h6" className={this.styles.text}>
                         {this.state.parentLecture.title} on {this.state.parentLecture.date}
                     </Typography>
-                    <Typography variant="h4" component="h2" className={this.styles.textQ} align="center">
+                    <Typography variant="h4" component="h4" className={this.styles.textQ} align="center">
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
                     </Typography>
                     <Grid item className={this.styles.showCodeBtn} >
-                        <AddStudentsModal profStore={this.profStore} joinCode={this.state.parentLecture.enroll_code} />
+                        <Typography variant="body2" component="body2" className={this.styles.text}>
+                            {this.state.parentLecture.description}
+                        </Typography>
                     </Grid>
                     <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3 || this.state.parentLecture.questions.length === 0 || this.state.editDeleteMode }>
                         {this.state.btnStatus === 0 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :

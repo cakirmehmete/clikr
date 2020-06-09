@@ -119,6 +119,8 @@ def create_course(current_user):
     if error:
         return custom_response(error, 400)
 
+    data['enroll_code'] = _generate_course_enroll_code()
+    
     course = CourseModel(data)
 
     # generate enrollment code and save to database
@@ -166,10 +168,49 @@ def duplicate_course(current_user, course_id):
     course_data = course_schema.dump(course).data
     course_data['term'] = new_term
     course_data['year'] = new_year
+    course_data['enroll_code'] = _generate_course_enroll_code()
 
-    lectures = course.lectures
+    new_course = CourseModel(course_data)
+    new_course.save()
+
+    # add the course to the prof's list of courses
+    current_user.courses.append(new_course)
+    db.session.commit()
+
+    all_lectures = course.lectures
+    all_lectures.sort(key=lambda x: x.created_at)
+    for lecture in all_lectures:
+        lecture_data = lecture_schema.dump(lecture).data
+        lecture_data['course_id'] = new_course.id
+        
+        new_lecture = LectureModel(lecture_data)
+        new_lecture.save()
+
+        # add the lecture to this course's list of lectures
+        new_course.lectures.append(new_lecture)
+        db.session.commit()
+
+        for question in lecture.questions:
+            question_data = dump_one_question(question)
+            question_data['lecture_id'] = new_lecture.id
+
+            question_data = fix_dictionary(question_data)
+
+            try:
+                new_question = load_one_question(question_data)
+            except Exception as e:
+                return custom_response({'error': str(e)}, 400)
+
+            new_question.save()
+
+            # add the question to this lecture's list of questions
+            new_lecture.questions.append(new_question)
+            db.session.commit()
 
     return custom_response(course_data, 200)
+
+def fix_dictionary(data):
+    return {key: val for key, val in data.items() if val is not None}
 
 @professor_api.route('/courses/<course_id>', methods=['POST'])
 @Auth.professor_auth_required
@@ -215,6 +256,29 @@ def update_course(current_user, course_id):
     course.update(updated_data)
 
     return custom_response({'message': 'course updated'}, 201)
+
+@professor_api.route('/courses/<course_id>/archive', methods=['POST'])
+@Auth.professor_auth_required
+def archive_course(current_user, course_id):
+    # retrieve course and check if valid, permissions
+    course = CourseModel.get_course_by_uuid(course_id)
+    if not course:
+        return custom_response({'error': 'course_id does not exist'}, 400)
+    if not current_user in course.professors:
+        return custom_response({'error': 'permission denied'}, 400)
+
+    # get data from request body
+    message = ""
+    if course.is_current:
+        course.is_current = False
+        message = "course archived"
+    else:
+        course.is_current = True
+        message = "course unarchived"
+    course.save()
+
+    course_data = course_schema.dump(course).data
+    return custom_response({'message': message, 'id': course.id, 'course': course_data}, 200)
 
 @professor_api.route('/courses/<course_id>', methods=['DELETE'])
 @Auth.professor_auth_required
@@ -450,8 +514,6 @@ def create_lecture(current_user, course_id):
     req_data['creator_id'] = current_user.id
     req_data['course_id'] = course_id
     data, error = lecture_schema.load(req_data)
-    enroll_code = _generate_lecture_enroll_code()
-    data['enroll_code'] = enroll_code # generate enroll code
 
     if error:
         return custom_response(error, 400)
@@ -467,18 +529,6 @@ def create_lecture(current_user, course_id):
     all_lectures = course.lectures
     all_lectures_data = lecture_schema.dump(all_lectures, many=True).data
     return custom_response({'message': 'lecture created', 'id': lecture.id, 'lectures': all_lectures_data}, 201)
-
-def _generate_lecture_enroll_code():
-    """
-    generate an enrollment code and check that it isn't a duplicate
-    """
-    enroll_code = ''.join(random.choices(ENROLL_CODE_VALID_CHARACTERS, k=8))
-    lecture = LectureModel.get_lecture_by_code(enroll_code)
-
-    while lecture:
-        enroll_code = ''.join(random.choices(ENROLL_CODE_VALID_CHARACTERS, k=8))
-        lecture = LectureModel.get_lecture_by_code(enroll_code)
-    return enroll_code
 
 @professor_api.route('/lectures/<lecture_id>', methods=['GET'])
 @Auth.professor_auth_required
@@ -546,7 +596,6 @@ def update_lecture(current_user, lecture_id):
 
     # get data from request body
     updated_data = request.get_json()
-    print("UPDATE:", updated_data)
     lecture.update(updated_data)
 
     return custom_response({'message': 'lecture updated'}, 200)
@@ -725,7 +774,7 @@ def _export_grades(course=None, lecture=None):
     """
 
     # build csv file
-    headers = ['Student', 'Course Total']
+    headers = ['Student', 'Total Correct', 'Lectures Attended', 'Questions Answered']
     score_dict = {}    # dictionary with student id's as keys, dictionaries as values (which in turn have question ids as keys and scores as values)
     export_course = False
 
@@ -746,19 +795,25 @@ def _export_grades(course=None, lecture=None):
 
     # fill score_dict with empty dicts for enrolled students
     for student in course.students:
-        score_dict[student.id] = {'Course Total': 0}
+        score_dict[student.id] = {'Total Correct': 0, 'Lectures Attended': 0, 'Questions Answered': 0}
     
     if export_course:
         for lecture in lectures:
             lecture_header = f'Total for {lecture.title}'
             headers.append(lecture_header)
             for student in course.students:
-                score_dict[student.id] = {lecture_header: 0}
+                score_dict[student.id][lecture_header] = 0
+
+    num_lectures = 0
+    num_questions = 0
 
     # process all questions
     for lecture in lectures:
+        num_lectures += 1
         questions = lecture.questions
+        attending_students = set()
         for question in questions:
+            num_questions += 1
             col_header = f'{lecture.title}: {question.question_title}'
             headers.append(col_header)
             answers = question.answers
@@ -766,14 +821,19 @@ def _export_grades(course=None, lecture=None):
             # process each answer to this question
             for answer in answers:
                 student_id = answer.student_id
+                attending_students.add(student_id)
                 score = 1 if question.is_correct(answer.answer) else 0
 
                 # add score to the student's list (if enrolled)
                 if student_id in score_dict:
-                    score_dict[student_id]['Course Total'] += score
+                    score_dict[student_id]['Total Correct'] += score
+                    score_dict[student_id]['Questions Answered'] += 1
                     score_dict[student_id][col_header] = score
                     if export_course:
                         score_dict[student_id][lecture_header] += score
+        
+        for student_id in attending_students:
+            score_dict[student_id]['Lectures Attended'] += 1
 
     # note that heroku discards dynamically generated files on dyno restart!
     today = datetime.date.today().strftime("%b-%d-%Y")
@@ -787,6 +847,15 @@ def _export_grades(course=None, lecture=None):
             netId = StudentModel.get_student_by_uuid(student_id).netId
             inner_dict['Student'] = netId
             writer.writerow(inner_dict)
+        
+        f.write('\n\n')
+        summary_writer = csv.DictWriter(f, ['Summary Statistics', 'Total Lectures', 'Total Questions'], restval=0, dialect='quote all')
+        summary_writer.writeheader()
+        summary_writer.writerow({
+            'Summary Statistics': '',
+            'Total Lectures': num_lectures,
+            'Total Questions': num_questions
+        })
 
     with open(os.path.join(dirname, 'dynamic_content/grades/', filename), 'r') as f:
         file_data = f.read()
@@ -857,7 +926,8 @@ def handle_question_action(current_user, question_id):
         return custom_response({'error': 'question does not exist'}, 400)
 
     # retrieve course and check permissions
-    course = question.lecture.course
+    lecture = question.lecture
+    course = lecture.course
     if not current_user in course.professors:
         return custom_response({'error': 'permission denied'}, 400)
 
@@ -871,6 +941,9 @@ def handle_question_action(current_user, question_id):
         return custom_response({'error': 'action required'}, 400)
 
     if action == 'open':
+        lecture.date = datetime.date.today().strftime('%Y-%m-%d')
+        lecture.save()
+
         success = _open_question(question, course)
         if success:
             return custom_response({'message': 'question opened'}, 200)

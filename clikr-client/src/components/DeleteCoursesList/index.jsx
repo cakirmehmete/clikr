@@ -30,18 +30,21 @@ class DeleteCoursesList extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
     }
+
     componentDidMount() {
         let shouldDelete = []
-        this.profStore.courses.map(courseObj => {
-            if (courseObj.is_current !== this.props.archive) {
-                shouldDelete.push({
-                    id: courseObj.id,
-                    checked: false,
-                    title: courseObj.title,
-                    term: courseObj.term,
-                    year: courseObj.year
-                })
-            }
+        var courses = this.profStore.courses.filter((courseObj) => {
+            return courseObj.is_current !== this.props.archive
+        })
+        
+        courses.forEach(courseObj => {
+            shouldDelete.push({
+                id: courseObj.id,
+                checked: false,
+                title: courseObj.title,
+                term: courseObj.term,
+                year: courseObj.year
+            })
         })
 
         this.setState({

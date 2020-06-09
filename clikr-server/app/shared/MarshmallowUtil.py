@@ -58,8 +58,10 @@ def load_one_question(input_data):
             raise Exception(error)
         question = MultipleChoiceModel(data)
     elif question_type == 'free_text':
+        print(input_data)
         data, error = FreeTextSchema().load(input_data)
         if error:
+            print(str(error))
             raise Exception(error)
         question = FreeTextModel(data)
     elif question_type == 'slider':

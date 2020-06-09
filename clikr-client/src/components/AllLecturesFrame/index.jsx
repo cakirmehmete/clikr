@@ -212,7 +212,7 @@ class AllLecturesFrame extends React.Component {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the folowing lecture(s): "}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the following lecture(s): "}</DialogTitle>
                     <DialogContent>
                         {this.state.delTitles.map((title, index) =>
                             <DialogContentText key={index} id="alert-dialog-description">

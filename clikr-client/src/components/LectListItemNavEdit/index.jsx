@@ -13,6 +13,7 @@ import InputBase from '@material-ui/core/InputBase';
 import ListItemText from '@material-ui/core/ListItemText';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
+import LectureObj from '../../models/LectureObj';
 import { baseURL } from '../../constants/api';
 
 const styles = theme => ({
@@ -56,42 +57,40 @@ class LectListItemNavEdit extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = props.apiProfService
-        this.lectureId = props.lectureId
-        this.lectureTitle = props.lectureTitle
+        this.lecture = props.lecture
     }
     
     state = {
         editMode: false,
-        lectureTitle: this.lectureTitle,
+        lecture: new LectureObj(),
         newTitle: "",
-        nav: false,
-        lectureId: this.lectureId
+        nav: false
     }
 
     componentDidMount() {
-        this.setState({
-            lectureTitle: this.lectureTitle,
-            newTitle: this.lectureTitle,
-            lectureId: this.lectureId,
-        })
+        if (this.lecture !== undefined) {
+            this.setState({
+                lecture: this.lecture,
+                newTitle: this.lecture.title
+            })
+        }
     }
 
     componentWillReceiveProps(nextProps) {
         if (!this.state.editMode) {
-            if (nextProps.lectureTitle !== this.lectureTitle) {
-                this.lectureTitle = nextProps.lectureTitle;
+            if (nextProps.lecture !== undefined && nextProps.lecture.id !== this.state.lecture.id) {
                 this.setState({
-                    lectureTitle: nextProps.lectureTitle,
-                    newTitle: nextProps.lectureTitle,
-                    lectureId: nextProps.lectureId,
+                    lecture: nextProps.lecture,
+                    newTitle: nextProps.lecture.title
                 })
             }
         } 
     }
 
     handleEdit = (e) => {
+        const {name, value} = e.target
         this.setState({
-            [e.target.name]: e.target.value
+            [name]: value
         })
     }
     
@@ -105,10 +104,9 @@ class LectListItemNavEdit extends React.Component {
 
         // only close if the title is not empty space
         if (this.state.newTitle.replace(/\s/g, '').length > 0) {
-            this.apiProfService.changeLectureTitle(this.lectureId, this.state.newTitle);
+            this.apiProfService.changeLectureTitle(this.state.lecture.id, this.state.newTitle);
             this.setState({
-                lectureTitle: this.state.newTitle,
-                editMode: false,
+                editMode: false
             })
         }
         else { // defaults to not changing title if invalid title is input
@@ -125,7 +123,7 @@ class LectListItemNavEdit extends React.Component {
     }
 
     handleExportGrades = () => {
-        this.apiProfService.exportGradesLecture(this.lectureId)
+        this.apiProfService.exportGradesLecture(this.state.lecture.id)
             .then(data => {
                 const element = document.createElement("a");
                 const file = new Blob([data.fileData], {type: 'text/csv;charset=utf-8;'});
@@ -138,8 +136,9 @@ class LectListItemNavEdit extends React.Component {
 
     render () {
         if (this.state.nav) {
-            return  <Redirect to={'/professor/' + this.state.lectureId + '/questions'} push />
+            return  <Redirect to={'/professor/' + this.state.lecture.id + '/questions'} push />
         }
+
         if (this.state.editMode) {
             return (
                 <ListItem divider>
@@ -157,7 +156,7 @@ class LectListItemNavEdit extends React.Component {
                     <ListItemSecondaryAction>
                         <Grid container direction="row" justify="flex-end">  
                             <Grid item>
-                                <Tooltip title="done editing" placement="top">
+                                <Tooltip title="Done Editing" placement="top">
                                     <IconButton color="secondary" onClick={this.handleEditClose}>
                                         <DoneIcon className={this.styles.iconDone}/>
                                     </IconButton>
@@ -165,7 +164,7 @@ class LectListItemNavEdit extends React.Component {
                             </Grid>
                             <Grid item>
                                 <Tooltip title="Export Grades" placement="top">
-                                    <IconButton color="secondary" href={baseURL + "professor/lectures/" + this.lectureId + "/exportgrades"} target="_blank">
+                                    <IconButton color="secondary" href={baseURL + "professor/lectures/" + this.state.lecture.id + "/exportgrades"} target="_blank">
                                         <ImportExportIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -178,11 +177,11 @@ class LectListItemNavEdit extends React.Component {
         else {
             return (
                  <ListItem button divider onClick={this.handleToLecture}>
-                   <ListItemText primary={this.state.lectureTitle} />
+                   <ListItemText primary={this.state.lecture.title} secondary={this.state.lecture.date} />
                         <ListItemSecondaryAction>  
                             <Grid container direction="row" justify="flex-end">  
                                 <Grid item>
-                                    <Tooltip title="change title" placement="top">
+                                    <Tooltip title="Change Title" placement="top">
                                         <IconButton color="secondary" onClick={this.handleEditOpen}>
                                             <EditIcon />
                                         </IconButton>

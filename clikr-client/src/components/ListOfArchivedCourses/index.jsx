@@ -32,27 +32,30 @@ class ListOfArchivedCourses extends React.Component {
     }
 
     render() {
+        var courses = this.profStore.courses.filter((courseObj) => {
+            return !courseObj.is_current
+        })
+
         // Handle routes
         if (this.state.referrerCourseId !== null) {
             return <Redirect to={'/professor/' + this.state.referrerCourseId + '/lectures'} push />
         }
         return (
             <List component="nav">
-                {this.profStore.courses.map((courseObj, index) => {
-                    if (!courseObj.is_current) {
-                        return (
-                            <CourseListItemNavEdit 
-                                key={index} 
-                                profStore={this.profStore} 
-                                apiProfService={this.apiProfService} 
-                                courseId={courseObj.id}
-                                courseTitle={courseObj.title} 
-                                courseYear={courseObj.year}
-                                courseTerm={courseObj.term}
-                                joinCode={courseObj.enroll_code} 
-                            />
-                        )
-                    }
+                {courses.map((courseObj, index) => {
+                    return (
+                        <CourseListItemNavEdit 
+                            key={index} 
+                            archive={true}
+                            profStore={this.profStore} 
+                            apiProfService={this.apiProfService} 
+                            courseId={courseObj.id}
+                            courseTitle={courseObj.title} 
+                            courseYear={courseObj.year}
+                            courseTerm={courseObj.term}
+                            joinCode={courseObj.enroll_code} 
+                        />
+                    )
                 })}
             </List>
         );

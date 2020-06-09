@@ -116,14 +116,14 @@ export default class ProfessorStore {
     @action
     updateCourseData(courseId, course) {
         const oldCourse = this.courses.find(x => x.id === courseId);
-        debugger
+        debugger;
         oldCourse.title = course.title
         oldCourse.dept = course.dept
         oldCourse.coursenum = course.coursenum
         oldCourse.year = course.year
         oldCourse.term = course.term
         oldCourse.description = course.description
-        debugger
+        oldCourse.is_current = course.is_current
     }
 
     @action

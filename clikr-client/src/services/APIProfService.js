@@ -1,4 +1,4 @@
-import { getProfDataAPI, exportGradesCourseAPI, exportGradesLectureAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
+import { getProfDataAPI, duplicateCourseAPI, archiveCourseAPI, exportGradesCourseAPI, exportGradesLectureAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
 
 
 export default class APIProfService {
@@ -10,6 +10,31 @@ export default class APIProfService {
         return getProfNameAPI()
             .then(res => {
                 return res.data.name
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
+    }
+
+    archiveCourse(course_id) {
+        return archiveCourseAPI(course_id)
+            .then(res => {
+                this.professorStore.updateCourseData(res.data.id, res.data.course)
+                return res.data.message
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
+    }
+
+    duplicateCourse(course_id, year, term) {
+        return duplicateCourseAPI(course_id, year, term)
+            .then(res => {
+                return res.data
             })
             .catch(error => {
                 console.log(error)
@@ -33,7 +58,6 @@ export default class APIProfService {
     exportGradesCourse(course_id) {
         return exportGradesCourseAPI(course_id)
             .then(res => {
-                debugger;
                 return res.data
             })
             .catch(error => {

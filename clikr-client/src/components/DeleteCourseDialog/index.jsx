@@ -64,7 +64,7 @@ class DeleteCourseDialog extends React.Component {
 
         return (
             <Grid item>
-                <Tooltip title="delete course" placement="top-start">
+                <Tooltip title="Delete Course" placement="top-start">
                     <Button variant="text" size="small" onClick={this.handleOpen}>
                         <Icon className={classes.icon} color="secondary">delete</Icon>
                     </Button>

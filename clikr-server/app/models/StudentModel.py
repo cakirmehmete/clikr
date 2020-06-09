@@ -29,7 +29,6 @@ class StudentModel(db.Model):
     lastName = db.Column(db.String(128), nullable=True)
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
-    lecture_attending = db.Column(db.String(128), nullable=True)
 
     # relationships
     courses = db.relationship('CourseModel', secondary=courses_students, lazy=True, backref='students', passive_deletes=True)
@@ -50,7 +49,6 @@ class StudentModel(db.Model):
 
         password_hash = hashlib.sha256()
         self.salt = generate_salt()
-        print(self.salt)
         salt = self.salt.encode('utf-8')
         password_hash.update(salt)
         password = data.get('password').encode('utf-8')

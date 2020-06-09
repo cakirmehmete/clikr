@@ -13,6 +13,9 @@ import InputBase from '@material-ui/core/InputBase';
 import ListItemText from '@material-ui/core/ListItemText';
 import FormControl from '@material-ui/core/FormControl';
 import AddStudentsModal from '../AddStudentsModal';
+import DuplicateCourseModal from '../DuplicateCourseModal';
+import ArchiveIcon from '@material-ui/icons/Archive';
+import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import Grid from '@material-ui/core/Grid';
 import { baseURL } from '../../constants/api';
 
@@ -69,7 +72,8 @@ class CourseListItemNavEdit extends React.Component {
         courseTitle: this.courseTitle,
         newTitle: "",
         nav: false,
-        courseId: this.courseId
+        courseId: this.courseId,
+        toHome: false
     }
 
     componentDidMount() {
@@ -94,9 +98,10 @@ class CourseListItemNavEdit extends React.Component {
         } 
     }
 
-    handleEdit = (e) => {
+    handleEdit = (event) => {
+        const {name, value} = event.target;
         this.setState({
-            [e.target.name]: e.target.value
+            [name]: value
         })
     }
     
@@ -129,6 +134,14 @@ class CourseListItemNavEdit extends React.Component {
         })
     }
 
+    handleArchive = () => {
+        this.apiProfService.archiveCourse(this.state.courseId)
+            .then(message => {
+                this.setState({ toHome: true })
+                debugger;
+            })
+    }
+
     handleExportGrades = () => {
         this.apiProfService.exportGradesCourse(this.courseId)
             .then(data => {
@@ -145,6 +158,11 @@ class CourseListItemNavEdit extends React.Component {
         if (this.state.nav) {
             return  <Redirect to={'/professor/' + this.state.courseId + '/lectures'} push />
         }
+
+        if (this.state.toHome) {
+            return  <Redirect to={'/professor'} push />
+        }
+
         if (this.state.editMode) {
             return (
                 <ListItem divider>
@@ -162,7 +180,7 @@ class CourseListItemNavEdit extends React.Component {
                     <ListItemSecondaryAction>
                         <Grid container direction="row" justify="flex-end" >
                             <Grid item>
-                                <Tooltip title="done editing" placement="top">
+                                <Tooltip title="Done Editing" placement="top">
                                     <IconButton color="secondary" onClick={this.handleEditClose}>
                                         <DoneIcon className={this.styles.iconDone}/>
                                     </IconButton>
@@ -194,9 +212,19 @@ class CourseListItemNavEdit extends React.Component {
                     <ListItemSecondaryAction>
                         <Grid container direction="row" justify="flex-end">
                             <Grid item>
-                                <Tooltip title="change title" placement="top">
+                                <Tooltip title="Change Title" placement="top">
                                     <IconButton color="secondary" onClick={this.handleEditOpen}>
                                         <EditIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <DuplicateCourseModal profStore={this.profStore} apiProfService = {this.apiProfService} courseId={this.state.courseId} />
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title={this.props.archive ? "Unarchive Course" : "Archive Course"} placement="top">
+                                    <IconButton color="secondary" onClick={this.handleArchive}>
+                                        {this.props.archive ? <UnarchiveIcon /> : <ArchiveIcon />}
                                     </IconButton>
                                 </Tooltip>
                             </Grid>

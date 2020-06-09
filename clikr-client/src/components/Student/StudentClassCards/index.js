@@ -88,7 +88,6 @@ class ClassCard extends React.Component {
 
     
     render() {
-        debugger;
         return (
             
                 <Card className={this.state.colorStyle}>
@@ -108,7 +107,7 @@ class ClassCard extends React.Component {
                             </Grid>
                             <Grid item xs={2}>
                                 <Grid container direction="row" justify="flex-end">
-                                    <Tooltip title="drop course" disableFocusListener placement="top-start">
+                                    <Tooltip title="Drop Course" disableFocusListener placement="top-start">
                                         <Button variant="text" size="small" onClick={this.handleOpen}>
                                             <Icon className={this.styles.icon} color="secondary">delete</Icon>
                                         </Button>
