@@ -138,7 +138,6 @@ class CourseListItemNavEdit extends React.Component {
         this.apiProfService.archiveCourse(this.state.courseId)
             .then(message => {
                 this.setState({ toHome: true })
-                debugger;
             })
     }
 

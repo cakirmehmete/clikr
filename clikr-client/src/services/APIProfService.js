@@ -1,4 +1,4 @@
-import { getProfDataAPI, duplicateCourseAPI, archiveCourseAPI, exportGradesCourseAPI, exportGradesLectureAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
+import { getProfDataAPI, patchUpdateLectureDescriptionAPI, duplicateCourseAPI, archiveCourseAPI, exportGradesCourseAPI, exportGradesLectureAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureTitleAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
 
 
 export default class APIProfService {
@@ -220,9 +220,21 @@ export default class APIProfService {
 
     // change lecture title
     changeLectureTitle(lectureId, lectureTitle) {
-        patchUpdateLectureAPI(lectureId, lectureTitle)
+        patchUpdateLectureTitleAPI(lectureId, lectureTitle)
             .then(res => {
-                this.professorStore.updateLecture(lectureId, lectureTitle)
+                this.professorStore.updateLectureTitle(lectureId, lectureTitle)
+            })
+            .catch(error => {
+                console.log(error);
+                this._checkAuth(error);
+            })
+    }
+
+    changeLectureDescription(lectureId, lectureDescription) {
+        return patchUpdateLectureDescriptionAPI(lectureId, lectureDescription)
+            .then(res => {
+                this.professorStore.updateLectureDescription(lectureId, lectureDescription)
+                return res.data.id
             })
             .catch(error => {
                 console.log(error);
@@ -241,6 +253,7 @@ export default class APIProfService {
             this._checkAuth(error);
         })
     }
+
     // remove lectures- input is array of lecture ids
     deleteLectures(lectures, courseId) {
         lectures.map(id => {

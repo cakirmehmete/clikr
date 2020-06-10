@@ -165,12 +165,18 @@ export function exportGradesCourseAPI(course_id) {
     return axios.get(baseURL + 'professor/courses/' + course_id + '/exportgrades')
 }
 
-// course: CourseObj
-export function patchUpdateLectureAPI(lecture_id, lecture_title) {
+export function patchUpdateLectureTitleAPI(lecture_id, lecture_title) {
     return axios.patch(baseURL + 'professor/lectures/' + lecture_id, {
         title: lecture_title,
     });
 }
+
+export function patchUpdateLectureDescriptionAPI(lecture_id, lecture_description) {
+    return axios.patch(baseURL + 'professor/lectures/' + lecture_id, {
+        description: lecture_description
+    });
+}
+
 // delete the course 
 export function deleteCourseAPI(course_id) {
     return axios.delete(baseURL + 'professor/courses/' + course_id);

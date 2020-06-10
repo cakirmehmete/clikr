@@ -69,8 +69,7 @@ export default class ProfessorStore {
     //         .find(lec => lec.id === lecture.id).questions.find(x => x.id === question_id)
     // }
     getQuestionWithId(lecture, question_id) {
-
-        if (lecture.questions === [])
+        if (lecture.questions === [] || lecture.questions === undefined)
             return new QuestionObj();
 
         if (lecture.questions.find(x => x.id === question_id) === undefined)
@@ -116,7 +115,6 @@ export default class ProfessorStore {
     @action
     updateCourseData(courseId, course) {
         const oldCourse = this.courses.find(x => x.id === courseId);
-        debugger;
         oldCourse.title = course.title
         oldCourse.dept = course.dept
         oldCourse.coursenum = course.coursenum
@@ -127,9 +125,15 @@ export default class ProfessorStore {
     }
 
     @action
-    updateLecture(lectureId, title) {
+    updateLectureTitle(lectureId, title) {
         const oldLecture = this.getLectureWithId(lectureId)
         oldLecture.title = title
+    }
+
+    @action
+    updateLectureDescription(lectureId, description) {
+        const oldLecture = this.getLectureWithId(lectureId)
+        oldLecture.description = description
     }
 
     @action
