@@ -598,7 +598,7 @@ def update_lecture(current_user, lecture_id):
     updated_data = request.get_json()
     lecture.update(updated_data)
 
-    return custom_response({'message': 'lecture updated'}, 200)
+    return custom_response({'message': 'lecture updated', 'id': lecture.id}, 200)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['DELETE'])
 @Auth.professor_auth_required
