@@ -111,6 +111,7 @@ class AllCoursesFrame extends React.Component {
         if (this.state.toNewCourse === true) {
             return <Redirect to='/professor/new' push />
         }
+        
         let list = <ListOfAllCourses profStore={this.profStore} apiProfService={this.apiProfService} />
         let deleteAction="Delete"
         

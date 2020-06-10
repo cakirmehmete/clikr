@@ -186,6 +186,7 @@ export default class APIProfService {
                 deleteCourseAPI(id)
                     .then(() => {
                         this.professorStore.removeCourse(id)
+                        this.professorStore.dataLoaded = false
                         this.loadData()
                     })
                     .catch(error => {

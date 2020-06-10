@@ -68,8 +68,7 @@ class EditCourseDialog extends React.Component {
         this.setState({ open: false });
     }
     handleSubmit = () => {
-        const newCourse = new CourseObj(this.state.title, this.course.id, this.course.num, this.course.dept, this.course.description, this.course.term, this.course.joinCode, this.course.year)
-        this.apiProfService.changeCourseTitle(newCourse);  
+        this.apiProfService.changeCourseTitle(this.course.id, this.state.title);
         this.handleClose();
     };
 

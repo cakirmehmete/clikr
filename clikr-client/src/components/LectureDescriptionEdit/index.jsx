@@ -50,7 +50,6 @@ class LectureDescriptionEdit extends React.Component {
     handleClose = () => {
         this.apiProfService.changeLectureDescription(this.state.parentLecture.id, this.state.description)
             .then(id => {
-                debugger;
                 this.setState({ 
                     editMode: false,
                     parentLecture: this.profStore.getLectureWithId(id)

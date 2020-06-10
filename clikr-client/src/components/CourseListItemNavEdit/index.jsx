@@ -64,7 +64,7 @@ class CourseListItemNavEdit extends React.Component {
         this.courseTitle = props.courseTitle
         this.courseYear = props.courseYear
         this.courseTerm = props.courseTerm
-        this.joinCode = props.joinCode
+        this.courseCode = props.courseCode
     }
 
     state = {
@@ -73,6 +73,9 @@ class CourseListItemNavEdit extends React.Component {
         newTitle: "",
         nav: false,
         courseId: this.courseId,
+        courseYear: this.courseYear,
+        courseTerm: this.courseTerm,
+        courseCode: this.courseCode,
         toHome: false
     }
 
@@ -80,19 +83,23 @@ class CourseListItemNavEdit extends React.Component {
         this.setState({
             courseTitle: this.courseTitle,
             newTitle: this.courseTitle,
-            courseId: this.courseId
+            courseId: this.courseId,
+            courseYear: this.courseYear,
+            courseTerm: this.courseTerm,
+            courseCode: this.courseCode
         })
     }
 
     componentWillReceiveProps(nextProps) {
         if (!this.state.editMode) {
-            if (nextProps.courseTitle !== this.courseTitle) {
-                this.joinCode = nextProps.joinCode;
+            if (nextProps.courseId !== this.courseId) {
                 this.setState({
                     courseTitle: nextProps.courseTitle,
                     newTitle: nextProps.courseTitle,
                     courseId: nextProps.courseId,
-                    joinCode: nextProps.joinCode,
+                    courseYear: nextProps.courseYear,
+                    courseTerm: nextProps.courseTerm,
+                    courseCode: nextProps.courseCode
                 })
             }
         } 
@@ -193,7 +200,7 @@ class CourseListItemNavEdit extends React.Component {
                                 </Tooltip>
                             </Grid>
                             <Grid item>
-                                <AddStudentsModal profStore={this.profStore} joinCode={this.state.joinCode} />
+                                <AddStudentsModal profStore={this.profStore} joinCode={this.state.courseCode} />
                             </Grid>  
                         </Grid>
                     </ListItemSecondaryAction>
@@ -205,7 +212,7 @@ class CourseListItemNavEdit extends React.Component {
                  <ListItem button divider onClick={this.handleToCourse}>
                     <Grid container direction="row" justify="flex-start">
                         <Grid item>
-                            <ListItemText primary={this.state.courseTitle} secondary={this.courseTerm + ' ' + this.courseYear} />
+                            <ListItemText primary={this.state.courseTitle} secondary={this.state.courseTerm + ' ' + this.state.courseYear} />
                         </Grid>
                     </Grid>
                     <ListItemSecondaryAction>
@@ -235,7 +242,7 @@ class CourseListItemNavEdit extends React.Component {
                                 </Tooltip>
                             </Grid>
                             <Grid item>
-                                <AddStudentsModal profStore={this.profStore} joinCode={this.joinCode} />
+                                <AddStudentsModal profStore={this.profStore} joinCode={this.state.courseCode} />
                             </Grid>
                         </Grid>
                     </ListItemSecondaryAction>

@@ -40,23 +40,26 @@ class ListOfAllCourses extends React.Component {
         if (this.state.referrerCourseId !== null) {
             return <Redirect to={'/professor/' + this.state.referrerCourseId + '/lectures'} push />
         }
+
+        var courseList = courses.map((courseObj, index) => {
+            return (
+                <CourseListItemNavEdit 
+                    key={index}
+                    archive={false}
+                    profStore={this.profStore} 
+                    apiProfService={this.apiProfService} 
+                    courseId={courseObj.id}
+                    courseTitle={courseObj.title}
+                    courseYear={courseObj.year}
+                    courseTerm={courseObj.term}
+                    courseCode={courseObj.enroll_code}
+                />
+            )
+        })
+
         return (
             <List component="nav">
-                {courses.map((courseObj, index) => {
-                    return (
-                        <CourseListItemNavEdit 
-                            key={index}
-                            archive={false}
-                            profStore={this.profStore} 
-                            apiProfService={this.apiProfService} 
-                            courseId={courseObj.id} 
-                            courseTitle={courseObj.title} 
-                            courseYear={courseObj.year}
-                            courseTerm={courseObj.term}
-                            joinCode={courseObj.enroll_code} 
-                        />
-                    )
-                })}
+                {courseList}
             </List>
         );
     }

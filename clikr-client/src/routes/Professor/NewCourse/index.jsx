@@ -41,9 +41,9 @@ class ProfessorNewCourse extends React.Component {
 
         this.state = {
             toHome: false,
-            name: '',
-            department: '',
-            courseNumber: '',
+            title: '',
+            dept: '',
+            num: '',
             year: '',
             term: '',
             description: ''
@@ -62,8 +62,7 @@ class ProfessorNewCourse extends React.Component {
         // Send course to API
         event.preventDefault()
         this.apiProfService.addCourse(
-            new CourseObj(this.state.name, this.state.courseNumber, this.state.department,
-                this.state.year, this.state.term, this.state.description)
+            new CourseObj(this.state)
         )
         // Close modal
         this.setState({ toHome: true });
@@ -84,27 +83,27 @@ class ProfessorNewCourse extends React.Component {
                 <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
                     <TextField
                         label="Course Name"
-                        name="name"
+                        name="title"
                         className={this.styles.textField}
-                        value={this.state.name}
+                        value={this.state.title}
                         onChange={this.handleChange}
                         margin="normal"
                     />
 
                     <TextField
                         label="Department"
-                        name="department"
+                        name="dept"
                         className={this.styles.textField}
-                        value={this.state.department}
+                        value={this.state.dept}
                         onChange={this.handleChange}
                         margin="normal"
                     />
 
                     <TextField
                         label="Course Number"
-                        name="courseNumber"
+                        name="num"
                         className={this.styles.textField}
-                        value={this.state.courseNumber}
+                        value={this.state.num}
                         onChange={this.handleChange}
                         margin="none"
                     />
@@ -139,7 +138,7 @@ class ProfessorNewCourse extends React.Component {
 
                     <Button
                         type="submit"
-                        disabled={!this.state.name}
+                        disabled={!this.state.title}
                         variant="outlined"
                         color="primary"
                         > submit
