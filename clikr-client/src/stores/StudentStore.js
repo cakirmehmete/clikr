@@ -53,6 +53,8 @@ export default class StudentStore {
     this.courses = []
 
     courses.forEach(element => {
+      element.num = element['coursenum']
+      element.joinCode = element['enroll_code']
       this.courses.push(new CourseObj(element))
     })
   }
