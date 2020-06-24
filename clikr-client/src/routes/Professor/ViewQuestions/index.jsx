@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import Grid from '@material-ui/core/Grid';
+import Collapse from '@material-ui/core/Collapse';
 import Paper from '@material-ui/core/Paper';
 import { observer, inject } from 'mobx-react';
 import { socketioURL } from '../../../constants/api';
@@ -12,7 +13,7 @@ import AllQuestionsFrame from '../../../components/AllQuestionsFrame';
 import MCQuestionStats from '../../../components/MCQuestionStats';
 import FreeTextStats from '../../../components/FreeTextStats';
 import SliderStats from '../../../components/SliderStats';
-import LectureDescriptionEdit from '../../../components/LectureDescriptionEdit';
+
 
 const socket = socketIOClient(socketioURL)
 
@@ -261,13 +262,11 @@ class ProfessorViewQuestions extends React.Component {
                     <Typography variant="h4" component="h4" className={this.styles.textQ} align="center">
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
                     </Typography>
-                    <Grid item>
-                        <LectureDescriptionEdit 
-                            profStore={this.profStore} 
-                            apiProfService={this.apiProfService}
-                            parentLecture={this.state.parentLecture}
-                        />
-                    </Grid>
+                    <Collapse in={this.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_image}>
+                        <Grid item align="center">
+                            <img src={this.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_image} alt="Preview Unavailable" height={300}></img>
+                        </Grid>
+                    </Collapse>
                     <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3 || this.state.parentLecture.questions.length === 0 || this.state.editDeleteMode }>
                         {this.state.btnStatus === 0 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
                             this.state.btnStatus === 1 ? "Close Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :

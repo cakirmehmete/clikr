@@ -4,6 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import { Redirect } from "react-router-dom";
 import Button from '@material-ui/core/Button';
+import Collapse from '@material-ui/core/Collapse';
 import Typography from '@material-ui/core/Typography';
 import { observer, inject } from 'mobx-react';
 import { MultipleChoiceQuestionObj } from '../../../models/QuestionObj';
@@ -25,10 +26,10 @@ import DoneIcon from '@material-ui/icons/Done';
 const styles = theme => ({
     paper: {
         position: 'absolute',
-        width: theme.spacing.unit*44,
+        width: theme.spacing.unit*60,
     },
     select: {
-        width: theme.spacing.unit*44
+        width: theme.spacing.unit*60
     },
     icon: {
         margin: theme.spacing.unit,
@@ -38,7 +39,7 @@ const styles = theme => ({
         flexWrap: 'wrap',
     },
     item: {
-        paddingBottom: theme.spacing.unit*4,
+        paddingBottom: theme.spacing.unit*4
     },
     buttonContainer: {
         paddingTop: theme.spacing.unit*2,
@@ -90,6 +91,7 @@ class ProfessorAddMCQuestion extends React.Component {
         title: '',
         correct_answer: '',
         number_of_options: "",
+        question_image_string: "",
         options: [], // necessary because of controlled form
         answer_choices: {option1: "", option2: "", option3: "", option4: "", option5: ""}, // must be set for input base to be controlled
         checked: {option1: false, option2: false, option3: false, option4: false, option5: false},
@@ -102,6 +104,7 @@ class ProfessorAddMCQuestion extends React.Component {
         delete_mode: false,
         deleteDisabled: false,
         deleteConfirmDisabled: false,
+        uploading: false,
     };
 
     constructor(props) {
@@ -313,11 +316,23 @@ class ProfessorAddMCQuestion extends React.Component {
         }, () => { this.validateFields(name, value) });
     };
 
+    encodeImageFileAsURL = (event) => {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onloadend = () => {
+          console.log('RESULT', reader.result);
+          this.setState({ question_image_string: reader.result })
+        }
+        reader.onloadend = reader.onloadend.bind(this)
+        reader.readAsDataURL(file);
+    }
+
     handleSubmit = (event) => {
         event.preventDefault();
         if (this.state.formValid) {
             const { lectureId } = this.props.match.params
-    
+
+            // EMRE: What is this?? lol
             let correct_answer = "";
             if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
                 correct_answer = this.state.correct_answer.substring(6, 7);
@@ -327,7 +342,7 @@ class ProfessorAddMCQuestion extends React.Component {
             this.props.apiService.addQuestion(
                 new MultipleChoiceQuestionObj(null,
                     lectureId, "multiple_choice",
-                    this.state.title, correct_answer,
+                    this.state.title, this.state.question_image_string, this.state.correct_answer,
                     null, null, null, null, null, null, null,
                     this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
                     this.state.number_of_options)
@@ -351,8 +366,8 @@ class ProfessorAddMCQuestion extends React.Component {
 
         return (
             <Grid container direction="column" justify="center" className={this.styles.paper}>
-                <Grid item >
-                    <Typography variant="h6" color="textPrimary">
+                <Grid item className={this.styles.item} >
+                    <Typography variant="h3" color="textPrimary">
                         Add New Question:
                     </Typography>
                 </Grid>
@@ -393,6 +408,7 @@ class ProfessorAddMCQuestion extends React.Component {
                         </FormControl>
                     </form>
                 </Grid>
+
                 {this.state.hasAnswers && 
                     <Grid item>
                         <Table>
@@ -473,8 +489,28 @@ class ProfessorAddMCQuestion extends React.Component {
                     </Grid>
                 }
                 
-                
-                
+                <Grid item className={this.styles.item}>
+                    <Button
+                        variant="contained"
+                        component="label"
+                    >
+                    Upload Image
+                    <input
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={this.encodeImageFileAsURL}
+                    />
+                    </Button>
+                </Grid>
+
+                <Collapse in={this.state.question_image_string} timeout="auto" unmountOnExit>
+                    <Typography variant="h6" color="textPrimary">
+                        Image Preview
+                    </Typography>
+                    <Grid item className={this.styles.item}>
+                        <img src={this.state.question_image_string} height={300} alt="Preview Unavailable"></img>
+                    </Grid>
+                </Collapse>
 
                 <Grid item className={this.styles.item}>
                     <Grid container direction="row" className={this.styles.buttonContainer}>

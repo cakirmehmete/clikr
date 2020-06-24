@@ -20,6 +20,7 @@ class QuestionModel(db.Model):
     lecture_id = db.Column(db.String(36), db.ForeignKey('lectures.id', onupdate='CASCADE', ondelete='CASCADE'))
     question_type = db.Column(db.String(32), nullable=False)
     question_title = db.Column(db.String(256), nullable=True)
+    question_image = db.Column(db.String(10485760), nullable=True)
     question_text = db.Column(db.String(1024), nullable=True)
     correct_answer = db.Column(db.String(1024), nullable=True)
     creator_id = db.Column(db.String(36), db.ForeignKey('professors.id', onupdate='CASCADE', ondelete='SET NULL'))
@@ -48,6 +49,7 @@ class QuestionModel(db.Model):
         self.question_type = data.get('question_type')
         self.question_title = data.get('question_title')
         self.question_text = data.get('question_text')
+        self.question_image = data.get('question_image')
         self.correct_answer = data.get('correct_answer')
         self.creator_id = data.get('creator_id')
         self.is_open = False
@@ -175,7 +177,7 @@ class SliderModel(QuestionModel):
 
 
 class DragAndDropModel(QuestionModel):
-    # answer1 is the correct match for opttion1, etc.
+    # answer1 is the correct match for option1, etc.
     question1 = db.Column(db.String(1024), nullable=True)
     question2 = db.Column(db.String(1024), nullable=True)
     question3 = db.Column(db.String(1024), nullable=True)
@@ -216,7 +218,8 @@ class QuestionSchema(Schema):
     lecture_id = CustomStringField(required=True)
     question_type = CustomStringField(required=True)
     question_title = CustomStringField()
-    question_text = CustomStringField(required=False)
+    question_image = CustomStringField()
+    question_text = CustomStringField()
     correct_answer = CustomStringField()
     creator_id = CustomStringField()
     is_open = CustomBoolField(dump_only=True)

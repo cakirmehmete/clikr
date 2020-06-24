@@ -658,6 +658,7 @@ def create_question(current_user, lecture_id):
 
     # get data from request body
     req_data = request.get_json()
+    print("LENGTH:", len(req_data['question_image']))
     req_data['creator_id'] = current_user.id
     req_data['lecture_id'] = lecture_id
 

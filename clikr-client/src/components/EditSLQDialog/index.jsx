@@ -1,6 +1,8 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Collapse from '@material-ui/core/Collapse';
+import Typography from '@material-ui/core/Typography';
 import { observer } from 'mobx-react';
 import Grid from '@material-ui/core/Grid';
 import APIProfService from '../../services/APIProfService';
@@ -51,7 +53,11 @@ const styles = theme => ({
         display:"flex", 
     },
     entry: {
-        maxWidth: 500
+        maxWidth: 500,
+        paddingBottom: theme.spacing.unit
+    },
+    buttonItem: {
+        paddingRight: theme.spacing.unit * 2,
     },
     titleContainer: {
         paddingTop: theme.spacing.unit,
@@ -121,6 +127,7 @@ class EditSLQDialog extends React.Component {
         open: false,
         title: '',
         titleError: "",
+        question_image: "",
         labels: {lower:"0%", upper:"100%"}, // labels on slider
         answer_bounds: {upper:"", lower:""}, 
         range: false, // whether or not correct answer has a range
@@ -143,7 +150,7 @@ class EditSLQDialog extends React.Component {
     componentDidMount() {
         const {lower_label, upper_label, correct_answer} = this.props.questionObj
 
-        this.setState({ title: this.props.questionObj.question_title })
+        this.setState({ title: this.props.questionObj.question_title, question_image: this.props.questionObj.question_image })
 
         if (lower_label !== null) {
             if (lower_label !== "0%" || upper_label !== "100%") {
@@ -503,12 +510,27 @@ class EditSLQDialog extends React.Component {
             this.props.getEdits( 
                 new SliderQuestionObj(this.props.questionObj.id, 
                     this.props.questionObj.lecture_id, "slider", 
-                    this.state.title, correct_answer, 
+                    this.state.title, this.state.question_image, correct_answer, 
                     this.props.questionObj.creator_id, this.props.questionObj.is_open, 
                     this.props.questionObj.opened_at, this.props.questionObj.closed_at, 
                     this.props.questionObj.created_at, null, null, this.state.labels.lower, this.state.labels.upper))
         }
         this.handleClose();
+    }
+
+    removeImage = () => {
+        this.setState({ question_image: "" })
+    }
+
+    encodeImageFileAsURL = (event) => {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onloadend = () => {
+          console.log('RESULT', reader.result);
+          this.setState({ question_image: reader.result })
+        }
+        reader.onloadend = reader.onloadend.bind(this)
+        reader.readAsDataURL(file);
     }
     
     render() {
@@ -543,7 +565,48 @@ class EditSLQDialog extends React.Component {
                                     helperText={this.state.titleError}
                                 />
                             </form>
-                        </Grid>  
+                        </Grid>
+
+                        <Collapse in={this.state.question_image} timeout="auto" unmountOnExit>
+                            <Grid item className={this.styles.entry}>
+                                <Typography variant="h6" color="textPrimary">
+                                    Image Preview
+                                </Typography>
+                            </Grid>
+                            <Grid item className={this.styles.entry}>
+                                <img src={this.state.question_image} height={300} alt="Preview Unavailable"></img>
+                            </Grid>
+                        </Collapse>
+
+                        <Grid item className={this.styles.entry}>
+                            <Grid container direction="row">
+                                <Grid item className={this.styles.buttonItem}>
+                                    <Button
+                                        variant="contained"
+                                        component="label"
+                                    >
+                                    {this.state.question_image ? "Update Image" : "Upload Image"}
+                                    <input
+                                        type="file"
+                                        style={{ display: "none" }}
+                                        onChange={this.encodeImageFileAsURL}
+                                    />
+                                    </Button>
+                                </Grid>
+
+                                <Collapse in={this.state.question_image} timeout="auto" unmountOnExit>
+                                    <Grid item className={this.styles.buttonItem}>
+                                        <Button
+                                            variant="contained"
+                                            component="label"
+                                            onClick={this.removeImage}
+                                        >
+                                        Remove Image
+                                        </Button>
+                                    </Grid>
+                                </Collapse>
+                            </Grid>
+                        </Grid>
                     </Grid>
                     <Grid container direction="column" justify="flex-start" >
                         <Grid item>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Collapse from '@material-ui/core/Collapse';
 import { Redirect } from "react-router-dom";
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -126,6 +127,7 @@ class ProfessorAddSliderQuestion extends React.Component {
         slider_value: 50,
         has_correct_answer: false,
         custom_labels: false,
+        question_image_string: "",
         fieldsValid: {title: false, lower_label:false, upper_label:false, lower_bound:false, upper_bound: false, equality_operators: false},
         disabled: true
     };
@@ -408,6 +410,17 @@ class ProfessorAddSliderQuestion extends React.Component {
         return condition;
     }
 
+    encodeImageFileAsURL = (event) => {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onloadend = () => {
+          console.log('RESULT', reader.result);
+          this.setState({ question_image_string: reader.result })
+        }
+        reader.onloadend = reader.onloadend.bind(this)
+        reader.readAsDataURL(file);
+    }
+
     handleSubmit = (e) => {
         e.preventDefault();
 
@@ -441,7 +454,7 @@ class ProfessorAddSliderQuestion extends React.Component {
 
         // Send course to API
         this.props.apiService.addQuestion(
-            new SliderQuestionObj(null, lectureId, "slider", this.state.title, correct_answer, null, null, null, null, null, null, null, this.state.labels.lower, this.state.labels.upper)
+            new SliderQuestionObj(null, lectureId, "slider", this.state.title, this.state.question_image_string, correct_answer, null, null, null, null, null, null, null, this.state.labels.lower, this.state.labels.upper)
         );
 
         this.setState({ toQuestions: true });
@@ -477,7 +490,20 @@ class ProfessorAddSliderQuestion extends React.Component {
                                     helperText={this.state.titleError}
                                 />
                             </form>
-                        </Grid>  
+                        </Grid>
+                        <Grid item>
+                            <Button
+                                variant="contained"
+                                component="label"
+                            >
+                            Upload Image
+                            <input
+                                type="file"
+                                style={{ display: "none" }}
+                                onChange={this.encodeImageFileAsURL}
+                            />
+                            </Button>
+                        </Grid>
                     </Grid>
                     <Grid container direction="column" justify="flex-start" >
                         <Grid item>
@@ -672,6 +698,11 @@ class ProfessorAddSliderQuestion extends React.Component {
                 <Grid item className={this.styles.gridItem} xs={12} sm={6}>
                     <Grid container direction="column" align-items="flex-start" spacing={24}>
                         <Grid item><Typography variant="h6" color="textPrimary"> Preview: </Typography></Grid>
+                        <Collapse in={this.state.question_image_string} timeout="auto" unmountOnExit>
+                            <Grid item align="center">
+                                <img src={this.state.question_image_string} height={300} alt="Preview Unavailable"></img>
+                            </Grid>
+                        </Collapse>
                         <Grid item>
                             <Grid container direction="column" justify="center" spacing={24}>
                                 <Grid item xs={12}>
