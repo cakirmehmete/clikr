@@ -2,7 +2,8 @@
 
 from flask import request, Response, Blueprint, session, render_template, redirect, send_from_directory
 import uuid
-import datetime
+from datetime import datetime, timezone, date
+import pytz
 import random, string, os
 import csv
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
@@ -513,6 +514,9 @@ def create_lecture(current_user, course_id):
     req_data = request.get_json()
     req_data['creator_id'] = current_user.id
     req_data['course_id'] = course_id
+
+    # DEBUG TIMEZONES
+    
     data, error = lecture_schema.load(req_data)
 
     if error:
@@ -529,6 +533,12 @@ def create_lecture(current_user, course_id):
     all_lectures = course.lectures
     all_lectures_data = lecture_schema.dump(all_lectures, many=True).data
     return custom_response({'message': 'lecture created', 'id': lecture.id, 'lectures': all_lectures_data}, 201)
+
+
+def convert_date(old_date):
+    date = datetime.strptime(old_date[:-5], '%Y-%m-%dT%H:%M:%S')
+    date.replace(tzinfo=timezone.utc).astimezone(tz=None)
+    return date.strftime('%Y-%m-%d')
 
 @professor_api.route('/lectures/<lecture_id>', methods=['GET'])
 @Auth.professor_auth_required
@@ -597,6 +607,8 @@ def update_lecture(current_user, lecture_id):
     # get data from request body
     updated_data = request.get_json()
     lecture.update(updated_data)
+
+    # DEBUG TIMEZONES
 
     return custom_response({'message': 'lecture updated', 'id': lecture.id}, 200)
 
@@ -837,7 +849,7 @@ def _export_grades(course=None, lecture=None):
             score_dict[student_id]['Lectures Attended'] += 1
 
     # note that heroku discards dynamically generated files on dyno restart!
-    today = datetime.date.today().strftime("%b-%d-%Y")
+    today = date.today().strftime("%b-%d-%Y")
     filename = f'grades_for_{file_id}_on_{today}.csv'
     dirname = os.path.dirname(__file__)
     with open(os.path.join(dirname, 'dynamic_content/grades/', filename), 'w') as f:
@@ -942,7 +954,7 @@ def handle_question_action(current_user, question_id):
         return custom_response({'error': 'action required'}, 400)
 
     if action == 'open':
-        lecture.date = datetime.date.today().strftime('%Y-%m-%d')
+        lecture.date = date.today().strftime('%Y-%m-%d')
         lecture.save()
 
         success = _open_question(question, course)
@@ -987,10 +999,14 @@ def _open_question(question, course):
     if question.is_open:
         return False
 
+    # check if lecture is scheduled
+    if question.lecture.scheduled:
+        return False
+
     # open the question (note that that questions can be opened and closed multiple times)
     updated_data = {
         'is_open': True,
-        'opened_at': datetime.datetime.utcnow(),
+        'opened_at': datetime.utcnow(),
         'closed_at': None
     }
     question.update(updated_data)
@@ -1015,7 +1031,7 @@ def _close_question(question, course):
     # close the question
     updated_data = {
         'is_open': False,
-        'closed_at': datetime.datetime.utcnow()
+        'closed_at': datetime.utcnow()
     }
     question.update(updated_data)
 
