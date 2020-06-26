@@ -89,7 +89,6 @@ class ClassCard extends React.Component {
 
     
     render() {
-        debugger;
         return (
             
                 <Card className={this.state.colorStyle}>

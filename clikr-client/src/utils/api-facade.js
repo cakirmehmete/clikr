@@ -117,7 +117,10 @@ export function postNewLectureAPI(lecture) {
     return axios.post(baseURL + 'professor/courses/' + lecture.course_id + '/lectures', {
         title: lecture.title,
         date: lecture.date,
-        description: lecture.description
+        description: lecture.description,
+        open_date: lecture.openDate,
+        close_date: lecture.closeDate,
+        scheduled: lecture.scheduled
     });
 }
 
@@ -165,15 +168,14 @@ export function exportGradesCourseAPI(course_id) {
     return axios.get(baseURL + 'professor/courses/' + course_id + '/exportgrades')
 }
 
-export function patchUpdateLectureTitleAPI(lecture_id, lecture_title) {
-    return axios.patch(baseURL + 'professor/lectures/' + lecture_id, {
-        title: lecture_title,
-    });
-}
-
-export function patchUpdateLectureDescriptionAPI(lecture_id, lecture_description) {
-    return axios.patch(baseURL + 'professor/lectures/' + lecture_id, {
-        description: lecture_description
+export function patchUpdateLectureAPI(lecture) {
+    return axios.patch(baseURL + 'professor/lectures/' + lecture.id, {
+        title: lecture.title,
+        date: lecture.date,
+        description: lecture.description,
+        open_date: lecture.openDate,
+        close_date: lecture.closeDate,
+        scheduled: lecture.scheduled
     });
 }
 

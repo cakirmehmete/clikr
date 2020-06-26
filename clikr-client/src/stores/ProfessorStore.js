@@ -125,15 +125,16 @@ export default class ProfessorStore {
     }
 
     @action
-    updateLectureTitle(lectureId, title) {
-        const oldLecture = this.getLectureWithId(lectureId)
-        oldLecture.title = title
-    }
+    updateLecture(lecture) {
+        const oldLecture = this.getLectureById(lecture.id)
 
-    @action
-    updateLectureDescription(lectureId, description) {
-        const oldLecture = this.getLectureWithId(lectureId)
-        oldLecture.description = description
+        oldLecture.title = lecture.title
+        oldLecture.closeDate = lecture.closeDate
+        oldLecture.openDate = lecture.openDate
+        oldLecture.scheduled = lecture.scheduled
+        oldLecture.date = lecture.date
+
+        console.log(oldLecture)
     }
 
     @action

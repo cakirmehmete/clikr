@@ -124,7 +124,6 @@ class AllQuestionsFrame extends React.Component {
 
     // gets course edits from child
     getEdits = (question) => {
-
         this.props.apiProfService.editQuestion(question);
         this.props.mcqEditDetect();
     }
@@ -271,10 +270,10 @@ class AllQuestionsFrame extends React.Component {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.handleClose} autoFocus color="secondary">
-                            no
+                            No
                         </Button>
                         <Button onClick={this.handleDeletion} color="secondary">
-                            yes
+                            Yes
                         </Button>
                     </DialogActions>
                 </Dialog>

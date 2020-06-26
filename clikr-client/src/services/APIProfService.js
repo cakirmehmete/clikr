@@ -1,4 +1,4 @@
-import { getProfDataAPI, patchUpdateLectureDescriptionAPI, duplicateCourseAPI, archiveCourseAPI, exportGradesCourseAPI, exportGradesLectureAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureTitleAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
+import { getProfDataAPI, patchUpdateLectureAPI, duplicateCourseAPI, archiveCourseAPI, exportGradesCourseAPI, exportGradesLectureAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
 
 
 export default class APIProfService {
@@ -219,31 +219,17 @@ export default class APIProfService {
             })
     }
 
-    // change lecture title
-    changeLectureTitle(lectureId, lectureTitle) {
-        patchUpdateLectureTitleAPI(lectureId, lectureTitle)
-            .then(res => {
-                this.professorStore.updateLectureTitle(lectureId, lectureTitle)
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
+    editLecture(lectureObj) {
+        return patchUpdateLectureAPI(lectureObj)
+        .then(res => {
+            this.professorStore.updateLecture(lectureObj);
+        })
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+        })
     }
 
-    changeLectureDescription(lectureId, lectureDescription) {
-        return patchUpdateLectureDescriptionAPI(lectureId, lectureDescription)
-            .then(res => {
-                this.professorStore.updateLectureDescription(lectureId, lectureDescription)
-                return res.data.id
-            })
-            .catch(error => {
-                console.log(error);
-                this._checkAuth(error);
-            })
-    }
-
-    // edit a question
     editQuestion(questionObj) {
         patchUpdateQuestionAPI(questionObj)
         .then(res => {

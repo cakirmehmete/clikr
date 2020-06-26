@@ -22,7 +22,7 @@ const styles = theme => ({
         ...theme.mixins.gutters(),
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 7,
-        backgroundColor: '#3C4252',
+        backgroundColor: theme.palette.secondary.main,
     },
     grid: {
         paddingTop: theme.spacing.unit * 2,
@@ -259,6 +259,11 @@ class ProfessorViewQuestions extends React.Component {
                     <Typography variant="h6" component="h6" className={this.styles.text}>
                         {this.state.parentLecture.title} on {this.state.parentLecture.date}
                     </Typography>
+                    <Collapse in={this.state.parentLecture.scheduled}>
+                        <Typography variant="h6" component="h6" className={this.styles.text} align="right">
+                            Questions available from {this.state.parentLecture.open_date} to {this.state.parentLecture.close_date}
+                        </Typography>
+                    </Collapse>
                     <Typography variant="h4" component="h4" className={this.styles.textQ} align="center">
                         Q{this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1}: {this.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_title}
                     </Typography>
@@ -267,13 +272,16 @@ class ProfessorViewQuestions extends React.Component {
                             <img src={this.profStore.getQuestionWithId(this.state.parentLecture, this.state.currentQuestionId).question_image} alt="Preview Unavailable" height={300}></img>
                         </Grid>
                     </Collapse>
-                    <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3 || this.state.parentLecture.questions.length === 0 || this.state.editDeleteMode }>
-                        {this.state.btnStatus === 0 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
-                            this.state.btnStatus === 1 ? "Close Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
-                                this.state.btnStatus === 2 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 2) :
-                                    "No More Questions"}
-                    </Button>
+                    <Collapse in={!this.state.parentLecture.scheduled}>
+                        <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()} className={this.styles.startLectureBtn} disabled={this.state.btnStatus === 3 || this.state.parentLecture.questions.length === 0 || this.state.editDeleteMode }>
+                            {this.state.btnStatus === 0 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
+                                this.state.btnStatus === 1 ? "Close Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 1) :
+                                    this.state.btnStatus === 2 ? "Open Question " + (this.convertQuestionIdToIndex(this.state.currentQuestionId) + 2) :
+                                        "No More Questions"}
+                        </Button>
+                    </Collapse>
                 </Paper>
+                
                 <Grid container spacing={24} className={this.styles.grid}>
                     <Grid item xs={12} md={8}>
                         <AllQuestionsFrame handleListClose={this.handleListClickClose} handleClick={this.handleListClick} profStore={this.profStore}  

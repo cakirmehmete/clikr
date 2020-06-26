@@ -3,7 +3,7 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
-from ..shared.Util import CustomStringField, CustomIntegerField, CustomDateTimeField, CustomDateField
+from ..shared.Util import CustomStringField, CustomIntegerField, CustomDateTimeField, CustomDateField, CustomBoolField
 import uuid
 
 class LectureModel(db.Model):
@@ -18,7 +18,10 @@ class LectureModel(db.Model):
     id = db.Column(db.String(36), primary_key=True) # uuid
     course_id = db.Column(db.String(36), db.ForeignKey('courses.id', onupdate='CASCADE', ondelete='CASCADE'))
     date = db.Column(db.Date, nullable=True)
+    open_date = db.Column(db.Date, nullable=True)
+    close_date = db.Column(db.Date, nullable=True)
     title = db.Column(db.String(256), nullable=True)
+    scheduled = db.Column(db.Boolean, nullable=False, default=False)
     description = db.Column(db.String(1024), nullable=True)
     creator_id = db.Column(db.String(36), db.ForeignKey('professors.id', onupdate='CASCADE', ondelete='SET NULL'))
     created_at = db.Column(db.DateTime)
@@ -35,9 +38,12 @@ class LectureModel(db.Model):
         self.id = str(uuid.uuid4())
         self.course_id = data.get('course_id')
         self.date = data.get('date')
+        self.open_date = data.get('open_date')
+        self.close_date = data.get('close_date')
         self.title = data.get('title')
         self.description = data.get('description')
         self.creator_id = data.get('creator_id')
+        self.scheduled = data.get('scheduled')
         timestamp = datetime.datetime.utcnow()
         self.created_at = timestamp
         self.modified_at = timestamp
@@ -74,6 +80,9 @@ class LectureSchema(Schema):
     id = CustomStringField(dump_only=True)
     course_id = CustomStringField(required=True)
     date = CustomDateField()
+    open_date = CustomDateField()
+    close_date = CustomDateField()
+    scheduled = CustomBoolField()
     title = CustomStringField()
     description = CustomStringField()
     creator_id = CustomStringField()

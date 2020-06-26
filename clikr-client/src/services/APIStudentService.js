@@ -36,7 +36,6 @@ export default class APIStudentService {
             .then(res => {
                 console.log(res.data)
                 this.studentStore.updateAllQuestions(res.data)
-
             })
             .catch(error => {
                 console.log(error.response);

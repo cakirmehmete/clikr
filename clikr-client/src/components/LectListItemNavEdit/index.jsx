@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 import ListItem from '@material-ui/core/ListItem';
 import { observer } from 'mobx-react';
 import IconButton from '@material-ui/core/IconButton';
-import EditIcon from '@material-ui/icons/Edit';
+import EditLectureDialog from '../../components/EditLectureDialog'
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 import DoneIcon from '@material-ui/icons/Done';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -62,7 +62,7 @@ class LectListItemNavEdit extends React.Component {
     
     state = {
         editMode: false,
-        lecture: new LectureObj(),
+        lecture: new LectureObj(null, new Date()),
         newTitle: "",
         nav: false
     }
@@ -139,32 +139,20 @@ class LectListItemNavEdit extends React.Component {
             return  <Redirect to={'/professor/' + this.state.lecture.id + '/questions'} push />
         }
 
-        if (this.state.editMode) {
-            return (
-                <ListItem divider>
-                    <FormControl>
-                        <InputBase
-                        id="bootstrap-input"
-                        name="newTitle"
-                        value={this.state.newTitle}
-                        onChange={e => this.handleEdit(e)}
-                        classes={{
-                            input: this.styles.bootstrapInput
-                        }}
-                        />
-                    </FormControl>
-                    <ListItemSecondaryAction>
-                        <Grid container direction="row" justify="flex-end">  
+        return (
+            <div>
+                <ListItem button divider onClick={this.handleToLecture}>
+                    <ListItemText primary={this.state.lecture.title} secondary={''+ this.state.lecture.date} />
+                    <ListItemSecondaryAction>  
+                        <Grid container direction="row" justify="flex-end" alignItems="center">  
                             <Grid item>
-                                <Tooltip title="Done Editing" placement="top">
-                                    <IconButton color="secondary" onClick={this.handleEditClose}>
-                                        <DoneIcon className={this.styles.iconDone}/>
-                                    </IconButton>
+                                <Tooltip title="Edit Lecture" placement="top">
+                                    <EditLectureDialog lectureObj={this.state.lecture} />
                                 </Tooltip>
                             </Grid>
                             <Grid item>
                                 <Tooltip title="Export Grades" placement="top">
-                                    <IconButton color="secondary" href={baseURL + "professor/lectures/" + this.state.lecture.id + "/exportgrades"} target="_blank">
+                                    <IconButton color="secondary" onClick={this.handleExportGrades}>
                                         <ImportExportIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -172,33 +160,8 @@ class LectListItemNavEdit extends React.Component {
                         </Grid>
                     </ListItemSecondaryAction>
                 </ListItem>
-            )
-        }
-        else {
-            return (
-                 <ListItem button divider onClick={this.handleToLecture}>
-                   <ListItemText primary={this.state.lecture.title} secondary={this.state.lecture.date} />
-                        <ListItemSecondaryAction>  
-                            <Grid container direction="row" justify="flex-end">  
-                                <Grid item>
-                                    <Tooltip title="Change Title" placement="top">
-                                        <IconButton color="secondary" onClick={this.handleEditOpen}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Grid>
-                                <Grid item>
-                                    <Tooltip title="Export Grades" placement="top">
-                                        <IconButton color="secondary" onClick={this.handleExportGrades}>
-                                            <ImportExportIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Grid>
-                            </Grid>
-                        </ListItemSecondaryAction>
-                </ListItem>
-            )
-        }
+            </div>
+        )
     }
 }
 
