@@ -608,9 +608,10 @@ def update_lecture(current_user, lecture_id):
     updated_data = request.get_json()
     lecture.update(updated_data)
 
-    # DEBUG TIMEZONES
+    lecture_data = lecture_schema.dump(lecture).data
+    lecture_data['num_questions'] = len(lecture.questions)
 
-    return custom_response({'message': 'lecture updated', 'id': lecture.id}, 200)
+    return custom_response({'message': 'lecture updated', 'id': lecture.id, 'lecture': lecture_data}, 200)
 
 @professor_api.route('/lectures/<lecture_id>', methods=['DELETE'])
 @Auth.professor_auth_required

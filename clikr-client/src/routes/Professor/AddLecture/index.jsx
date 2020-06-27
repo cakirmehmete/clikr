@@ -101,20 +101,34 @@ class ProfessorAddLecture extends React.Component {
         this.setState({formValid: this.state.titleValid && this.state.dateValid });
     }
 
+    modifyDate = date => {
+        date.setUTCDate(date.getDate());
+        date.setUTCHours(12);
+        date.setUTCMinutes(0);
+        date.setUTCMinutes(0);
+
+        return date;
+    }
 
     handleDateChange = date => {
+        date = this.modifyDate(date);
+
         this.setState({
             selectedDate: date
         })
     }
 
     handleOpenDateChange = date => {
+        date = this.modifyDate(date);
+
         this.setState({ 
             openDate: date
         }, () => { this.handleValidation() })
     }
 
     handleCloseDateChange = date => {
+        date = this.modifyDate(date);
+
         this.setState({
             closeDate: date
         }, () => { this.handleValidation() })

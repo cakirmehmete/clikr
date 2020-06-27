@@ -222,7 +222,7 @@ export default class APIProfService {
     editLecture(lectureObj) {
         return patchUpdateLectureAPI(lectureObj)
         .then(res => {
-            this.professorStore.updateLecture(lectureObj);
+            this.professorStore.updateLecture(res.data.lecture);
         })
         .catch(error => {
             console.log(error);
