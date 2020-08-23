@@ -27,7 +27,7 @@ class Auth():
                 return jsonify({'error': 'permission denied'}), 401
             
             current_user = ProfessorModel.get_professor_by_netId(username)
-            
+            print(current_user)
             return f(current_user, *args, **kwargs)
 
         return decorated
