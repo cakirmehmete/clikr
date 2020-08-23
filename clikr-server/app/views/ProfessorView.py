@@ -116,7 +116,7 @@ def create_course(current_user):
     
     req_data['creator_id'] = current_user.id
     print(req_data)
-    print(course_schema)
+    print(course_schema.__dict__)
     data, error = course_schema.load(req_data)
 
     if error:
