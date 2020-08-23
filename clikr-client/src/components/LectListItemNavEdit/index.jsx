@@ -139,6 +139,8 @@ class LectListItemNavEdit extends React.Component {
             return  <Redirect to={'/professor/' + this.state.lecture.id + '/questions'} push />
         }
 
+        debugger;
+
         return (
             <div>
                 <ListItem button divider onClick={this.handleToLecture}>

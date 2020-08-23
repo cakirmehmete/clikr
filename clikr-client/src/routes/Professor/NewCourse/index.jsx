@@ -46,16 +46,34 @@ class ProfessorNewCourse extends React.Component {
             num: '',
             year: '',
             term: '',
-            description: ''
+            description: '',
+            formValid: false,
+            yearValid: false,
+            titleValid: false
         }
 
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
     }
 
+    handleValidation() {
+        var titleValid = true;
+        var yearValid = true;
+
+        if (this.state.title === '' ) {
+            titleValid = false;
+        }
+
+        if (isNaN(this.state.year)) {
+            yearValid = false;
+        }
+
+        this.setState({titleValid: titleValid, yearValid: yearValid, formValid: titleValid && yearValid})
+    }
+
     handleChange(event) {
         const { name, value } = event.target
-        this.setState({ [name]: value })
+        this.setState({ [name]: value }, () => { this.handleValidation() })
     }
 
     handleSubmit(event) {
@@ -84,6 +102,8 @@ class ProfessorNewCourse extends React.Component {
                     <TextField
                         label="Course Name"
                         name="title"
+                        error={!this.state.titleValid}
+                        helperText="Course must have a title"
                         className={this.styles.textField}
                         value={this.state.title}
                         onChange={this.handleChange}
@@ -111,6 +131,8 @@ class ProfessorNewCourse extends React.Component {
                     <TextField
                         label="Year"
                         name="year"
+                        error={!this.state.yearValid}
+                        helperText="Year must be an integer"
                         className={this.styles.textField}
                         value={this.state.year}
                         onChange={this.handleChange}
@@ -138,7 +160,7 @@ class ProfessorNewCourse extends React.Component {
 
                     <Button
                         type="submit"
-                        disabled={!this.state.title}
+                        disabled={!this.state.formValid}
                         variant="outlined"
                         color="primary"
                         > submit

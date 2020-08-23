@@ -2,8 +2,9 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
-from ..shared.Util import CustomStringField, CustomDateTimeField
+from ..shared.Util import CustomStringField, CustomDateTimeField, generate_salt
 import uuid
+import hashlib
 
 # helper table for the many-to-many relationship courses-students
 courses_students = db.Table('courses_students',
@@ -22,6 +23,8 @@ class StudentModel(db.Model):
     # columns
     id = db.Column(db.String(36), primary_key=True) # uuid
     netId = db.Column(db.String(128), unique=True, nullable=False)
+    # salt = db.Column(db.String(128), nullable=False)
+    # password_hash = db.Column(db.String(256), nullable=False)
     firstName = db.Column(db.String(128), nullable=True)
     lastName = db.Column(db.String(128), nullable=True)
     created_at = db.Column(db.DateTime)
@@ -88,6 +91,9 @@ class StudentSchema(Schema):
     """
     id = CustomStringField(dump_only=True)
     netId = CustomStringField(required=True)
+    password = CustomStringField()
+    salt = CustomStringField()
+    password_hash = CustomStringField()
     firstName = CustomStringField()
     lastName = CustomStringField()
     created_at = CustomDateTimeField(dump_only=True)

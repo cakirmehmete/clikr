@@ -108,9 +108,8 @@ class EditLectureDialog extends React.Component {
     }
 
     modifyDate = date => {
-        console.log(date.getYear(), date.getMonth(), date.getDate());
-        date = new Date(Date.UTC(date.getYear(), date.getMonth(), date.getDate(), 0, 0, 0));
-        console.log(date);
+        date = new Date(Date.UTC(date.getYear() + 1900, date.getMonth(), date.getDate(), 12, 0, 0));
+        // console.log(date);
 
         return date;
     }
