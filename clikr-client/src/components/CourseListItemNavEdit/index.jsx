@@ -143,7 +143,7 @@ class CourseListItemNavEdit extends React.Component {
 
     handleArchive = () => {
         this.apiProfService.archiveCourse(this.state.courseId)
-            .then(message => {
+            .then(() => {
                 this.setState({ toHome: true })
             })
     }

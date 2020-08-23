@@ -36,6 +36,8 @@ class ListOfAllCourses extends React.Component {
             return courseObj.is_current
         })
 
+        debugger;
+
         // Handle routes
         if (this.state.referrerCourseId !== null) {
             return <Redirect to={'/professor/' + this.state.referrerCourseId + '/lectures'} push />
@@ -46,7 +48,7 @@ class ListOfAllCourses extends React.Component {
                 <CourseListItemNavEdit 
                     key={index}
                     archive={false}
-                    profStore={this.profStore} 
+                    profStore={this.profStore}
                     apiProfService={this.apiProfService} 
                     courseId={courseObj.id}
                     courseTitle={courseObj.title}
