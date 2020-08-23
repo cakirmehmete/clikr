@@ -3,6 +3,8 @@ import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { Redirect } from "react-router-dom";
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Collapse from '@material-ui/core/Collapse';
 import Typography from '@material-ui/core/Typography';
 import { observer, inject } from 'mobx-react';
 import { FreeTextQuestionObj } from '../../../models/QuestionObj';
@@ -15,6 +17,9 @@ const styles = theme => ({
     container: {
         display: 'flex',
         flexWrap: 'wrap',
+    },
+    item: {
+        paddingBottom: theme.spacing.unit
     },
     textField: {
         marginLeft: theme.spacing.unit,
@@ -34,6 +39,7 @@ class ProfessorAddFreeTextQuestion extends React.Component {
         error: '',
         titleValid: false,
         correct_answer_valid: true,
+        question_image_string: ''
     };
 
     constructor(props) {
@@ -81,6 +87,17 @@ class ProfessorAddFreeTextQuestion extends React.Component {
         }, () => { this.handleValidation(name, value) });
     };
 
+    encodeImageFileAsURL = (event) => {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onloadend = () => {
+          console.log('RESULT', reader.result);
+          this.setState({ question_image_string: reader.result })
+        }
+        reader.onloadend = reader.onloadend.bind(this)
+        reader.readAsDataURL(file);
+    }
+
     handleSubmit = (event) => {
         event.preventDefault();
 
@@ -89,7 +106,7 @@ class ProfessorAddFreeTextQuestion extends React.Component {
     
             // Send course to API
             this.props.apiService.addQuestion(
-                new FreeTextQuestionObj(null, lectureId, "free_text", this.state.title, this.state.correct_answer, null, null, null, null, null, null, null, '')
+                new FreeTextQuestionObj(null, lectureId, "free_text", this.state.title, this.state.question_image_string, this.state.correct_answer, null, null, null, null, null, null, null, '')
             )
     
             this.setState({ toQuestions: true });
@@ -108,30 +125,65 @@ class ProfessorAddFreeTextQuestion extends React.Component {
                 <Typography variant="h6" color="textPrimary">
                     Add New Question:
                 </Typography>
+
                 <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
-                    <TextField
-                        required
-                        error={!this.state.titleValid && !(this.state.error === "")}
-                        label="Question Title"
-                        className={this.styles.textField}
-                        value={this.state.title}
-                        onChange={this.handleChange('title')}
-                        margin="normal"
-                        helperText={this.state.error}
-                    />
-                    <TextField
-                        label="Correct Answer"
-                        className={this.styles.textField}
-                        value={this.state.correct_answer}
-                        onChange={this.handleChange('correct_answer')}
-                        margin="normal"
-                    />
-                    <Button
-                        type="submit"
-                        disabled={!this.state.titleValid || !this.state.correct_answer_valid}
-                        variant="outlined"
-                        color="primary"
-                        onClick={this.handleSubmit}>Submit</Button>
+                    <Grid container direction="column">
+                        <TextField
+                            required
+                            error={!this.state.titleValid && !(this.state.error === "")}
+                            label="Question Title"
+                            className={this.styles.textField}
+                            value={this.state.title}
+                            onChange={this.handleChange('title')}
+                            margin="normal"
+                            helperText={this.state.error}
+                        />
+                        
+                        <TextField
+                            label="Correct Answer"
+                            className={this.styles.textField}
+                            value={this.state.correct_answer}
+                            onChange={this.handleChange('correct_answer')}
+                            margin="normal"
+                        />
+
+                        <Grid item className={this.styles.item}>
+                            <Button
+                                variant="contained"
+                                component="label"
+                            >
+                            Upload Image
+                            <input
+                                type="file"
+                                style={{ display: "none" }}
+                                onChange={this.encodeImageFileAsURL}
+                            />
+                            </Button>
+                        </Grid>
+
+                        <Collapse in={this.state.question_image_string} timeout="auto" unmountOnExit>
+                            <Grid item className={this.styles.item}>
+                                <Typography variant="h6" color="textPrimary">
+                                    Image Preview
+                                </Typography>
+                            </Grid>
+
+                            <Grid item className={this.styles.item}>
+                                <img src={this.state.question_image_string} height={300} alt="Preview Unavailable"></img>
+                            </Grid>
+                        </Collapse>
+
+                        <Grid item className={this.styles.item}>
+                            <Button
+                                type="submit"
+                                disabled={!this.state.titleValid || !this.state.correct_answer_valid}
+                                variant="outlined"
+                                color="primary"
+                                onClick={this.handleSubmit}>
+                                Submit
+                            </Button>
+                        </Grid>
+                    </Grid>
                 </form>
             </div>
         );

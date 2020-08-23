@@ -3,6 +3,8 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
+import Collapse from '@material-ui/core/Collapse';
+import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import { Redirect } from "react-router-dom";
 import { inject } from 'mobx-react';
@@ -13,7 +15,7 @@ import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
 const styles = theme => ({
     paper: {
         position: 'absolute',
-        width: theme.spacing.unit * 50,
+        width: theme.spacing.unit * 80,
     },
     container: {
         display: 'flex',
@@ -22,13 +24,18 @@ const styles = theme => ({
     gridItem: {
         margin: theme.spacing.unit
     },
+    dateField: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        width: theme.spacing.unit * 30,
+    },
     gridItemButton: {
         margin: theme.spacing.unit*2
     },
     textField: {
         marginLeft: theme.spacing.unit,
         marginRight: theme.spacing.unit,
-        width: 400,
+        width: theme.spacing.unit * 60,
     },
 });
 
@@ -47,11 +54,16 @@ class ProfessorAddLecture extends React.Component {
             toLecture: false,
             title: "Lecture ",
             courseId: this.courseId,
+            // description: "",
+            scheduled: false,
             numLects: this.props.location.state.numLects.toString(),
             errors: {title: ''},
             titleValid: true,
             formValid: false,
-            selectedDate: date
+            selectedDate: date,
+            dateValid: true,
+            openDate: date,
+            closeDate: date
         }
     }
 
@@ -66,6 +78,7 @@ class ProfessorAddLecture extends React.Component {
 
     handleValidation() {
         let titleValid = this.state.titleValid;
+        let dateValid = this.state.dateValid;
         let errors = this.state.errors;
 
         if (this.state.title === '') {
@@ -76,30 +89,68 @@ class ProfessorAddLecture extends React.Component {
             titleValid = true
         }
 
-        this.setState({ titleValid: titleValid }, this.validateForm);
+        if (this.state.scheduled) {
+            dateValid = this.state.closeDate.getTime() >= this.state.openDate.getTime()
+        }
+
+        this.setState({ titleValid: titleValid, dateValid: dateValid }, this.validateForm);
     }
+
 
     validateForm() {
-        this.setState({formValid: this.state.titleValid });
+        this.setState({formValid: this.state.titleValid && this.state.dateValid });
     }
 
+    modifyDate = date => {
+        date.setUTCDate(date.getDate());
+        date.setUTCHours(12);
+        date.setUTCMinutes(0);
+        date.setUTCMinutes(0);
+
+        return date;
+    }
 
     handleDateChange = date => {
+        date = this.modifyDate(date);
+
         this.setState({
             selectedDate: date
         })
-    }  
+    }
 
-    handleChange = name => event => {
+    handleOpenDateChange = date => {
+        date = this.modifyDate(date);
+
+        this.setState({ 
+            openDate: date
+        }, () => { this.handleValidation() })
+    }
+
+    handleCloseDateChange = date => {
+        date = this.modifyDate(date);
+
         this.setState({
-            [name]: event.target.value,
+            closeDate: date
+        }, () => { this.handleValidation() })
+    }
+
+    handleChange = (event) => {
+        const {name, value} = event.target
+        this.setState({
+            [name]: value
         }, () => { this.handleValidation() });
     };
 
+    handleCheck = (event) => {
+        const {name, checked} = event.target
+        this.setState({
+            [name]: checked
+        }, () => {this.handleValidation() });
+    }
+
     handleSubmit = () => {
-        // Send course to API
         this.props.apiService.addLecture(
-            new LectureObj(this.state.title, this.state.selectedDate, null, this.state.courseId)
+            new LectureObj(this.state.title, this.state.selectedDate, null, this.state.courseId, null, this.state.scheduled, this.state.openDate, this.state.closeDate)
         )
         this.setState({ toLecture: true });
     }
@@ -122,26 +173,77 @@ class ProfessorAddLecture extends React.Component {
                         <TextField
                             requiredtitle="true"
                             error={!this.state.titleValid}
-                            id="standard-name"
+                            name="title"
                             label="Lecture Title"
                             className={this.styles.textField}
                             value={this.state.title}
-                            onChange={this.handleChange('title')}
+                            onChange={this.handleChange}
                             margin="normal"
                             helperText={this.state.errors["title"]}
+                            multiline={true}
                         />
                     </Grid>
+
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <Grid item className={this.styles.gridItem}>
-                        <DatePicker
-                            margin="normal"
-                            label="Lecture Date"
-                            value={this.state.selectedDate}
-                            onChange={this.handleDateChange}
-                            className={this.styles.textField}
-                        />
+                            <DatePicker
+                                margin="normal"
+                                label="Lecture Date"
+                                name="selectedDate"
+                                value={this.state.selectedDate}
+                                onChange={this.handleDateChange}
+                                className={this.styles.dateField}
+                            />
                         </Grid>
                     </MuiPickersUtilsProvider>
+
+                    <Grid item className={this.styles.gridItem}>
+                        <Grid container direction="row" alignItems="center">
+                            <Grid item>
+                                <Checkbox
+                                    checked={this.state.scheduled}
+                                    onChange={this.handleCheck}
+                                    name="scheduled"
+                                />
+                            </Grid>
+
+                            <Grid item>
+                                <Typography variant="body2" color="textPrimary">
+                                    Schedule the Lecture to Open and Close at Specific Dates
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Collapse in={this.state.scheduled} timeout="auto" unmountOnExit>
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <Grid container direction="row">
+                                <Grid item className={this.styles.gridItem}>
+                                    <DatePicker
+                                        margin="normal"
+                                        label="Start Date"
+                                        name="openDate"
+                                        value={this.state.openDate}
+                                        onChange={this.handleOpenDateChange}
+                                        className={this.styles.dateField}
+                                    />
+                                </Grid>
+
+                                <Grid item className={this.styles.gridItem}>
+                                    <DatePicker
+                                        margin="normal"
+                                        label="End Date"
+                                        name="closeDate"
+                                        value={this.state.closeDate}
+                                        onChange={this.handleCloseDateChange}
+                                        className={this.styles.dateField}
+                                    />
+                                </Grid>
+                            </Grid>
+                            
+                        </MuiPickersUtilsProvider>
+                    </Collapse>
+
                     <Grid item className={this.styles.gridItemButton}>
                         <Button
                             disabled={!this.state.formValid}

@@ -7,8 +7,59 @@ export function getProfDataAPI() {
     return axios.get(baseURL + 'professor/data');
 }
 
+export function loginProfessorAPI(username, password) {
+    return axios.post(baseURL + 'admin/professorlogin', {
+        netId: username,
+        password: password
+    });
+}
+
+export function createProfessorAPI(username, password, firstName, lastName) {
+    return axios.post(baseURL + 'admin/professor', {
+        netId: username,
+        password: password,
+        firstName: firstName,
+        lastName: lastName
+    });
+}
+
+export function archiveCourseAPI(course_id) {
+    return axios.post(baseURL + 'professor/courses/' + course_id + '/archive');
+}
+
+export function duplicateCourseAPI(course_id, year, term) {
+    return axios.post(baseURL + 'professor/courses/' + course_id + '/duplicate', {
+        year: year,
+        term: term
+    });
+}
+
+export function loginStudentAPI(username, password) {
+    return axios.post(baseURL + 'admin/studentlogin', {
+        netId: username,
+        password: password
+    });
+}
+
+export function createStudentAPI(username, password, firstName, lastName) {
+    return axios.post(baseURL + 'admin/student', {
+        netId: username,
+        password: password,
+        firstName: firstName,
+        lastName: lastName
+    });
+}
+
 export function getProfAnswers(question_id) {
     return axios.get(baseURL + 'professor/questions/' + question_id + '/statistics');
+}
+
+export function getProfNameAPI() {
+    return axios.get(baseURL + 'professor/name');
+}
+
+export function getStudentNameAPI() {
+    return axios.get(baseURL + 'student/name');
 }
 
 export function getStudentCoursesAPI() {
@@ -52,7 +103,12 @@ export function postCloseAllQuestionsAPI(lecture_id) {
 // course: CourseObj
 export function postNewCourseAPI(course) {
     return axios.post(baseURL + 'professor/courses', {
-        title: course.title
+        title: course.title,
+        dept: course.dept,
+        coursenum: course.num,
+        description: course.description,
+        year: course.year,
+        term: course.term
     });
 }
 
@@ -61,6 +117,10 @@ export function postNewLectureAPI(lecture) {
     return axios.post(baseURL + 'professor/courses/' + lecture.course_id + '/lectures', {
         title: lecture.title,
         date: lecture.date,
+        description: lecture.description,
+        open_date: lecture.openDate,
+        close_date: lecture.closeDate,
+        scheduled: lecture.scheduled
     });
 }
 
@@ -88,12 +148,37 @@ export function patchUpdateCourseAPI(course_id, course_title) {
         title: course_title
     });
 }
-// course: CourseObj
-export function patchUpdateLectureAPI(lecture_id, lecture_title) {
-    return axios.patch(baseURL + 'professor/lectures/' + lecture_id, {
-        title: lecture_title,
+
+export function patchUpdateCourseDataAPI(course_id, course) {
+    return axios.patch(baseURL + 'professor/courses/' + course_id, {
+        title: course.title,
+        dept: course.dept,
+        coursenum: course.coursenum,
+        year: course.year,
+        term: course.term,
+        description: course.description
     });
 }
+
+export function exportGradesLectureAPI(lecture_id) {
+    return axios.get(baseURL + 'professor/lectures/' + lecture_id + '/exportgrades')
+}
+
+export function exportGradesCourseAPI(course_id) {
+    return axios.get(baseURL + 'professor/courses/' + course_id + '/exportgrades')
+}
+
+export function patchUpdateLectureAPI(lecture) {
+    return axios.patch(baseURL + 'professor/lectures/' + lecture.id, {
+        title: lecture.title,
+        date: lecture.date,
+        description: lecture.description,
+        open_date: lecture.openDate,
+        close_date: lecture.closeDate,
+        scheduled: lecture.scheduled
+    });
+}
+
 // delete the course 
 export function deleteCourseAPI(course_id) {
     return axios.delete(baseURL + 'professor/courses/' + course_id);
@@ -125,6 +210,7 @@ export function patchUpdateQuestionAPI(question) {
         lecture_id: question.lecture_id,
         question_type: question.question_type,
         question_title: question.question_title,
+        question_image: question.question_image,
         correct_answer: question.correct_answer,
         option1: question.option1,
         option2: question.option2,
@@ -143,6 +229,7 @@ export function postNewQuestionAPI(question) {
         lecture_id: question.lecture_id,
         question_type: question.question_type,
         question_title: question.question_title,
+        question_image: question.question_image,
         correct_answer: question.correct_answer,
         creator_id: question.creator_id,
         option1: question.option1,

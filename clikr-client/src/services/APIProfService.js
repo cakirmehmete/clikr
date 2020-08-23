@@ -1,9 +1,70 @@
-import { getProfDataAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, patchUpdateLectureAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
+import { getProfDataAPI, patchUpdateLectureAPI, duplicateCourseAPI, archiveCourseAPI, exportGradesCourseAPI, exportGradesLectureAPI, patchUpdateCourseDataAPI, getProfNameAPI, getProfAnswers, postNewCourseAPI, postNewQuestionAPI, postNewLectureAPI, postOpenQuestionAPI, postCloseQuestionAPI, getLogoutProfAPI, patchUpdateCourseAPI, deleteCourseAPI, getProfCoursesAPI, deleteLecturesAPI, getQuestionsForLectureAPI, postCloseAllQuestionsAPI, deleteQuestionsAPI, patchUpdateQuestionAPI } from '../utils/api-facade';
 
 
 export default class APIProfService {
     constructor(professorStore) {
         this.professorStore = professorStore;
+    }
+    
+    async getName() {
+        return getProfNameAPI()
+            .then(res => {
+                return res.data.name
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
+    }
+
+    archiveCourse(course_id) {
+        return archiveCourseAPI(course_id)
+            .then(res => {
+                this.professorStore.updateCourseData(res.data.id, res.data.course)
+                return res.data.message
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
+    }
+
+    duplicateCourse(course_id, year, term) {
+        return duplicateCourseAPI(course_id, year, term)
+            .then(res => {
+                return res.data
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
+    }
+
+    exportGradesLecture(lecture_id) {
+        return exportGradesLectureAPI(lecture_id)
+            .then(res => {
+                return res.data
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
+    }
+
+    exportGradesCourse(course_id) {
+        return exportGradesCourseAPI(course_id)
+            .then(res => {
+                return res.data
+            })
+            .catch(error => {
+                console.log(error)
+                this._checkAuth(error)
+                return []
+            })
     }
 
     loadData() {
@@ -17,6 +78,7 @@ export default class APIProfService {
                     this._checkAuth(error);
                 })
         }
+
         return new Promise(function () {
             return true
         })
@@ -124,6 +186,7 @@ export default class APIProfService {
                 deleteCourseAPI(id)
                     .then(() => {
                         this.professorStore.removeCourse(id)
+                        this.professorStore.dataLoaded = false
                         this.loadData()
                     })
                     .catch(error => {
@@ -145,11 +208,10 @@ export default class APIProfService {
             })
     }
 
-    // change lecture title
-    changeLectureTitle(lectureId, lectureTitle) {
-        patchUpdateLectureAPI(lectureId, lectureTitle)
+    changeCourseData(courseId, course) {
+        patchUpdateCourseDataAPI(courseId, course)
             .then(res => {
-                this.professorStore.updateLecture(lectureId, lectureTitle)
+                this.professorStore.updateCourseData(courseId, course)
             })
             .catch(error => {
                 console.log(error);
@@ -157,7 +219,17 @@ export default class APIProfService {
             })
     }
 
-    // edit a question
+    editLecture(lectureObj) {
+        return patchUpdateLectureAPI(lectureObj)
+        .then(res => {
+            this.professorStore.updateLecture(res.data.lecture);
+        })
+        .catch(error => {
+            console.log(error);
+            this._checkAuth(error);
+        })
+    }
+
     editQuestion(questionObj) {
         patchUpdateQuestionAPI(questionObj)
         .then(res => {
@@ -168,6 +240,7 @@ export default class APIProfService {
             this._checkAuth(error);
         })
     }
+
     // remove lectures- input is array of lecture ids
     deleteLectures(lectures, courseId) {
         lectures.map(id => {
@@ -224,7 +297,7 @@ export default class APIProfService {
     _checkAuth(error) {
         if (error.response !== undefined) {
             if (error.response.status === 401)
-                window.location.replace('/login-prof')
+                window.location.replace('/login/prof')
         }
     }
 }

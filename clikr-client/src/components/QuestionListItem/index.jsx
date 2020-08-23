@@ -62,11 +62,6 @@ class QuestionListItem extends React.Component {
                 <ListItemText primary={(this.props.number + 1) + ". " + this.props.questionObj.question_title} />
                 <ListItemSecondaryAction>
                     <Grid container direction="row" justify="flex-end">
-                        <Grid item >
-                            <Tooltip title="View Stats" placement="top">
-                                <ViewStatsModalWrapped index={(this.props.number + 1)} question={this.props.questionObj} parentLecture={this.props.parentLecture} />
-                            </Tooltip>
-                        </Grid>
                         <Grid item className={this.styles.open}>
                             {this.props.mode === "viewingMode" ? (<OpenClosedButton className={this.styles.open} parentLecture={this.props.parentLecture}
                                 questionId={this.props.questionObj.id} handleListClose={this.props.handleListClose}
@@ -79,7 +74,12 @@ class QuestionListItem extends React.Component {
                                         : (<EditSLQDialog questionObj={this.props.questionObj} getEdits={this.props.getEdits} is_open={this.state.selected}/> )) 
                                 )
                             }
-                            
+                        </Grid>
+
+                        <Grid item >
+                            <Tooltip title="View Stats" placement="top">
+                                <ViewStatsModalWrapped index={(this.props.number + 1)} question={this.props.questionObj} parentLecture={this.props.parentLecture} />
+                            </Tooltip>
                         </Grid>
                     </Grid>
                 </ListItemSecondaryAction>

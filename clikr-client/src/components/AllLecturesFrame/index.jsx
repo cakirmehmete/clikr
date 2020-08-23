@@ -7,8 +7,9 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { observer } from 'mobx-react';
 import PropTypes from 'prop-types';
-import CourseObj from '../../models/LectureObj';
+import CourseObj from '../../models/CourseObj';
 import ListOfAllLectures from '../ListOfAllLectures';
+import CourseInfo from '../CourseInfo';
 import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -49,6 +50,7 @@ class AllLecturesFrame extends React.Component {
         delIds: [],
         open: false
     }
+
     constructor(props) {
         super(props)
         this.styles = props.classes
@@ -163,6 +165,7 @@ class AllLecturesFrame extends React.Component {
         }
 
         let list = <ListOfAllLectures courseId={this.state.parentCourse.id} profStore={this.profStore} apiProfService={this.apiProfService} />
+        let course_info = <CourseInfo courseId={this.state.parentCourse.id} profStore={this.profStore} apiProfService={this.apiProfService} />
         let deleteAction = "delete"
 
         if (this.state.deleteMode) {
@@ -174,9 +177,11 @@ class AllLecturesFrame extends React.Component {
             <div>
                 <Card className={this.props.classes.card}>
                     <CardContent>
+                        {course_info} 
+
                         <Grid container direction='row' justify='space-between' alignItems='stretch'>
                             <Grid item>
-                                <Typography className={this.styles.title} variant="h6" color="inherit">Lectures for {this.state.parentCourse.title} </Typography>
+                                <Typography className={this.styles.title} variant="h6" color="inherit">List of Lectures</Typography>
                             </Grid>
                             <Grid item>
                                 <Grid container direction="row" justify="flex-end">
@@ -196,7 +201,9 @@ class AllLecturesFrame extends React.Component {
                                 </Grid>
                             </Grid>
                         </Grid>
+
                         {list}
+
                     </CardContent>
                 </Card>
                 <Dialog
@@ -205,7 +212,7 @@ class AllLecturesFrame extends React.Component {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the folowing lecture(s): "}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the following lecture(s): "}</DialogTitle>
                     <DialogContent>
                         {this.state.delTitles.map((title, index) =>
                             <DialogContentText key={index} id="alert-dialog-description">

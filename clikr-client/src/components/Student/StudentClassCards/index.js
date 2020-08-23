@@ -73,6 +73,7 @@ class ClassCard extends React.Component {
             colorStyle: colors[this.props.colorIndex]
         });
     }
+    
     handleOpen = () => {
         this.setState({ open: true });
     };
@@ -89,6 +90,7 @@ class ClassCard extends React.Component {
     
     render() {
         return (
+            
                 <Card className={this.state.colorStyle}>
                     <CardContent>
                         <Grid container direction="row" justify="space-between" alignItems="stretch" spacing={24}>
@@ -100,13 +102,13 @@ class ClassCard extends React.Component {
                                 }
                                 }}>
                                     <Typography className={this.styles.typography} variant="h4">
-                                        {this.props.name}
+                                        {this.props.course.dept} {this.props.course.num} - {this.props.course.title}: {this.props.course.term} {this.props.course.year}
                                     </Typography>
                                 </Link>
                             </Grid>
                             <Grid item xs={2}>
                                 <Grid container direction="row" justify="flex-end">
-                                    <Tooltip title="drop course" disableFocusListener placement="top-start">
+                                    <Tooltip title="Drop Course" disableFocusListener placement="top-start">
                                         <Button variant="text" size="small" onClick={this.handleOpen}>
                                             <Icon className={this.styles.icon} color="secondary">delete</Icon>
                                         </Button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Collapse from '@material-ui/core/Collapse';
 import { socketioURL } from '../../constants/api';
 import socketIOClient from 'socket.io-client'
 import { observer, inject } from 'mobx-react';
@@ -77,10 +78,12 @@ class OpenClosedButton extends React.Component {
 
     render() {
         return (
-            <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()}
-                className={this.styles.startLectureBtn}>
-                {!this.state.isOpen ? "Open" : "Close"}
-            </Button>
+            <Collapse in={!this.props.parentLecture.scheduled}>
+                <Button variant="outlined" color="primary" onClick={() => this.handleBtnClick()}
+                    className={this.styles.startLectureBtn}>
+                    {!this.state.isOpen ? "Open" : "Close"}
+                </Button>
+            </Collapse>
         );
     }
 }

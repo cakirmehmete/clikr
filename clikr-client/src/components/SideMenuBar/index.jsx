@@ -26,6 +26,13 @@ const styles = theme => ({
     listtext: {
         color: theme.palette.primary.main
     },
+    listsubtext: {
+        color: theme.palette.primary.dark
+    },
+    titletext: {
+        color: theme.palette.primary.main,
+        paddingTop: theme.spacing.unit*2
+    },
     nestedListtext: {
         color: theme.palette.primary.main,
         paddingLeft: theme.spacing.unit*2,
@@ -110,6 +117,10 @@ class SideMenuBar extends React.Component {
     }
 
     render() {
+        var courses = this.profStore.courses.filter((courseObj) => {
+            return courseObj.is_current
+        })
+
         return (
             <Grid container direction="column" justify="center" alignItems="center">
                 <Drawer
@@ -123,14 +134,19 @@ class SideMenuBar extends React.Component {
                 
                 <Grid item><Grid container direction="row" justify="center" ><img src={logo} alt="logo" height={80}/></Grid></Grid>
                 <Grid item><Divider /></Grid>
+                <Grid item align="center"><Typography variant="h5" className={this.styles.titletext}>Courses</Typography></Grid>
                 <Grid item>
                     <List>
-                        {this.profStore.courses.map((courseObj, index) => {
+                        {courses.map((courseObj, index) => {
                             var lectures = this.profStore.getCourseLectures(courseObj.id);
                             return (
                                 <div key={"div" + index}>
                                     <ListItem className={this.styles.hover} button key={index} onClick={() => this.handleCourseClick(courseObj.id)} selected={this.state.selectedCourse === courseObj.id}>
-                                        <ListItemText disableTypography primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} />
+                                        <ListItemText disableTypography 
+                                            primary={<Typography type="body2" className={this.styles.listtext}>{courseObj.title}</Typography>} 
+                                            secondary={<Typography type="body2" className={this.styles.listsubtext}>{courseObj.term} {courseObj.year}</Typography>}
+                                        />
+
                                         <ListItemSecondaryAction>
                                             <IconButton color="primary" disabled={lectures.length === 0} onClick={() => this.handleExpand(courseObj.id)}>
                                                 {lectures.length > 0 && this.state.open === courseObj.id ? <ExpandLess /> : <ExpandMore />}

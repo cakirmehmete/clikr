@@ -7,9 +7,10 @@ from ..models.StudentModel import StudentModel, StudentSchema
 from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceSchema, FreeTextSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
+from ..models.LectureModel import LectureModel, LectureSchema
 from .. import db, cas
 from ..shared.Authentication import Auth
-from ..shared.Util import custom_response
+from ..shared.Util import custom_response, check_lecture_open, check_lecture_past
 from ..shared.SocketIOUtil import emit_question_statistics
 from ..shared.MarshmallowUtil import dump_one_question
 
@@ -22,6 +23,7 @@ student_api = Blueprint('students', __name__)
 student_schema = StudentSchema()
 course_schema = CourseSchema()
 answer_schema = AnswerSchema()
+lecture_schema = LectureSchema()
 
 @socketio.on('subscribe student')
 def on_join(course_id):
@@ -50,14 +52,18 @@ def on_join(course_id):
     open_questions = QuestionModel.query.filter_by(is_open=True).all()
 
     # filter for the specified course
-    questions_data = []
-    for question in open_questions:
-        if question.lecture.course_id == course_id:
-            # use the appropriate question schema
-            question_data = dump_one_question(question, exclude=['correct_answer'])
-            questions_data.append(question_data)
+    questions_data = get_open_questions(course_id)
     
     emit('all open questions', {'questions': questions_data, 'message': 'you joined the room (course) ' + course_id})
+
+@student_api.route('/name', methods=['GET'])
+@Auth.student_auth_required
+def get_name(current_user):
+    """
+    Returns name of the current prof
+    """
+    full_name = f'{current_user.firstName} {current_user.lastName}'
+    return custom_response({'name': full_name}, 200)
 
 @student_api.route('/courses', methods=['GET'])
 @Auth.student_auth_required
@@ -130,7 +136,7 @@ def drop_course(current_user, course_id):
 
 @student_api.route('/courses/<course_id>/questions', methods=['GET'])
 @Auth.student_auth_required
-def get_open_questions(current_user, course_id):
+def get_open_questions_api(current_user, course_id):
     """
     returns all open questions for this course
     """
@@ -143,8 +149,16 @@ def get_open_questions(current_user, course_id):
     if not current_user in course.students:
         return custom_response({'error': 'permission denied'}, 400)
 
+    questions_data = get_open_questions(course_id)
+
+    return custom_response(questions_data, 200)
+
+def get_open_questions(course_id):
     # query database to get ALL open questions
-    open_questions = QuestionModel.query.filter_by(is_open=True).all()
+    all_lectures = LectureModel.query.filter_by(course_id=course_id).all()
+    lecture_ids = [lecture.id for lecture in all_lectures]
+    scheduled_lectures = [lecture for lecture in all_lectures if check_lecture_open(lecture)]
+    open_questions = QuestionModel.query.filter(QuestionModel.lecture_id.in_(lecture_ids), QuestionModel.is_open==True).all()
 
     # filter for the specified course
     questions_data = []
@@ -154,7 +168,12 @@ def get_open_questions(current_user, course_id):
             question_data = dump_one_question(question, exclude=['correct_answer'])
             questions_data.append(question_data)
 
-    return custom_response(questions_data, 200)
+    for lecture in scheduled_lectures:
+        for question in lecture.questions:
+            question_data = dump_one_question(question, exclude=['correct_answer'])
+            questions_data.append(question_data)
+
+    return questions_data
 
 @student_api.route('/courses/<course_id>/prevquestions', methods=['GET'])
 @Auth.student_auth_required
@@ -173,12 +192,29 @@ def get_previous_questions(current_user, course_id):
 
     # return list of all previous (already closed) questions for this course
     # query database to get ALL previously closed questions # TODO: this may be way too inefficient
-    prev_questions = QuestionModel.query.filter(QuestionModel.closed_at != None).order_by(QuestionModel.closed_at.desc()).all()
+    all_lectures = LectureModel.query.filter_by(course_id=course.id).all()
+    lecture_ids = [lecture.id for lecture in all_lectures]
+    past_lectures = [lecture for lecture in all_lectures if check_lecture_past(lecture)]
+    prev_questions = QuestionModel.query.filter(QuestionModel.lecture_id.in_(lecture_ids), QuestionModel.closed_at != None).order_by(QuestionModel.closed_at.desc()).all()
 
     # filter for the specified course
     prev_questions_data = []
     for question in prev_questions:
         if question.lecture.course_id == course_id:
+            # use the appropriate question schema
+            question_data = dump_one_question(question)
+
+            # retrieve the student's answer to this question
+            answer_tuple = AnswerModel.query.filter_by(question_id=question.id, student_id=current_user.id).first()
+            if answer_tuple:
+                question_data['answer'] = answer_tuple.answer
+            else:
+                question_data['answer'] = None
+            
+            prev_questions_data.append(question_data)
+
+    for lecture in past_lectures:
+        for question in lecture.questions:
             # use the appropriate question schema
             question_data = dump_one_question(question)
 
@@ -231,10 +267,11 @@ def submit_answer(current_user, question_id):
     # retrieve course and check permissions
     course = question.lecture.course
     if not current_user in course.students:
-        return custom_response({'error': 'permission denied'}, 400)
+        return custom_response({'error': 'permission denied - student is not enrolled'}, 400)
 
-    # check if question is open
-    if not question.is_open:
+    # check if question is open or if lecture is open
+    lecture_is_open = check_lecture_open(question.lecture)
+    if not (question.is_open or lecture_is_open):
         return custom_response({'error': 'question is not open'}, 400)
 
     # get data from request body

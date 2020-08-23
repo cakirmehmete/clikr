@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 import ListItem from '@material-ui/core/ListItem';
 import { observer } from 'mobx-react';
 import IconButton from '@material-ui/core/IconButton';
-import EditIcon from '@material-ui/icons/Edit';
+import EditLectureDialog from '../../components/EditLectureDialog'
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 import DoneIcon from '@material-ui/icons/Done';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -13,6 +13,7 @@ import InputBase from '@material-ui/core/InputBase';
 import ListItemText from '@material-ui/core/ListItemText';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
+import LectureObj from '../../models/LectureObj';
 import { baseURL } from '../../constants/api';
 
 const styles = theme => ({
@@ -56,41 +57,40 @@ class LectListItemNavEdit extends React.Component {
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = props.apiProfService
-        this.lectureId = props.lectureId
-        this.lectureTitle = props.lectureTitle
+        this.lecture = props.lecture
     }
+    
     state = {
         editMode: false,
-        lectureTitle: this.lectureTitle,
+        lecture: new LectureObj(null, new Date()),
         newTitle: "",
-        nav: false,
-        lectureId: this.lectureId
+        nav: false
     }
 
     componentDidMount() {
-        this.setState({
-            lectureTitle: this.lectureTitle,
-            newTitle: this.lectureTitle,
-            lectureId: this.lectureId,
-        })
+        if (this.lecture !== undefined) {
+            this.setState({
+                lecture: this.lecture,
+                newTitle: this.lecture.title
+            })
+        }
     }
 
     componentWillReceiveProps(nextProps) {
         if (!this.state.editMode) {
-            if (nextProps.lectureTitle !== this.lectureTitle) {
-                this.lectureTitle = nextProps.lectureTitle;
+            if (nextProps.lecture !== undefined && nextProps.lecture.id !== this.state.lecture.id) {
                 this.setState({
-                    lectureTitle: nextProps.lectureTitle,
-                    newTitle: nextProps.lectureTitle,
-                    lectureId: nextProps.lectureId
+                    lecture: nextProps.lecture,
+                    newTitle: nextProps.lecture.title
                 })
             }
         } 
     }
 
     handleEdit = (e) => {
+        const {name, value} = e.target
         this.setState({
-            [e.target.name]: e.target.value
+            [name]: value
         })
     }
     
@@ -104,10 +104,9 @@ class LectListItemNavEdit extends React.Component {
 
         // only close if the title is not empty space
         if (this.state.newTitle.replace(/\s/g, '').length > 0) {
-            this.apiProfService.changeLectureTitle(this.lectureId, this.state.newTitle);
+            this.apiProfService.changeLectureTitle(this.state.lecture.id, this.state.newTitle);
             this.setState({
-                lectureTitle: this.state.newTitle,
-                editMode: false,
+                editMode: false
             })
         }
         else { // defaults to not changing title if invalid title is input
@@ -123,36 +122,37 @@ class LectListItemNavEdit extends React.Component {
         })
     }
 
+    handleExportGrades = () => {
+        this.apiProfService.exportGradesLecture(this.state.lecture.id)
+            .then(data => {
+                const element = document.createElement("a");
+                const file = new Blob([data.fileData], {type: 'text/csv;charset=utf-8;'});
+                element.href = URL.createObjectURL(file);
+                element.download = data.fileName;
+                document.body.appendChild(element); // Required for this to work in FireFox
+                element.click();
+            })
+    }
+
     render () {
         if (this.state.nav) {
-            return  <Redirect to={'/professor/' + this.state.lectureId + '/questions'} push />
+            return  <Redirect to={'/professor/' + this.state.lecture.id + '/questions'} push />
         }
-        if (this.state.editMode) {
-            return (
-                <ListItem divider>
-                    <FormControl>
-                        <InputBase
-                        id="bootstrap-input"
-                        name="newTitle"
-                        value={this.state.newTitle}
-                        onChange={e => this.handleEdit(e)}
-                        classes={{
-                            input: this.styles.bootstrapInput
-                        }}
-                        />
-                    </FormControl>
-                    <ListItemSecondaryAction>
-                        <Grid container direction="row" justify="flex-end">  
+
+        return (
+            <div>
+                <ListItem button divider onClick={this.handleToLecture}>
+                    <ListItemText primary={this.state.lecture.title} secondary={''+ this.state.lecture.date} />
+                    <ListItemSecondaryAction>  
+                        <Grid container direction="row" justify="flex-end" alignItems="center">  
                             <Grid item>
-                                <Tooltip title="done editing" placement="top">
-                                    <IconButton color="secondary" onClick={this.handleEditClose}>
-                                        <DoneIcon className={this.styles.iconDone}/>
-                                    </IconButton>
+                                <Tooltip title="Edit Lecture" placement="top">
+                                    <EditLectureDialog lectureObj={this.state.lecture} />
                                 </Tooltip>
                             </Grid>
                             <Grid item>
                                 <Tooltip title="Export Grades" placement="top">
-                                    <IconButton color="secondary" href={baseURL + "professor/lectures/" + this.lectureId + "/exportgrades"} target="_blank">
+                                    <IconButton color="secondary" onClick={this.handleExportGrades}>
                                         <ImportExportIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -160,33 +160,8 @@ class LectListItemNavEdit extends React.Component {
                         </Grid>
                     </ListItemSecondaryAction>
                 </ListItem>
-            )
-        }
-        else {
-            return (
-                 <ListItem button divider onClick={this.handleToLecture}>
-                   <ListItemText primary={this.state.lectureTitle} />
-                        <ListItemSecondaryAction>  
-                            <Grid container direction="row" justify="flex-end">  
-                                <Grid item>
-                                    <Tooltip title="change title" placement="top">
-                                        <IconButton color="secondary" onClick={this.handleEditOpen}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Grid>
-                                <Grid item>
-                                    <Tooltip title="Export Grades" placement="top">
-                                        <IconButton color="secondary" href={baseURL + "professor/lectures/" + this.lectureId + "/exportgrades"} target="_blank">
-                                            <ImportExportIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Grid>
-                            </Grid>
-                        </ListItemSecondaryAction>
-                </ListItem>
-            )
-        }
+            </div>
+        )
     }
 }
 

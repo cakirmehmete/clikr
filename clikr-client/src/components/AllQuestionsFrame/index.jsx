@@ -124,7 +124,6 @@ class AllQuestionsFrame extends React.Component {
 
     // gets course edits from child
     getEdits = (question) => {
-
         this.props.apiProfService.editQuestion(question);
         this.props.mcqEditDetect();
     }
@@ -200,13 +199,13 @@ class AllQuestionsFrame extends React.Component {
                             <Grid container direction="row" justify="flex-end">
                                 <Grid item>
                                     {this.state.editMode ? (
-                                    <Tooltip title={"done editing"} placement="top-start">
+                                    <Tooltip title={"Done Editing"} placement="top-start">
                                         <IconButton color="secondary" onClick={this.handleRestoreMode}>
                                             <DoneIcon />
                                         </IconButton>
                                     </Tooltip>
                                     ) : (
-                                    <Tooltip title={"edit questions"} placement="top-start">
+                                    <Tooltip title={"Edit Questions"} placement="top-start">
                                         <IconButton color="secondary" onClick={this.handleEditQuestions} component="div" disabled={this.state.mode === "deleteMode" || this.state.questions.length === 0}>  
                                             <EditIcon />
                                         </IconButton>
@@ -215,13 +214,13 @@ class AllQuestionsFrame extends React.Component {
                                 </Grid>
                                 <Grid item>
                                 {this.state.deleteMode ? (
-                                    <Tooltip title={"done deleting"} placement="top-start">
+                                    <Tooltip title={"Done Deleting"} placement="top-start">
                                         <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
                                             <DoneIcon />
                                         </IconButton>
                                     </Tooltip>
                                     ) : (
-                                    <Tooltip title={"delete questions"} placement="top-start">
+                                    <Tooltip title={"Delete Questions"} placement="top-start">
                                         <IconButton color="secondary" onClick={this.handleDeleteQuestions} component="div" disabled={this.state.mode === "editMode" || this.state.questions.length === 0}>
                                             <DeleteIcon />
                                         </IconButton>
@@ -260,7 +259,7 @@ class AllQuestionsFrame extends React.Component {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the folowing question(s): "}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the following question(s): "}</DialogTitle>
                     <DialogContent>
                         {this.state.delTitles.map((title, index) =>
                             <DialogContentText key={index} id="alert-dialog-description">
@@ -271,10 +270,10 @@ class AllQuestionsFrame extends React.Component {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.handleClose} autoFocus color="secondary">
-                            no
+                            No
                         </Button>
                         <Button onClick={this.handleDeletion} color="secondary">
-                            yes
+                            Yes
                         </Button>
                     </DialogActions>
                 </Dialog>

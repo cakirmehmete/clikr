@@ -18,6 +18,11 @@ const styles = theme => ({
         display: 'flex',
         flexWrap: 'wrap',
     },
+    subcontainer: {
+        display: 'flex',
+        direction: 'row',
+        alignItems: 'flex-start'
+    },
     textField: {
         marginLeft: theme.spacing.unit,
         marginRight: theme.spacing.unit,
@@ -28,52 +33,39 @@ const styles = theme => ({
 @inject("profStore")
 @observer
 class ProfessorNewCourse extends React.Component {
-    state = {
-        toHome: false,
-        name: '',
-        nameValid: false,
-        formValid: true
-    };
-
     constructor(props) {
         super(props)
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = new APIProfService(this.profStore)
-    }
 
-    handleValidation(value) {
-        let nameValid = this.state.nameValid;
-
-        if (value === '') {
-            nameValid = false
+        this.state = {
+            toHome: false,
+            title: '',
+            dept: '',
+            num: '',
+            year: '',
+            term: '',
+            description: ''
         }
-        else {
-            nameValid = true
-        }
 
-        this.setState({ nameValid: nameValid }, this.validateForm);
+        this.handleChange = this.handleChange.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
     }
 
-    validateForm() {
-        this.setState({formValid: this.state.nameValid });
+    handleChange(event) {
+        const { name, value } = event.target
+        this.setState({ [name]: value })
     }
 
-    handleChange = name => event => {
-        let value = event.target.value;
-        this.setState({
-            [name]: value,
-        }, () => { this.handleValidation(value) });
-    };
-
-    handleSubmit = (event) => {
+    handleSubmit(event) {
         // Send course to API
+        event.preventDefault()
         this.apiProfService.addCourse(
-            new CourseObj(this.state.name)
+            new CourseObj(this.state)
         )
         // Close modal
         this.setState({ toHome: true });
-        event.preventDefault();
     }
 
 
@@ -90,16 +82,63 @@ class ProfessorNewCourse extends React.Component {
                 </Typography>
                 <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
                     <TextField
-                        id="standard-name"
                         label="Course Name"
+                        name="title"
                         className={this.styles.textField}
-                        value={this.state.name}
-                        onChange={this.handleChange('name')}
+                        value={this.state.title}
+                        onChange={this.handleChange}
                         margin="normal"
                     />
+
+                    <TextField
+                        label="Department"
+                        name="dept"
+                        className={this.styles.textField}
+                        value={this.state.dept}
+                        onChange={this.handleChange}
+                        margin="normal"
+                    />
+
+                    <TextField
+                        label="Course Number"
+                        name="num"
+                        className={this.styles.textField}
+                        value={this.state.num}
+                        onChange={this.handleChange}
+                        margin="none"
+                    />
+
+                    <TextField
+                        label="Year"
+                        name="year"
+                        className={this.styles.textField}
+                        value={this.state.year}
+                        onChange={this.handleChange}
+                        margin="normal"
+                    />
+
+                    <TextField
+                        label="Term"
+                        name="term"
+                        className={this.styles.textField}
+                        value={this.state.term}
+                        onChange={this.handleChange}
+                        margin="none"
+                    />
+
+                    <TextField
+                        label="Description"
+                        name="description"
+                        className={this.styles.textField}
+                        value={this.state.description}
+                        onChange={this.handleChange}
+                        margin="normal"
+                        multiline={true}
+                    />
+
                     <Button
                         type="submit"
-                        disabled={!this.state.nameValid}
+                        disabled={!this.state.title}
                         variant="outlined"
                         color="primary"
                         > submit

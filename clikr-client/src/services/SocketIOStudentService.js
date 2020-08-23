@@ -50,9 +50,9 @@ export default class SocketIOStudentService {
 
     // get all open questions for a course 
     getAllQuestions() {
-        this.socket.on('all open questions', (data) => {
+        return this.socket.on('all open questions', (data) => {
             this.store.updateAllQuestions(data.questions);
-            console.log(data)
+            console.log(data);
         });
     }
 

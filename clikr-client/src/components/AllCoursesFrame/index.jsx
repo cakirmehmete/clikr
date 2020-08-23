@@ -111,12 +111,13 @@ class AllCoursesFrame extends React.Component {
         if (this.state.toNewCourse === true) {
             return <Redirect to='/professor/new' push />
         }
+        
         let list = <ListOfAllCourses profStore={this.profStore} apiProfService={this.apiProfService} />
-        let deleteAction="delete"
+        let deleteAction="Delete"
         
         if (this.state.deleteMode) {
-            list = <DeleteCoursesList profStore={this.profStore} getDeletions={this.getDeletions} />
-            deleteAction="done"
+            list = <DeleteCoursesList profStore={this.profStore} getDeletions={this.getDeletions} archive={false} />
+            deleteAction="Done"
         }
 
         return (
@@ -132,7 +133,7 @@ class AllCoursesFrame extends React.Component {
                                     <Grid item>
                                         <Tooltip title={deleteAction} placement="top">
                                             <IconButton color="secondary" onClick={this.handleDelete.bind(this)}>
-                                                {deleteAction === 'delete' ? <DeleteIcon /> : <DoneIcon />}
+                                                {deleteAction === 'Delete' ? <DeleteIcon /> : <DoneIcon />}
                                             </IconButton>
                                         </Tooltip>
                                     </Grid>
@@ -154,7 +155,7 @@ class AllCoursesFrame extends React.Component {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the folowing course(s): "}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the following course(s): "}</DialogTitle>
                     <DialogContent>
                         {this.state.delTitles.map((title, index) => 
                             <DialogContentText key={index} id="alert-dialog-description">

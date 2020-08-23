@@ -3,7 +3,7 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
-from ..shared.Util import CustomStringField, CustomIntegerField, CustomDateTimeField
+from ..shared.Util import CustomStringField, CustomIntegerField, CustomDateTimeField, CustomBoolField
 import uuid
 
 class CourseModel(db.Model):
@@ -26,6 +26,7 @@ class CourseModel(db.Model):
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
     enroll_code = db.Column(db.String(8), nullable=True)    # TODO: should not be nullable
+    is_current = db.Column(db.Boolean)
 
     # relationships
     lectures = db.relationship('LectureModel', backref='course', lazy=True, passive_deletes=True)
@@ -46,7 +47,8 @@ class CourseModel(db.Model):
         timestamp = datetime.datetime.utcnow()
         self.created_at = timestamp
         self.modified_at = timestamp
-        self.enroll_code = None
+        self.enroll_code = data.get('enroll_code')
+        self.is_current = True
 
     def save(self):
         db.session.add(self)
@@ -92,3 +94,4 @@ class CourseSchema(Schema):
     created_at = CustomDateTimeField(dump_only=True)
     modified_at = CustomDateTimeField(dump_only=True)
     enroll_code = CustomStringField(dump_only=True)
+    is_current = CustomBoolField()

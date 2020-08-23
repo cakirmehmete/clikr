@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Collapse from '@material-ui/core/Collapse';
 import { observer } from 'mobx-react';
 import Grid from '@material-ui/core/Grid';
 import APIProfService from '../../services/APIProfService';
@@ -42,6 +43,9 @@ const styles = theme => ({
     },
     item: {
         paddingBottom: theme.spacing.unit,
+    },
+    buttonItem: {
+        paddingRight: theme.spacing.unit * 2,
     },
     bootstrapInput: {
         borderRadius: 4,
@@ -93,6 +97,7 @@ class EditMCQDialog extends React.Component {
         title: '',
         correct_answer: '',
         number_of_options: "",
+        question_image: "",
         options: [], // necessary because of controlled form
         answer_choices: {option1: "", option2: "", option3: "", option4: "", option5: ""}, // must be set for input base to be controlled
         checked: {option1: false, option2: false, option3: false, option4: false, option5: false},
@@ -131,7 +136,14 @@ class EditMCQDialog extends React.Component {
             checked[correct] = true;
         }
        
-        this.setState({ title: this.props.questionObj.question_title, correct_answer: correct, number_of_options: number_of_options,  answer_choices: answer_choices, checked: checked, options: options })
+        this.setState({ title: this.props.questionObj.question_title,
+                        question_image: this.props.questionObj.question_image,
+                        correct_answer: correct,
+                        number_of_options: number_of_options,
+                        answer_choices: answer_choices,
+                        checked: checked,
+                        options: options
+        })
        
         
     }
@@ -349,7 +361,7 @@ class EditMCQDialog extends React.Component {
                 this.props.getEdits( 
                     new MultipleChoiceQuestionObj(this.props.questionObj.id,
                     this.props.questionObj.lecture_id, "multiple_choice",
-                    this.state.title, correct_answer,
+                    this.state.title, this.state.question_image, correct_answer,
                     this.props.questionObj.creator_id, this.props.questionObj.is_open, this.props.questionObj.opened_at, this.props.questionObj.closed_at,
                     this.props.questionObj.created_at, this.props.questionObj.modified_at, this.props.questionObj.answer,
                     this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
@@ -357,6 +369,21 @@ class EditMCQDialog extends React.Component {
             }
             this.handleClose();
         }  
+    }
+
+    removeImage = () => {
+        this.setState({ question_image: "" })
+    }
+
+    encodeImageFileAsURL = (event) => {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onloadend = () => {
+          console.log('RESULT', reader.result);
+          this.setState({ question_image: reader.result })
+        }
+        reader.onloadend = reader.onloadend.bind(this)
+        reader.readAsDataURL(file);
     }
     
     render() {
@@ -374,138 +401,177 @@ class EditMCQDialog extends React.Component {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                <DialogTitle id="alert-dialog-title">{"Edit Multiple Choice Question"}</DialogTitle>
-                <DialogContent>
-                <Grid container direction="column" justify="center">
-                <Grid item className={this.styles.item}>
-                    <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
-                        <TextField
-                            required
-                            fullWidth
-                            error={!this.state.titleValid}
-                            id="standard-name"
-                            label="Question Title"
-                            value={this.state.title}
-                            onChange={this.handleChange('title')}
-                            margin="normal"
-                            helperText={this.state.titleError}
-                        />
-                    </form>
-                </Grid>
-                <Grid item className={this.styles.item}>
-                    <form autoComplete="off">
-                        <FormControl>
-                            <InputLabel htmlFor="number-options">number of answer choices</InputLabel>
-                            <Select
-                                value={this.state.number_of_options}
-                                onChange={this.handleSetNumberOfOptions('number_of_options')}
-                                className={this.styles.select}
-                                disabled={this.state.delete_mode}
-                                inputProps={{
-                                name: 'number_of_options',
-                                id: 'number-options',
-                                }}
-                            >
-                                <MenuItem value={2}>2</MenuItem>
-                                <MenuItem value={3}>3</MenuItem>
-                                <MenuItem value={4}>4</MenuItem>
-                                <MenuItem value={5}>5</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </form>
-                </Grid>
-                {this.state.hasAnswers && 
-                    <Grid item>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
+                    <DialogTitle id="alert-dialog-title">{"Edit Multiple Choice Question"}</DialogTitle>
+                    <DialogContent>
+                        <Grid container direction="column" justify="center">
+                            <Grid item className={this.styles.item}>
+                                <form className={this.styles.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        error={!this.state.titleValid}
+                                        id="standard-name"
+                                        label="Question Title"
+                                        value={this.state.title}
+                                        onChange={this.handleChange('title')}
+                                        margin="normal"
+                                        helperText={this.state.titleError}
+                                    />
+                                </form>
+                            </Grid>
+                            <Grid item className={this.styles.item}>
+                                <form autoComplete="off">
+                                    <FormControl>
+                                        <InputLabel htmlFor="number-options">number of answer choices</InputLabel>
+                                        <Select
+                                            value={this.state.number_of_options}
+                                            onChange={this.handleSetNumberOfOptions('number_of_options')}
+                                            className={this.styles.select}
+                                            disabled={this.state.delete_mode}
+                                            inputProps={{
+                                            name: 'number_of_options',
+                                            id: 'number-options',
+                                            }}
+                                        >
+                                            <MenuItem value={2}>2</MenuItem>
+                                            <MenuItem value={3}>3</MenuItem>
+                                            <MenuItem value={4}>4</MenuItem>
+                                            <MenuItem value={5}>5</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </form>
+                            </Grid>
+                            {this.state.hasAnswers && 
+                            <Grid item>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            {this.state.delete_mode ? 
+                                                <TableCell> Delete?</TableCell>
+                                                :
+                                                <TableCell>Correct Answer?</TableCell>
+                                            }
+                                            <TableCell>Answer Choices</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
                                     {this.state.delete_mode ? 
-                                        <TableCell> Delete?</TableCell>
+                                    this.state.options.map((option, index) => 
+                                            <TableRow key={index}> 
+                                                <TableCell>
+                                                    <Checkbox
+                                                        checked={this.state.should_delete[Object.keys(option)[0]]}
+                                                        onChange={this.handleDeleteQueue(Object.keys(option)[0])}
+                                                        value={Object.keys(option)[0]}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="body1" align="justify"> {this.state.answer_choices[Object.keys(option)[0]]}</Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
                                         :
-                                        <TableCell>Correct Answer?</TableCell>
+                                        this.state.options.map((option, index) => 
+                                            <TableRow key={index}>
+                                                <TableCell>
+                                                    <Checkbox
+                                                        checked={this.state.correct_answer === Object.keys(option)[0]}
+                                                        onChange={this.handleCheck(option)}
+                                                        value={Object.keys(option)[0]}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <FormControl>
+                                                        <InputBase
+                                                        multiline
+                                                        id="bootstrap-input"
+                                                        name={Object.keys(option)[0]}
+                                                        value={this.state.answer_choices[Object.keys(option)[0]]}
+                                                        onChange={this.handleOption(option)}
+                                                        classes={{
+                                                            input: this.styles.bootstrapInput
+                                                        }}
+                                                        />
+                                                    </FormControl>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
                                     }
-                                    <TableCell>Answer Choices</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                            {this.state.delete_mode ? 
-                               this.state.options.map((option, index) => 
-                                    <TableRow key={index}> 
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={this.state.should_delete[Object.keys(option)[0]]}
-                                                onChange={this.handleDeleteQueue(Object.keys(option)[0])}
-                                                value={Object.keys(option)[0]}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body1" align="justify"> {this.state.answer_choices[Object.keys(option)[0]]}</Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                                :
-                                this.state.options.map((option, index) => 
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={this.state.correct_answer === Object.keys(option)[0]}
-                                                onChange={this.handleCheck(option)}
-                                                value={Object.keys(option)[0]}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <FormControl>
-                                                <InputBase
-                                                multiline
-                                                id="bootstrap-input"
-                                                name={Object.keys(option)[0]}
-                                                value={this.state.answer_choices[Object.keys(option)[0]]}
-                                                onChange={this.handleOption(option)}
-                                                classes={{
-                                                    input: this.styles.bootstrapInput
-                                                }}
-                                                />
-                                            </FormControl>
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            }
-
-                            </TableBody>
-                        </Table>    
+                                    </TableBody>
+                                </Table>    
                     
                                     
-                        <Grid container direction="row" justify="flex-end">
-                                {!this.state.delete_mode ? 
+                                <Grid container direction="row" justify="flex-end">
+                                    {!this.state.delete_mode ? 
 
-                                <IconButton onClick={this.setDeleteMode.bind(this)} color="secondary" disabled={this.state.deleteDisabled}>
-                                    <DeleteIcon />
-                                </IconButton>
+                                    <IconButton onClick={this.setDeleteMode.bind(this)} color="secondary" disabled={this.state.deleteDisabled}>
+                                        <DeleteIcon />
+                                    </IconButton>
 
-                                :
-                                
-                                <IconButton color="secondary" onClick={this.handleDelete.bind(this)} disabled={this.state.deleteConfirmDisabled}>
+                                    :
+                                    
+                                    <IconButton color="secondary" onClick={this.handleDelete.bind(this)} disabled={this.state.deleteConfirmDisabled}>
                                         <DoneIcon className={this.styles.iconDone}/>
-                                </IconButton>
-                         
-                                }     
-                        </Grid>
+                                    </IconButton>
                             
-                    </Grid>
-                }
-                
-            </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <form onSubmit={this.handleSubmit}>
-                        <Button onClick={this.handleClose} type="button" autoFocus color="secondary">
-                            cancel
-                        </Button>
-                        <Button onClick={this.handleSubmit} type="submit" color="secondary" disabled={!this.state.formValid}>
-                            submit
-                        </Button>
-                    </form>
-            </DialogActions>
+                                    }     
+                                </Grid>
+                            </Grid>
+                            }
+
+                            <Collapse in={this.state.question_image} timeout="auto" unmountOnExit>
+                                <Grid item className={this.styles.item}>
+                                    <Typography variant="h6" color="textPrimary">
+                                        Image Preview
+                                    </Typography>
+                                </Grid>
+                                <Grid item className={this.styles.item}>
+                                    <img src={this.state.question_image} height={300} alt="Preview Unavailable"></img>
+                                </Grid>
+                            </Collapse>
+
+                            <Grid item className={this.styles.item}>
+                                <Grid container direction="row">
+                                    <Grid item className={this.styles.buttonItem}>
+                                        <Button
+                                            variant="contained"
+                                            component="label"
+                                        >
+                                        {this.state.question_image ? "Update Image" : "Upload Image"}
+                                        <input
+                                            type="file"
+                                            style={{ display: "none" }}
+                                            onChange={this.encodeImageFileAsURL}
+                                        />
+                                        </Button>
+                                    </Grid>
+
+                                    <Collapse in={this.state.question_image} timeout="auto" unmountOnExit>
+                                        <Grid item className={this.styles.buttonItem}>
+                                            <Button
+                                                variant="contained"
+                                                component="label"
+                                                onClick={this.removeImage}
+                                            >
+                                            Remove Image
+                                            </Button>
+                                        </Grid>
+                                    </Collapse>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+
+                    <DialogActions>
+                        <form onSubmit={this.handleSubmit}>
+                            <Button onClick={this.handleClose} type="button" autoFocus color="secondary">
+                                Cancel
+                            </Button>
+                            <Button onClick={this.handleSubmit} type="submit" color="secondary" disabled={!this.state.formValid}>
+                                Submit
+                            </Button>
+                        </form>
+                    </DialogActions>
                 </Dialog>
             </div>
         );

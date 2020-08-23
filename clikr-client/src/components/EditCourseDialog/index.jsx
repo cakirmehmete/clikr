@@ -68,8 +68,7 @@ class EditCourseDialog extends React.Component {
         this.setState({ open: false });
     }
     handleSubmit = () => {
-        const newCourse = new CourseObj(this.state.title, this.course.id, this.course.num, this.course.dept, this.course.description, this.course.term, this.course.joinCode, this.course.year)
-        this.apiProfService.changeCourseTitle(newCourse);  
+        this.apiProfService.changeCourseTitle(this.course.id, this.state.title);
         this.handleClose();
     };
 
@@ -79,7 +78,7 @@ class EditCourseDialog extends React.Component {
 
         return (
             <Grid item>
-                <Tooltip title="change title" placement="top-start">
+                <Tooltip title="Change Title" placement="top-start">
                     <Button variant="text" size="small" onClick={this.handleOpen}>
                         <Icon className={classes.icon} color="secondary">edit</Icon>
                     </Button>

@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import APIProfService from '../../../services/APIProfService';
 import { observer, inject } from 'mobx-react';
 import AllCoursesFrame from '../../../components/AllCoursesFrame';
+import ArchivedCoursesFrame from '../../../components/ArchivedCoursesFrame';
 
 const styles = theme => ({
 
@@ -20,7 +21,10 @@ class ProfessorHome extends React.Component {
 
     render() {
         return (
-            <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+            <div>
+                <AllCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+                <ArchivedCoursesFrame profStore={this.profStore} apiProfService={this.apiProfService} />
+            </div>
         );
     }
 }
