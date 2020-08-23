@@ -10,6 +10,7 @@
 import urllib, re
 from flask import session, request, redirect
 from functools import wraps
+import ssl
 
 class CASClient:
     
@@ -34,7 +35,11 @@ class CASClient:
         val_url = self.cas_url + 'validate' + \
             '?service=' + urllib.parse.quote(self.strip_ticket(request)) + \
             '&ticket=' + urllib.parse.quote(ticket)
-        r = urllib.request.urlopen(val_url).readlines() # returns 2 lines # TODO: only for Princeton CAS or always?
+
+        myssl = ssl.create_default_context()
+        myssl.check_hostname=False
+        myssl.verify_mode=ssl.CERT_NONE
+        r = urllib.request.urlopen(val_url, context=myssl).readlines() # returns 2 lines # TODO: only for Princeton CAS or always?
         if len(r) == 2 and re.match('yes', r[0].decode('utf-8')) != None:
             return r[1].decode('utf-8').strip()
         return None
