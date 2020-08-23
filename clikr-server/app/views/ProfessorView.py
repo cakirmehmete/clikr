@@ -13,7 +13,7 @@ from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoice
 from ..models.AnswerModel import AnswerModel, AnswerSchema
 from .. import db
 from ..shared.Authentication import Auth
-from ..shared.Util import custom_response
+from ..shared.Util import custom_response, get_timestamp_string
 from ..shared.SocketIOUtil import emit_question_statistics, compute_question_statistics
 from ..shared.MarshmallowUtil import dump_questions, dump_one_question, load_one_question
 
@@ -223,15 +223,17 @@ def reset_enrollment_code(current_user, course_id):
 
     return custom_response({'message': 'code created', 'enroll_code': enroll_code}, 200)
 
+ENROLL_CODE_VALID_CHARACTERS = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789"
+
 def _generate_enroll_code():
     """
     generate an enrollment code and check that it isn't a duplicate
     """
-    enroll_code = ''.join(random.choices("ABCDEFGHIJKLMNPQRSTUVWXYZ123456789", k=6))
+    enroll_code = ''.join(random.choices(ENROLL_CODE_VALID_CHARACTERS, k=6))
     course = CourseModel.get_course_by_code(enroll_code)
 
     while course:
-        enroll_code = ''.join(random.choices("ABCDEFGHIJKLMNPQRSTUVWXYZ123456789", k=6))
+        enroll_code = ''.join(random.choices(ENROLL_CODE_VALID_CHARACTERS, k=6))
         course = CourseModel.get_course_by_code(enroll_code)
     return enroll_code
 
@@ -279,7 +281,8 @@ def export_students(current_user, course_id):
         student_netIds.append(student.netId)
 
     # note that heroku discards dynamically generated files on dyno restart!
-    filename = 'students_' + course_id + '.csv'
+    now = get_timestamp_string()
+    filename = f'students_{course_id}_on_{now}.csv'
     with open('app/views/dynamic_content/students/' + filename, 'w') as f:
         csv.register_dialect('quote all', quoting=csv.QUOTE_ALL)
         writer = csv.writer(f, dialect='quote all')
@@ -697,7 +700,7 @@ def _export_grades(course=None, lecture=None):
     for lecture in lectures:
         questions = lecture.questions
         for question in questions:
-            col_header = lecture.title + ': ' + question.question_title + ' [' + question.id + ']'
+            col_header = f'{lecture.title}: {question.question_title} [{question_id}]'
             headers.append(col_header)
             answers = question.answers
 
@@ -712,8 +715,10 @@ def _export_grades(course=None, lecture=None):
                     score_dict[student_id][col_header] = score
 
     # note that heroku discards dynamically generated files on dyno restart!
-    filename = 'grades_' + file_id + '.csv'
-    with open('app/views/dynamic_content/grades/' + filename, 'w') as f:
+    now = get_timestamp_string
+    filename = f'grades_{file_id}_on_{now}.csv'
+    dirname = os.path.dirname(__file__)
+    with open(os.path.join(dirname, 'dynamic_content/grades/', filename), 'w') as f:
         csv.register_dialect('quote all', quoting=csv.QUOTE_ALL)
         writer = csv.DictWriter(f, headers, restval=0, dialect='quote all')
         writer.writeheader()
@@ -722,7 +727,6 @@ def _export_grades(course=None, lecture=None):
             inner_dict['username'] = netId
             writer.writerow(inner_dict)
 
-    dirname = os.path.dirname(__file__)
     path = os.path.join(dirname, "dynamic_content/grades/", filename)
     print("======THE PATH IS: ", path)
     if os.path.exists(path):

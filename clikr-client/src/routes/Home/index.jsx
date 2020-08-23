@@ -10,6 +10,7 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import logoprof from '../../assets/clikrlogo2.png';
 import logostudent from '../../assets/clikrlogo.png';
+import background from '../../assets/background.png';
 
 
 const styles = theme => ({
@@ -80,7 +81,6 @@ class Home extends Component {
       return <Redirect to={'/login-student'} push />
     }
     return (
-      
       <div className={this.styles.root}>
         <Grid container spacing={24} justify="center">
           <Grid item className={this.styles.clickGrid}>
@@ -128,7 +128,7 @@ class Home extends Component {
             justify="center"
           >
             <Typography color="inherit">
-              {"Created by mecakir, zsyang, afeng, and lheimes."}
+              {"Created by mecakir, zsyang, afeng, lheimes, and czye."}
             </Typography>
           </Grid>
         </AppBar>

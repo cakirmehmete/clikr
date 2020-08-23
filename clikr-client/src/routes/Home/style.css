@@ -22,6 +22,15 @@
   color: #61dafb;
 }
 
+body {
+  background-image: url("../../assets/background.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-color: black
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
