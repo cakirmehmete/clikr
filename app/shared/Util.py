@@ -2,8 +2,6 @@ from flask import Response, json
 from marshmallow import fields
 
 import datetime
-import random
-import hashlib
 
 def custom_response(res, status_code):
     """

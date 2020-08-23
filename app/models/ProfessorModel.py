@@ -3,9 +3,8 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
-from ..shared.Util import CustomStringField, CustomDateTimeField, generate_salt
+from ..shared.Util import CustomStringField, CustomDateTimeField
 import uuid
-import hashlib
 
 # helper table for the many-to-many relationship courses_profs
 courses_profs = db.Table('courses_profs',
@@ -24,8 +23,6 @@ class ProfessorModel(db.Model):
     # columns
     id = db.Column(db.String(36), primary_key=True) # uuid
     netId = db.Column(db.String(128), unique=True, nullable=False)
-    salt = db.Column(db.String(128), unique=True, nullable=False) 
-    password_hash = db.Column(db.String(256), unique=True, nullable=False)
     firstName = db.Column(db.String(128), nullable=True)
     lastName = db.Column(db.String(128), nullable=True)
     created_at = db.Column(db.DateTime)
@@ -40,7 +37,6 @@ class ProfessorModel(db.Model):
         """
         Class constructor
         """
-
         self.id = str(uuid.uuid4())
         self.netId = data.get('netId')
         self.firstName = data.get('firstName')
@@ -48,15 +44,6 @@ class ProfessorModel(db.Model):
         timestamp = datetime.datetime.utcnow()
         self.created_at = timestamp
         self.modified_at = timestamp
-
-        password_hash = hashlib.sha256()
-        self.salt = generate_salt()
-        salt = self.salt.encode('utf-8')
-        password_hash.update(salt)
-        password = data.get('password').encode('utf-8')
-        password_hash.update(password)
-
-        self.password_hash = password_hash.hexdigest()
 
     def save(self):
         db.session.add(self)
@@ -93,9 +80,6 @@ class ProfessorSchema(Schema):
     """
     id = CustomStringField(dump_only=True)
     netId = CustomStringField(required=True)
-    password = CustomStringField()
-    salt = CustomStringField()
-    password_hash = CustomStringField()
     firstName = CustomStringField()
     lastName = CustomStringField()
     created_at = CustomDateTimeField(dump_only=True)
