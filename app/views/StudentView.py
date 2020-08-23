@@ -62,7 +62,7 @@ def get_name(current_user):
     """
     Returns name of the current prof
     """
-    full_name = f'{current_user.firstName} {current_user.lastName}'
+    full_name = f'{current_user.netId}'
     return custom_response({'name': full_name}, 200)
 
 @student_api.route('/courses', methods=['GET'])
