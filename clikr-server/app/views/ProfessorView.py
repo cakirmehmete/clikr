@@ -118,6 +118,7 @@ def create_course(current_user):
     data, error = course_schema.load(req_data)
 
     if error:
+        print("============")
         return custom_response(error, 400)
 
     data['enroll_code'] = _generate_course_enroll_code()
