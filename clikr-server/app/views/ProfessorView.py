@@ -1045,49 +1045,33 @@ def _close_question(question, course):
 
     return True
 
-@professor_api.route('/login', methods=['GET', 'POST'])
+@professor_api.route('/login', methods=['GET'])
+@cas.cas_required
 def login():
     """
-    Does not provide authentication at the moment!
-    Its only purpose is to create a session (cookie) for a professor, which is used to identify the user in subsequent API calls.
+    Redirects the user to the CAS login page, which after succesful cas login redirects back here.
+    This page then redirects again to the page specified in the service parameter (or to the login page if none specified)
     """
+    netId = session['username']
+    
+    # check if this user exists in the database, otherwise create it
+    current_user = ProfessorModel.get_professor_by_netId(netId)
+    
+    if not current_user:
+        # create new professor
+        current_user = ProfessorModel({'netId': netId})
+        current_user.save()
 
-    # for testing purposes, the user only needs to supply his netId (no password required)
-    if request.method == 'GET':
+    # set role (username is set by CASClient)
+    session['role'] = 'professor'
 
-        if 'username' in session:
-            netId = session['username']
-        else:
-            netId = None
-
-        if 'role' in session:
-            role = session['role']
-        else:
-            role = ''
-
-        # if not logged in as professor, return login page
-        if not netId or role != 'professor':
-            return render_template('login_professor.html', role=role, netId=netId)
-    else:
-        netId = request.form.get('netId')
-
-        # check if student exists in DB
-        professor = ProfessorModel.get_professor_by_netId(netId)
-        if not professor:
-            return render_template('login_professor.html', error='Invalid netId')
-
-        # create a session for the user
-        session['username'] = netId
-        session['role'] = 'professor'
-
-    # redirection after successful login
+    # check if there is a redirect url
     service_url = request.args.get('service')
-
     if service_url:
         print('redirecting to' + service_url)
         return redirect(service_url)
     else:
-        return render_template('login_professor.html', role=session['role'], netId=session['username'])
+        return 'logged in as instructor ' + session['username']
 
 @professor_api.route('/logout', methods=['GET'])
 def logout():
@@ -1101,10 +1085,9 @@ def logout():
     if service_url:
         return redirect(service_url)
     else:
-        return custom_response({'message': 'logged out'}, 200)
+        return 'logged out'
 
-
-# test endpoints
-@professor_api.route('/socketio', methods=['GET'])
-def socketIO_test():
-    return render_template('socketIO_professor.html')
+# endpoint for socketIO testing; comment out before deployment
+# @professor_api.route('/socketio', methods=['GET'])
+# def socketIO_test():
+#     return render_template('socketIO_professor.html')
