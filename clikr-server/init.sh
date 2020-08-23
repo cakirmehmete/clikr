@@ -6,6 +6,8 @@ export PORT=5000
 export JWT_SECRET_KEY=aaa
 export SECRET_KEY=aaa
 
+python manage.py db init
+python manage.py db migrate
 python manage.py db upgrade
 
 python run.py

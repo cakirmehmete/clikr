@@ -122,7 +122,7 @@ export default class APIStudentService {
     _checkAuth(error) {
         if (error.response !== undefined) {
             if (error.response.status === 401)
-                window.location.replace('/login/student')
+                window.location.replace('/login-student')
         }
     }
 }

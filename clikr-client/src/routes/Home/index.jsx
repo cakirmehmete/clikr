@@ -10,7 +10,7 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import logoprof from '../../assets/clikrlogo2.png';
 import logostudent from '../../assets/clikrlogo.png';
-import background from '../../assets/boathouse.jpeg';
+import background from '../../assets/background.jpeg';
 
 
 const styles = theme => ({
@@ -81,13 +81,11 @@ class Home extends Component {
 
   render() {
     if (this.state.toProf) {
-      return <Redirect to={'/login/prof'} push />
+      return <Redirect to={'/login-prof'} push />
     }
-    
     if (this.state.toStudent) {
-      return <Redirect to={'/login/student'} push />
+      return <Redirect to={'/login-student'} push />
     }
-
     return (
       <div className={this.styles.root}>
         <Grid container spacing={24} justify="center">

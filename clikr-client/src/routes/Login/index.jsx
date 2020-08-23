@@ -9,14 +9,20 @@ import LoginStudent from "./LoginStudent"
 import CreateStudent from "./CreateStudent"
 import APILoginService from '../../services/APILoginService';
 import NoMatch from '../../components/NoMatch';
+import { baseURL } from '../../constants/api';
 
-const styles = theme => ({});
+class Login extends Component {
+    componentDidMount() {
+        var url_add_on_1 = 'student/login?service=';
+        var url_add_on_2 = '/student';
+        var end_sub = 14;
+        if (window.location.href.split('login-')[1].valueOf() === 'prof'.valueOf()) {
+            url_add_on_1 = 'professor/login?service=';
+            url_add_on_2 = '/professor';
+            end_sub = 11;
+        }
 
-class LoginRoutes extends Component {
-    constructor(props) {
-        super(props)
-        this.styles = props.classes
-        this.apiLoginService = new APILoginService()
+        window.location.replace(baseURL + url_add_on_1 + window.location.href.substring(0, window.location.href.length - end_sub) + url_add_on_2);
     }
 
     componentDidMount() {
@@ -33,7 +39,7 @@ class LoginRoutes extends Component {
     }
 
     render() {
-        return(
+        return (
             <div>
                 Logging In...
             </div>
@@ -41,4 +47,4 @@ class LoginRoutes extends Component {
     }
 }
 
-export default withStyles(styles)(LoginRoutes);
+export default Login;

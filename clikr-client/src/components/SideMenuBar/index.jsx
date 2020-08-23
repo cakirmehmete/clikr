@@ -134,7 +134,6 @@ class SideMenuBar extends React.Component {
                 
                 <Grid item><Grid container direction="row" justify="center" ><img src={logo} alt="logo" height={80}/></Grid></Grid>
                 <Grid item><Divider /></Grid>
-                <Grid item align="center"><Typography variant="h5" className={this.styles.titletext}>Courses</Typography></Grid>
                 <Grid item>
                     <List>
                         {courses.map((courseObj, index) => {

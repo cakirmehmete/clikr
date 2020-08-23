@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ProfessorRoutes from './Professor'
 import StudentRoutes from './Student'
-import LoginRoutes from './Login';
 import NoMatch from '../components/NoMatch';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Home from './Home';
-import ProfessorStore from '../stores/ProfessorStore';
-import APIProfService from '../services/APIProfService';
+import Login from './Login'
 
 const theme = createMuiTheme({
     palette: {
@@ -31,13 +29,6 @@ const theme = createMuiTheme({
 
 class App extends Component {
 
-    constructor(props) {
-        super(props)
-
-        this.profStore = new ProfessorStore()
-        this.apiProfService = new APIProfService(this.profStore) 
-    }
-
     render() {
         return (
             <MuiThemeProvider theme={theme}>
@@ -45,7 +36,7 @@ class App extends Component {
                     <div>
                         <Switch>
                             <Route exact path='/' component={Home} />
-                            <Route path='/login' component={LoginRoutes} />
+                            <Route exact path='/login-(prof|student)' component={Login} />
                             <Route path="/professor" component={ProfessorRoutes} />
                             <Route path="/student" component={StudentRoutes} />
                             <Route component={NoMatch} />
