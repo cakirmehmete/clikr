@@ -608,6 +608,7 @@ def update_lecture(current_user, lecture_id):
 
     # get data from request body
     updated_data = request.get_json()
+    print(updated_data)
     lecture.update(updated_data)
 
     lecture_data = lecture_schema.dump(lecture).data
