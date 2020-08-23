@@ -17,6 +17,7 @@ flask-cors = "*"
 flask-socketio = "*"
 eventlet = "*"
 flask-sslify = "*"
+pytz = "*"
 
 [dev-packages]
 
