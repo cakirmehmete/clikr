@@ -334,53 +334,38 @@ def delete_answer(current_user, question_id):
 
     return custom_response({'message': 'answer deleted'}, 200)
 
-@student_api.route('/login', methods=['GET', 'POST'])
+@student_api.route('/login', methods=['GET'])
+@cas.cas_required
 def login():
     """
-    Does not provide authentication at the moment! 
-    Its only purpose is to obtain a session (cookie) for a student, which is used to identify the user in subsequent API calls.
+    Redirects the user to the CAS login page, which after succesful cas login redirects back here.
+    This page then redirects again to the page specified in the service parameter (or to the login page if none specified)
     """
+    netId = session['username']
+    
+    # check if this user exists in the database, otherwise create it
+    current_user = StudentModel.get_student_by_netId(netId)
+    
+    if not current_user:
+        # create new student
+        current_user = StudentModel({'netId': netId})
+        current_user.save()
 
-    # for testing purposes, the user only needs to supply his netId (no password required)
-    if request.method == 'GET':
-        if 'username' in session:
-            netId = session['username']
-        else:
-            netId = None
+    # set role (username is set by CASClient)
+    session['role'] = 'student'
 
-        if 'role' in session:
-            role = session['role']
-        else:
-            role = ''
-
-        # if not logged in as professor, return login page
-        if not netId or role != 'student':
-            return render_template('login_student.html', role=role, netId=netId)
-    else:
-        netId = request.form.get('netId')
-
-        # check if student exists in DB
-        student = StudentModel.get_student_by_netId(netId)
-        if not student:
-            return render_template('login_student.html', error='Invalid netId')
-        
-        # create a session for the user
-        session['username'] = netId
-        session['role'] = 'student'
-
-    # redirection after successful login
+    # check if there is a redirect url
     service_url = request.args.get('service')
-
     if service_url:
         print('redirecting to' + service_url)
         return redirect(service_url)
     else:
-        return render_template('login_student.html', role=session['role'], netId=session['username'])
+        return 'logged in as student ' + session['username']
 
 @student_api.route('/logout', methods=['GET'])
 def logout():
     """
-    deletes the session cookie
+    deletes the session cookie (but does not log the user out of CAS)
     """
     session.pop('username', None)
 
@@ -389,24 +374,9 @@ def logout():
     if service_url:
         return redirect(service_url)
     else:
-        return custom_response({'message': 'logged out'}, 200)
-            
-# various test endpoints
-
-@student_api.route('/logincas', methods=['GET'])
-def login_cas():
-    auth_response = cas.authenticate()
-
-    if isinstance(auth_response, str):
-        return render_template('login_test.html', username=session['username'])
-    else:
-        return auth_response
-
-@student_api.route('/secure', methods=['GET'])
-@cas.cas_required
-def secure():
-    return render_template('login_test.html', username=session['username'])
-
-@student_api.route('/socketio', methods=['GET'])
-def socketIO_test():
-    return render_template('socketIO_student.html')
+        return 'logged out'
+     
+# endpoint for socketIO testing; comment out before deployment
+# @student_api.route('/socketio', methods=['GET'])
+# def socketIO_test():
+#     return render_template('socketIO_student.html')
