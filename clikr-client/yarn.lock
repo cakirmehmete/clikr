@@ -775,11 +775,23 @@
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@date-io/core/-/core-0.0.2.tgz#35be27d26eb652e752ccfbffe624c95169200dbd"
 
+"@date-io/core@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@date-io/core/-/core-2.8.1.tgz#800c38c8f0d8708b5f53d39ee61934fae5b412c4"
+  integrity sha512-hIBXL2dL/a4s7HwPmk5ek4jIpn69o8RUGcWA8AwmK8FHol5QIqI7vY+upnyeQGtuvBzRYevZxjrw8vg+6m4VAw==
+
 "@date-io/date-fns@0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@date-io/date-fns/-/date-fns-0.0.2.tgz#1604546d080707b73185a135db197598cfd16e6d"
   dependencies:
     "@date-io/core" "^0.0.2"
+
+"@date-io/moment@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@date-io/moment/-/moment-2.8.1.tgz#154dbfee5c0a243170167780d2a21938cf9b5c19"
+  integrity sha512-QV4N+njwok80rU5bnqFRmcXqhVSeLDvN893KuJFQuYaNRMpv5kjlq8WgFf39WsPh8T2zjeWuPAJmVlgkiCQSlA==
+  dependencies:
+    "@date-io/core" "^2.8.1"
 
 "@material-ui/core@^3.6.1":
   version "3.8.1"
@@ -3695,6 +3707,7 @@ from2@^2.1.0:
 fs-extra@7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-7.0.0.tgz#8cc3f47ce07ef7b3593a11b9fb245f7e34c041d6"
+  integrity sha512-EglNDLRpmaTWiD/qraZn6HREAEAHJcJOmxNEYwq6xeMKnVMAy3GUcFB+wXt2C6k4CNvB/mP1y/U3dzvKKj5OtQ==
   dependencies:
     graceful-fs "^4.1.2"
     jsonfile "^4.0.0"
