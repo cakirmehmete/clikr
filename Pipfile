@@ -9,7 +9,7 @@ flask-sqlalchemy = "*"
 "psycopg2" = "*"
 flask-migrate = "*"
 flask-script = "*"
-marshmallow = "~=2.17.0"
+marshmallow = "*"
 flask-bcrypt = "*"
 pyjwt = "*"
 gunicorn = "*"
@@ -17,7 +17,6 @@ flask-cors = "*"
 flask-socketio = "*"
 eventlet = "*"
 flask-sslify = "*"
-pytz = "*"
 
 [dev-packages]
 
