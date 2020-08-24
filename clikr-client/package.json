@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.10.4",
     "@date-io/date-fns": "0.0.2",
     "@date-io/moment": "^2.8.1",
     "@material-ui/core": "^3.6.1",
