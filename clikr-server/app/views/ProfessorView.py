@@ -518,7 +518,7 @@ def create_lecture(current_user, course_id):
     req_data['course_id'] = course_id
 
     # DEBUG TIMEZONES
-    
+    print(req_data)
     data, error = lecture_schema.load(req_data)
 
     if error:

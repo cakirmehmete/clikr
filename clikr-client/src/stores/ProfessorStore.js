@@ -126,11 +126,12 @@ export default class ProfessorStore {
 
     @action
     updateLecture(lecture) {
+        debugger;
         const oldLecture = this.getLectureById(lecture.id)
 
         oldLecture.title = lecture.title
-        oldLecture.closeDate = lecture.closeDate
-        oldLecture.openDate = lecture.openDate
+        oldLecture.close_date = lecture.close_date
+        oldLecture.open_date = lecture.open_date
         oldLecture.scheduled = lecture.scheduled
         oldLecture.date = lecture.date
 
