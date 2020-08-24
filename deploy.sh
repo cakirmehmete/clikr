@@ -1,5 +1,5 @@
 cd clikr-client/
-yarn build
+npm run build
 cd ../
 
 rm -r clikr-server/app/react_app/build
