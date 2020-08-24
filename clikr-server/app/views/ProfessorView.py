@@ -116,9 +116,9 @@ def create_course(current_user):
     req_data['creator_id'] = current_user.id
     print(req_data)
     print(course_schema.__dict__)
-    data, error = course_schema.load(req_data)
-
-    if error:
+    try:
+        data = course_schema.load(req_data)
+    except ValidationError as error:
         return custom_response(error, 400)
 
     data['enroll_code'] = _generate_course_enroll_code()
@@ -517,10 +517,9 @@ def create_lecture(current_user, course_id):
     req_data['course_id'] = course_id
 
     # DEBUG TIMEZONES
-    
-    data, error = lecture_schema.load(req_data)
-
-    if error:
+    try:
+        data = lecture_schema.load(req_data)
+    except ValidationError as error:
         return custom_response(error, 400)
 
     lecture = LectureModel(data)

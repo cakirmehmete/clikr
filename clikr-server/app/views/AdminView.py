@@ -25,9 +25,9 @@ def create_professor():
     Create Professor Function
     """
     req_data = request.get_json()
-    data, error = professor_schema.load(req_data)
-
-    if error:
+    try:
+        data = professor_schema.load(req_data)
+    except ValidationError as error:
         return custom_response(error, 400)
 
     # check if professor already exists in the db
@@ -54,9 +54,9 @@ def create_student():
     Create Student Function
     """
     req_data = request.get_json()
-    data, error = student_schema.load(req_data)
-
-    if error:
+    try:
+        data = student_schema.load(req_data)
+    except ValidationError as error:
         return custom_response(error, 400)
 
     # check if student already exists in the db
