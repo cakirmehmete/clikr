@@ -3,7 +3,6 @@
 from flask import request, Response, Blueprint, session, render_template, redirect, send_from_directory
 import uuid
 from datetime import datetime, timezone, date
-import pytz
 import random, string, os
 import csv
 from ..models.ProfessorModel import ProfessorModel, ProfessorSchema
