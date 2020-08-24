@@ -15,6 +15,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import LectureObj from '../../models/LectureObj';
 import Typography from '@material-ui/core/Typography';
 import Checkbox from '@material-ui/core/Checkbox';
+import MomentUtils from "@date-io/moment";
 
 const styles = theme => ({
     paper: {
@@ -50,6 +51,8 @@ class EditLectureDialog extends React.Component {
 
     constructor(props) {
         super(props)
+        MomentUtils.prototype.getStartOfMonth =
+          MomentUtils.prototype.startOfMonth;
         this.styles = props.classes
         this.profStore = props.profStore
         this.apiProfService = props.apiService
@@ -213,7 +216,7 @@ class EditLectureDialog extends React.Component {
                                     label="Lecture Date"
                                     name="selectedDate"
                                     value={this.state.selectedDate}
-                                    onChange={this.handleDateChange}
+                                    onChange={this.handleDateChange.bind}
                                     className={this.styles.dateField}
                                 />
                             </Grid>

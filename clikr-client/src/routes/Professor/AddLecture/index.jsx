@@ -11,6 +11,7 @@ import { inject } from 'mobx-react';
 import LectureObj from '../../../models/LectureObj';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
+import MomentUtils from "@date-io/moment";
 
 const styles = theme => ({
     paper: {
@@ -44,6 +45,8 @@ const styles = theme => ({
 class ProfessorAddLecture extends React.Component {
     constructor(props) {
         super(props)
+        MomentUtils.prototype.getStartOfMonth =
+          MomentUtils.prototype.startOfMonth;
         this.styles = props.classes
         this.profStore = props.profStore
         this.courseId = this.props.match.params.courseId
