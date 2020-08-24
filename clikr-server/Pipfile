@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 flask = "*"
 flask-sqlalchemy = "*"
-"psycopg2" = "*"
 flask-migrate = "*"
 flask-script = "*"
 marshmallow = "*"
@@ -17,6 +16,7 @@ flask-cors = "*"
 flask-socketio = "*"
 eventlet = "*"
 flask-sslify = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
