@@ -12,7 +12,7 @@ from ..models.CourseModel import CourseModel, CourseSchema
 from ..models.LectureModel import LectureModel, LectureSchema
 from ..models.QuestionModel import QuestionModel, QuestionSchema, MultipleChoiceModel, MultipleChoiceSchema, FreeTextModel, FreeTextSchema, SliderModel, SliderSchema
 from ..models.AnswerModel import AnswerModel, AnswerSchema
-from .. import db
+from .. import db, cas
 from ..shared.Authentication import Auth
 from ..shared.Util import custom_response, get_timestamp_string
 from ..shared.SocketIOUtil import emit_question_statistics, compute_question_statistics
@@ -115,6 +115,8 @@ def create_course(current_user):
     req_data = request.get_json()
     
     req_data['creator_id'] = current_user.id
+    print(req_data)
+    print(course_schema.__dict__)
     data, error = course_schema.load(req_data)
 
     if error:
