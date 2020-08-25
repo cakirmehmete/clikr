@@ -105,10 +105,7 @@ class ProfessorAddLecture extends React.Component {
     }
 
     modifyDate = date => {
-        date.setUTCDate(date.getDate());
-        date.setUTCHours(12);
-        date.setUTCMinutes(0);
-        date.setUTCMinutes(0);
+        date = new Date(Date.UTC(date.getYear() + 1900, date.getMonth(), date.getDate(), 12, 0, 0));
 
         return date;
     }

@@ -117,9 +117,11 @@ class DuplicateCourseModal extends React.Component {
                                  label="Year"
                                  name="newYear"
                                  className={this.styles.textField}
+                                 error={isNaN(this.state.newYear)}
                                  value={this.state.newYear}
                                  onChange={this.handleChange}
                                  margin="normal"
+                                 helperText="Year must be an integer."
                            />
 
                            <TextField
@@ -133,7 +135,7 @@ class DuplicateCourseModal extends React.Component {
 
                            <Button className={this.styles.button}
                                  type="submit"
-                                 disabled={!(this.state.newTerm && this.state.newYear)}
+                                 disabled={!(this.state.newTerm && !isNaN(this.state.newYear))}
                                  variant="outlined"
                                  color="primary"
                                  > submit

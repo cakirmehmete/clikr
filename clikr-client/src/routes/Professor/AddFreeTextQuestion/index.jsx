@@ -106,7 +106,7 @@ class ProfessorAddFreeTextQuestion extends React.Component {
     
             // Send course to API
             this.props.apiService.addQuestion(
-                new FreeTextQuestionObj(null, lectureId, "free_text", this.state.title, this.state.question_image_string, this.state.correct_answer, null, null, null, null, null, null, null, '')
+                new FreeTextQuestionObj(null, lectureId, "free_text", this.state.title, this.state.question_image_string, this.state.correct_answer, null, null, null, null, null, null, null, null, '')
             )
     
             this.setState({ toQuestions: true });

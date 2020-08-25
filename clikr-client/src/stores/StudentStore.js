@@ -75,6 +75,7 @@ export default class StudentStore {
   @action
   updateQuestion(question) {
     const original_question = this.questions.find(x => x.id === question.id);
+
     if (question.question_type === 'free_text') {
       original_question.id = question.id;
       original_question.lecture_id = question.lecture_id;
@@ -100,7 +101,7 @@ export default class StudentStore {
         if (element.question_type === 'multiple_choice') {
           this.questions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
             element.question_type, element.question_title, element.question_image,
-            element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+            element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at,
             element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
             element.option2, element.option3, element.option4, element.option5, element.number_of_options))
         }
@@ -108,12 +109,12 @@ export default class StudentStore {
           if (element.question_type === 'free_text') {
             this.questions.push(new FreeTextQuestionObj(element.id, element.lecture_id,
               element.question_type, element.question_title, element.question_image,
-              element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+              element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at,
               element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit))
             }
           else {
             this.questions.push(new SliderQuestionObj(element.id, element.lecture_id, element.question_type, 
-              element.question_title, element.question_image, element.correct_answer, element.creator_id, element.is_open, element.opened_at, 
+              element.question_title, element.question_image, element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at, 
               element.closed_at, element.created_at, element.modified_at, element.answer, element.lower_label, element.upper_label))
           }
 
@@ -132,7 +133,7 @@ export default class StudentStore {
       if (element.question_type === 'multiple_choice') {
         this.prevQuestions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title, element.question_image,
-          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at,
           element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
           element.option2, element.option3, element.option4, element.option5, element.number_of_options))
       }
@@ -140,12 +141,12 @@ export default class StudentStore {
         if (element.question_type === 'free_text') {
           this.prevQuestions.push(new FreeTextQuestionObj(element.id, element.lecture_id,
             element.question_type, element.question_title, element.question_image,
-            element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+            element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at,
             element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit))
         }
         else {
           this.prevQuestions.push(new SliderQuestionObj(element.id, element.lecture_id, element.question_type, 
-            element.question_title, element.question_image, element.correct_answer, element.creator_id, element.is_open, element.opened_at, 
+            element.question_title, element.question_image, element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at, 
             element.closed_at, element.created_at, element.modified_at, element.answer, element.lower_label, element.upper_label))
         }
       }
@@ -158,17 +159,17 @@ export default class StudentStore {
       if (element.question_type === 'multiple_choice') {
         this.questions.push(new MultipleChoiceQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title, element.question_image,
-          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at,
           element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
           element.option2, element.option3, element.option4, element.option5, element.number_of_options));
       } else if (element.question_type === 'free_text') {
         this.questions.push(new FreeTextQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title, element.question_image,
-          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at,
           element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit));
       } else {
         this.questions.push(new SliderQuestionObj(element.id, element.lecture_id, element.question_type, 
-          element.question_title, element.question_image, element.correct_answer, element.creator_id, element.is_open, element.opened_at, 
+          element.question_title, element.question_image, element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at, 
           element.closed_at, element.created_at, element.modified_at, element.answer, element.lower_label, element.upper_label));
       }
 
@@ -190,17 +191,17 @@ export default class StudentStore {
       if (element.question_type === 'multiple_choice') {
         updatedQuestion = new MultipleChoiceQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title,
-          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at,
           element.closed_at, element.created_at, element.modified_at, element.answer, element.option1,
           element.option2, element.option3, element.option4, element.option5, element.number_of_options);
       } else if (element.question_type === 'free_text') {
         updatedQuestion = new FreeTextQuestionObj(element.id, element.lecture_id,
           element.question_type, element.question_title, 
-          element.correct_answer, element.creator_id, element.is_open, element.opened_at,
+          element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at,
           element.closed_at, element.created_at, element.modified_at, element.answer, element.word_limit);
       } else {
         updatedQuestion = new SliderQuestionObj(element.id, element.lecture_id, element.question_type, 
-          element.question_title, element.correct_answer, element.creator_id, element.is_open, element.opened_at, 
+          element.question_title, element.correct_answer, element.creator_id, element.is_open, element.scheduled, element.opened_at, 
           element.closed_at, element.created_at, element.modified_at, element.answer, element.lower_label, element.upper_label);
       }
       this.questions[index] = updatedQuestion;

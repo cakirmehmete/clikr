@@ -362,7 +362,7 @@ class EditMCQDialog extends React.Component {
                     new MultipleChoiceQuestionObj(this.props.questionObj.id,
                     this.props.questionObj.lecture_id, "multiple_choice",
                     this.state.title, this.state.question_image, correct_answer,
-                    this.props.questionObj.creator_id, this.props.questionObj.is_open, this.props.questionObj.opened_at, this.props.questionObj.closed_at,
+                    this.props.questionObj.creator_id, this.props.questionObj.is_open, this.props.questionObj.scheduled, this.props.questionObj.opened_at, this.props.questionObj.closed_at,
                     this.props.questionObj.created_at, this.props.questionObj.modified_at, this.props.questionObj.answer,
                     this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
                     this.state.number_of_options))

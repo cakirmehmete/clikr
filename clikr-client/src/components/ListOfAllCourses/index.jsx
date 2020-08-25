@@ -46,7 +46,7 @@ class ListOfAllCourses extends React.Component {
                 <CourseListItemNavEdit 
                     key={index}
                     archive={false}
-                    profStore={this.profStore} 
+                    profStore={this.profStore}
                     apiProfService={this.apiProfService} 
                     courseId={courseObj.id}
                     courseTitle={courseObj.title}
