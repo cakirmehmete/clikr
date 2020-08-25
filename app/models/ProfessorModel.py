@@ -5,6 +5,7 @@ import datetime
 from .. import db
 from ..shared.Util import CustomStringField, CustomDateTimeField
 import uuid
+import hashlib
 
 # helper table for the many-to-many relationship courses_profs
 courses_profs = db.Table('courses_profs',
@@ -37,6 +38,7 @@ class ProfessorModel(db.Model):
         """
         Class constructor
         """
+
         self.id = str(uuid.uuid4())
         self.netId = data.get('netId')
         self.firstName = data.get('firstName')

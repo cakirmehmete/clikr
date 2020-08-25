@@ -4,6 +4,7 @@ import datetime
 from .. import db
 from ..shared.Util import CustomStringField, CustomDateTimeField
 import uuid
+import hashlib
 
 # helper table for the many-to-many relationship courses-students
 courses_students = db.Table('courses_students',
@@ -43,15 +44,6 @@ class StudentModel(db.Model):
         timestamp = datetime.datetime.utcnow()
         self.created_at = timestamp
         self.modified_at = timestamp
-
-        password_hash = hashlib.sha256()
-        self.salt = generate_salt()
-        salt = self.salt.encode('utf-8')
-        password_hash.update(salt)
-        password = data.get('password').encode('utf-8')
-        password_hash.update(password)
-
-        self.password_hash = password_hash.hexdigest()
 
     def save(self):
         db.session.add(self)

@@ -30,7 +30,7 @@ def check_valid_login(password, salt, hash):
     return check_hash.hexdigest() == hash
 
 def check_lecture_open(lecture):
-    if lecture.open_date is None or lecture.close_date is None:
+    if (lecture.open_date is None or lecture.close_date is None) or not lecture.scheduled:
         return False
 
     today = datetime.date.today()
@@ -38,7 +38,7 @@ def check_lecture_open(lecture):
     return today >= lecture.open_date and today <= lecture.close_date
 
 def check_lecture_past(lecture):
-    if lecture.open_date is None or lecture.close_date is None:
+    if (lecture.open_date is None or lecture.close_date is None) or not lecture.scheduled:
         return False
 
     today = datetime.date.today()
