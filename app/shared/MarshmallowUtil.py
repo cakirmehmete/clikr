@@ -53,27 +53,25 @@ def load_one_question(input_data):
 
     # load the appropriate schema and create object
     if question_type == 'multiple_choice':
-        try:
-            data = MultipleChoiceSchema().load(input_data)
-        except ValidationError as error:
+        data, error = MultipleChoiceSchema().load(input_data)
+        if error:
             raise Exception(error)
         question = MultipleChoiceModel(data)
     elif question_type == 'free_text':
-        try:
-            data = FreeTextSchema().load(input_data)
-        except ValidationError as error:
+        print(input_data)
+        data, error = FreeTextSchema().load(input_data)
+        if error:
+            print(str(error))
             raise Exception(error)
         question = FreeTextModel(data)
     elif question_type == 'slider':
-        try:
-            data = SliderSchema().load(input_data)
-        except ValidationError as error:
+        data, error = SliderSchema().load(input_data)
+        if error:
             raise Exception(error)
         question = SliderModel(data)
     elif question_type == 'drag_and_drop':
-        try:
-            data = DragAndDropSchema().load(input_data)
-        except ValidationError as error:
+        data, error = DragAndDropSchema().load(input_data)
+        if error:
             raise Exception(error)
         question = DragAndDropModel(data)
     else:

@@ -278,9 +278,9 @@ def submit_answer(current_user, question_id):
     req_data = request.get_json()
     req_data['student_id'] = current_user.id
     req_data['question_id'] = question_id
-    try:
-        data = answer_schema.load(req_data)
-    except ValidationError as error:
+    data, error = answer_schema.load(req_data)
+
+    if error:
         return custom_response({'error': error}, 400)
 
     # check if student has already answered this question
