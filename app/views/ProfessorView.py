@@ -32,7 +32,6 @@ def on_join(question_id):
     # authenticate the user
     current_user = Auth.authenticate_professor()
     if not current_user:
-        print('here')
         emit('server message', 'permission denied')
         return
 
@@ -44,7 +43,6 @@ def on_join(question_id):
 
     # check permission
     if not question.lecture.course in current_user.courses:
-        print('there')
         emit('server message', 'permission denied')
         return
 
@@ -115,8 +113,6 @@ def create_course(current_user):
     req_data = request.get_json()
     
     req_data['creator_id'] = current_user.id
-    print(req_data)
-    print(course_schema.__dict__)
     data, error = course_schema.load(req_data)
 
     if error:
@@ -517,8 +513,6 @@ def create_lecture(current_user, course_id):
     req_data['creator_id'] = current_user.id
     req_data['course_id'] = course_id
 
-    # DEBUG TIMEZONES
-    print(req_data)
     data, error = lecture_schema.load(req_data)
 
     if error:
@@ -608,7 +602,6 @@ def update_lecture(current_user, lecture_id):
 
     # get data from request body
     updated_data = request.get_json()
-    print(updated_data)
     lecture.update(updated_data)
 
     lecture_data = lecture_schema.dump(lecture).data
@@ -674,7 +667,6 @@ def create_question(current_user, lecture_id):
 
     # get data from request body
     req_data = request.get_json()
-    print("LENGTH:", len(req_data['question_image']))
     req_data['creator_id'] = current_user.id
     req_data['lecture_id'] = lecture_id
 
