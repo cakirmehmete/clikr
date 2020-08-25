@@ -171,7 +171,6 @@ def get_open_questions(course_id):
             question_data['opened_at'] = str(lecture.open_date)
             question_data['closed_at'] = str(lecture.close_date)
             question_data['scheduled'] = True
-            print(question_data)
             questions_data.append(question_data)
 
     return questions_data

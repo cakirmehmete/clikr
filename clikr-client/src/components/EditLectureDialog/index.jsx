@@ -54,7 +54,7 @@ class EditLectureDialog extends React.Component {
         this.profStore = props.profStore
         this.apiProfService = props.apiService
 
-        const date = new Date()
+        const date = this.modifyDate(new Date());
 
         this.state = {
             open: false,
@@ -76,15 +76,15 @@ class EditLectureDialog extends React.Component {
             this.setState({
                 title: nextProps.lectureObj.title,
                 scheduled: nextProps.lectureObj.scheduled,
-                selectedDate: new Date(nextProps.lectureObj.date),
+                selectedDate: this.modifyDate(new Date(nextProps.lectureObj.date)),
                 courseId: nextProps.lectureObj.courseId,
                 id: nextProps.lectureObj.id
             }, () => { this.handleValidation() })
 
             if (nextProps.lectureObj.scheduled) {
                 this.setState({
-                    openDate: new Date(nextProps.lectureObj.open_date),
-                    closeDate: new Date(nextProps.lectureObj.close_date)
+                    openDate: this.modifyDate(new Date(nextProps.lectureObj.open_date)),
+                    closeDate: this.modifyDate(new Date(nextProps.lectureObj.close_date))
                 }, () => { this.handleValidation() })
             }
         }
@@ -109,7 +109,6 @@ class EditLectureDialog extends React.Component {
 
     modifyDate = date => {
         date = new Date(Date.UTC(date.getYear() + 1900, date.getMonth(), date.getDate(), 12, 0, 0));
-        // console.log(date);
 
         return date;
     }
