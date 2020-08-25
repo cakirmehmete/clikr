@@ -2,7 +2,7 @@
 from marshmallow import fields, Schema
 import datetime
 from .. import db
-from ..shared.Util import CustomStringField, CustomDateTimeField, generate_salt
+from ..shared.Util import CustomStringField, CustomDateTimeField
 import uuid
 import hashlib
 
