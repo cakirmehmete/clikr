@@ -25,7 +25,6 @@ class MCQuestionStats extends React.Component {
     }
 
     componentDidMount() {
-
         this.setState({ override: this.props.override })
         if (this.state.question.id !== this.props.selectedQuestionId && this.props.selectedQuestionId !== 0) {
             const question = this.props.profStore.getQuestionWithId(this.props.parentLecture, this.props.selectedQuestionId)
@@ -33,8 +32,9 @@ class MCQuestionStats extends React.Component {
             const labels = []
             for (var i = 0; i < question.number_of_options; i++) {
                 let currLabel = question["option" + (i + 1)]
-                if (currLabel.length > 10)
-                    currLabel = "Option " + (i + 1)
+                if (currLabel.length > 10) {
+                    currLabel = currLabel.substring(0, 8) + "..."
+                }
                 labels.push(currLabel)
             }
 
@@ -51,6 +51,7 @@ class MCQuestionStats extends React.Component {
                 question: { id: 0, data: { labels: [] } }
             })
         }
+
         if (!this.props.override) {
             socket.on('new results', (msg) => {
 
@@ -116,8 +117,9 @@ class MCQuestionStats extends React.Component {
             const labels = []
             for (var i = 0; i < question.number_of_options; i++) {
                 let currLabel = question["option" + (i + 1)]
-                if (currLabel.length > 10)
-                    currLabel = "Option " + (i + 1)
+                if (currLabel.length > 10) {
+                    currLabel = currLabel.substring(0, 8) + "..."
+                }
                 labels.push(currLabel)
             }
 
@@ -147,8 +149,9 @@ class MCQuestionStats extends React.Component {
                     const labels = []
                     for (var j = 0; j < question.number_of_options; j++) {
                         let currLabel = question["option" + (j + 1)]
-                        if (currLabel.length > 10)
-                            currLabel = "Option " + (j + 1)
+                        if (currLabel.length > 10) {
+                            currLabel = currLabel.substring(0, 8) + "..."
+                        }
                         labels.push(currLabel)
                     }
 
@@ -179,8 +182,9 @@ class MCQuestionStats extends React.Component {
                     const labels = []
                     for (var j = 0; j < question.number_of_options; j++) {
                         let currLabel = question["option" + (j + 1)]
-                        if (currLabel.length > 10)
-                            currLabel = "Option " + (j + 1)
+                        if (currLabel.length > 10) {
+                            currLabel = currLabel.substring(0, 8) + "..."
+                        }
                         labels.push(currLabel)
                     }
 
@@ -218,7 +222,6 @@ class MCQuestionStats extends React.Component {
                             if (Math.floor(label) === label) {
                                 return label;
                             }
-
                         },
                     }
                 }],

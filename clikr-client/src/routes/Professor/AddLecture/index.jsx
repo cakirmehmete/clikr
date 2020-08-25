@@ -51,7 +51,7 @@ class ProfessorAddLecture extends React.Component {
         this.profStore = props.profStore
         this.courseId = this.props.match.params.courseId
         
-        const date = new Date();
+        const date = this.modifyDate(new Date());
        
         this.state = {
             toLecture: false,
