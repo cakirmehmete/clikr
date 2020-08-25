@@ -169,8 +169,6 @@ export function exportGradesCourseAPI(course_id) {
 }
 
 export function patchUpdateLectureAPI(lecture) {
-    debugger;
-    
     return axios.patch(baseURL + 'professor/lectures/' + lecture.id, {
         title: lecture.title,
         date: lecture.date,

@@ -126,7 +126,6 @@ export default class ProfessorStore {
 
     @action
     updateLecture(lecture) {
-        debugger;
         const oldLecture = this.getLectureById(lecture.id)
 
         oldLecture.title = lecture.title

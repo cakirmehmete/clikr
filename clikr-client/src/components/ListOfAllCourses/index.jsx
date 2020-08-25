@@ -36,8 +36,6 @@ class ListOfAllCourses extends React.Component {
             return courseObj.is_current
         })
 
-        debugger;
-
         // Handle routes
         if (this.state.referrerCourseId !== null) {
             return <Redirect to={'/professor/' + this.state.referrerCourseId + '/lectures'} push />

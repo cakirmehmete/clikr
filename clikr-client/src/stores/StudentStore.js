@@ -75,7 +75,7 @@ export default class StudentStore {
   @action
   updateQuestion(question) {
     const original_question = this.questions.find(x => x.id === question.id);
-    debugger;
+
     if (question.question_type === 'free_text') {
       original_question.id = question.id;
       original_question.lecture_id = question.lecture_id;
@@ -96,7 +96,6 @@ export default class StudentStore {
   @action
   updateAllQuestions(questions) {
       this.questions = []
-      debugger;
 
       questions.forEach(element => {
         if (element.question_type === 'multiple_choice') {
