@@ -47,10 +47,6 @@ def on_join(course_id):
 
     join_room(course_id)
 
-    # return list of all open questions for this course
-    # query database to get ALL open questions
-    open_questions = QuestionModel.query.filter_by(is_open=True).all()
-
     # filter for the specified course
     questions_data = get_open_questions(course_id)
     
@@ -166,11 +162,16 @@ def get_open_questions(course_id):
         if question.lecture.course_id == course_id:
             # use the appropriate question schema
             question_data = dump_one_question(question, exclude=['correct_answer'])
+            question_data['scheduled'] = False
             questions_data.append(question_data)
 
     for lecture in scheduled_lectures:
         for question in lecture.questions:
             question_data = dump_one_question(question, exclude=['correct_answer'])
+            question_data['opened_at'] = str(lecture.open_date)
+            question_data['closed_at'] = str(lecture.close_date)
+            question_data['scheduled'] = True
+            print(question_data)
             questions_data.append(question_data)
 
     return questions_data
