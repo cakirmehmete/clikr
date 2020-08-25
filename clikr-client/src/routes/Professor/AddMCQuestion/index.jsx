@@ -331,19 +331,13 @@ class ProfessorAddMCQuestion extends React.Component {
         event.preventDefault();
         if (this.state.formValid) {
             const { lectureId } = this.props.match.params
-
-            // EMRE: What is this?? lol
-            let correct_answer = "";
-            if (this.state.correct_answer !== "" && this.state.correct_answer !== null) {
-                correct_answer = this.state.correct_answer.substring(6, 7);
-            }
             
             // Send course to API
             this.props.apiService.addQuestion(
                 new MultipleChoiceQuestionObj(null,
                     lectureId, "multiple_choice",
                     this.state.title, this.state.question_image_string, this.state.correct_answer,
-                    null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null,
                     this.state.answer_choices.option1, this.state.answer_choices.option2, this.state.answer_choices.option3, this.state.answer_choices.option4, this.state.answer_choices.option5,
                     this.state.number_of_options)
             )

@@ -175,6 +175,13 @@ class SLQ extends Component {
     };
 
     render() {
+        var timerString = `Open for ${this.state.time < 1000 ?
+            '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}`;
+        
+        if (this.question.scheduled === true) {
+            timerString = `Open from ${this.question.opened_at} to ${this.question.closed_at}`
+        }
+
         return (
             <div>
                 <Paper className={this.styles.paper}>
@@ -184,8 +191,7 @@ class SLQ extends Component {
                                 <Grid item xs>
                                     <div className={this.styles.titleWrap}> {this.question.question_title} </div>
                                     <Typography variant="subtitle2" color="secondary"> 
-                                        <Timer className={this.styles.icon} /> Open for {this.state.time < 1000 ?
-                                            '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}
+                                        <Timer className={this.styles.icon} /> {timerString}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={4}>

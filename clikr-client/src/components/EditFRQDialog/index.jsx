@@ -94,7 +94,7 @@ class EditFRQDialog extends React.Component {
                 new FreeTextQuestionObj(this.props.questionObj.id, 
                     this.props.questionObj.lecture_id, "free_text", 
                     this.state.title, this.state.question_image, this.state.correct_answer, 
-                    this.props.questionObj.creator_id, this.props.questionObj.is_open, 
+                    this.props.questionObj.creator_id, this.props.questionObj.is_open, this.props.questionObj.scheduled, 
                     this.props.questionObj.opened_at, this.props.questionObj.closed_at, 
                     this.props.questionObj.created_at, null, null, this.props.questionObj.word_limit))
         }

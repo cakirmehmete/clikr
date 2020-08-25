@@ -148,14 +148,20 @@ class FRQ extends Component {
     };
 
     render() {
+        var timerString = `Open for ${this.state.time < 1000 ?
+            '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}`;
+        
+        if (this.question.scheduled === true) {
+            timerString = `Open from ${this.question.opened_at} to ${this.question.closed_at}`
+        }
+        
         return (
             <div>
                 <Paper className={this.styles.paper}>
                     <Grid container direction="column" className={this.styles.gridContainer}>
                         <Typography variant="h5" color="secondary"> {this.question.question_title} </Typography>
                         <Typography variant="subtitle2" color="secondary"> 
-                            <Timer className={this.styles.icon} /> Open for {this.state.time < 1000 ?
-                                '0s' : prettyMs(this.state.time, { secDecimalDigits: 0 })}
+                            <Timer className={this.styles.icon} /> {timerString}
                         </Typography>
                         <Grid item className={this.styles.gridItem}>
                             <TextField

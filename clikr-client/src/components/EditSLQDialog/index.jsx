@@ -511,7 +511,7 @@ class EditSLQDialog extends React.Component {
                 new SliderQuestionObj(this.props.questionObj.id, 
                     this.props.questionObj.lecture_id, "slider", 
                     this.state.title, this.state.question_image, correct_answer, 
-                    this.props.questionObj.creator_id, this.props.questionObj.is_open, 
+                    this.props.questionObj.creator_id, this.props.questionObj.is_open, this.props.questionObj.scheduled,
                     this.props.questionObj.opened_at, this.props.questionObj.closed_at, 
                     this.props.questionObj.created_at, null, null, this.state.labels.lower, this.state.labels.upper))
         }

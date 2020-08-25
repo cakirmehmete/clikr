@@ -454,7 +454,7 @@ class ProfessorAddSliderQuestion extends React.Component {
 
         // Send course to API
         this.props.apiService.addQuestion(
-            new SliderQuestionObj(null, lectureId, "slider", this.state.title, this.state.question_image_string, correct_answer, null, null, null, null, null, null, null, this.state.labels.lower, this.state.labels.upper)
+            new SliderQuestionObj(null, lectureId, "slider", this.state.title, this.state.question_image_string, correct_answer, null, null, null, null, null, null, null, null, this.state.labels.lower, this.state.labels.upper)
         );
 
         this.setState({ toQuestions: true });
